@@ -100,6 +100,7 @@ import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.BluetoothDeviceSelectionSheet
 import com.sameerasw.essentials.ui.core.sheets.NotificationTriggerSheet
 import com.sameerasw.essentials.ui.core.sheets.WifiNetworkSelectionSheet
+import com.sameerasw.essentials.ui.features.location.sheets.LocationTriggerSheet
 import com.sameerasw.essentials.ui.features.system.ActionSequenceEditor
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
@@ -361,6 +362,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 var showBluetoothSettings by remember { mutableStateOf(false) }
                 var showWifiSettings by remember { mutableStateOf(false) }
                 var showNotificationTriggerSettings by remember { mutableStateOf(false) }
+                var showLocationSettings by remember { mutableStateOf(false) }
 
                 val isTriggerConfigured =
                     when (val trigger = selectedTrigger) {
@@ -369,6 +371,8 @@ class AutomationEditorActivity : ComponentActivity() {
                         is Trigger.WifiConnected -> trigger.ssid.isNotBlank()
                         is Trigger.WifiDisconnected -> trigger.ssid.isNotBlank()
                         is Trigger.NotificationReceived -> trigger.packageName.isNotBlank() || trigger.textContains.isNotBlank()
+                        is Trigger.ArriveAtLocation -> trigger.latitude != 0.0 || trigger.longitude != 0.0
+                        is Trigger.LeaveLocation -> trigger.latitude != 0.0 || trigger.longitude != 0.0
                         else -> true
                     }
 
@@ -1040,6 +1044,11 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                         Trigger.DndOn,
                                                                         Trigger.DndOff,
                                                                     ),
+                                                                R.string.diy_category_location to
+                                                                    listOf(
+                                                                        (selectedTrigger as? Trigger.ArriveAtLocation) ?: Trigger.ArriveAtLocation(),
+                                                                        (selectedTrigger as? Trigger.LeaveLocation) ?: Trigger.LeaveLocation(),
+                                                                    ),
                                                                 R.string.diy_category_time_schedule to
                                                                     listOf(
                                                                         Trigger.Schedule(
@@ -1099,6 +1108,10 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                                 showWifiSettings =
                                                                                     true
                                                                             is Trigger.NotificationReceived -> showNotificationTriggerSettings = true
+                                                                            is Trigger.ArriveAtLocation, is Trigger.LeaveLocation -> {
+                                                                                selectedTrigger = trigger
+                                                                                showLocationSettings = true
+                                                                            }
                                                                             else -> {}
                                                                         }
                                                                     },
@@ -1395,6 +1408,32 @@ class AutomationEditorActivity : ComponentActivity() {
                                     },
                                 )
                             }
+
+                            if (showLocationSettings) {
+                                val trigger = selectedTrigger
+                                val (latitude, longitude, radius, name) =
+                                    when (trigger) {
+                                        is Trigger.ArriveAtLocation -> LocationFields(trigger.latitude, trigger.longitude, trigger.radiusMeters, trigger.placeName)
+                                        is Trigger.LeaveLocation -> LocationFields(trigger.latitude, trigger.longitude, trigger.radiusMeters, trigger.placeName)
+                                        else -> LocationFields(0.0, 0.0, Trigger.DEFAULT_LOCATION_RADIUS_METERS, "")
+                                    }
+                                LocationTriggerSheet(
+                                    title = stringResource(trigger?.title ?: R.string.diy_trigger_arrive_location),
+                                    initialLatitude = latitude,
+                                    initialLongitude = longitude,
+                                    initialRadiusMeters = radius,
+                                    initialPlaceName = name,
+                                    onDismiss = { showLocationSettings = false },
+                                    onSave = { lat, lng, radiusMeters, placeName ->
+                                        selectedTrigger =
+                                            when (trigger) {
+                                                is Trigger.LeaveLocation -> Trigger.LeaveLocation(lat, lng, radiusMeters, placeName)
+                                                else -> Trigger.ArriveAtLocation(lat, lng, radiusMeters, placeName)
+                                            }
+                                        showLocationSettings = false
+                                    },
+                                )
+                            }
                         }
 
                         if (showPermissionSheet) {
@@ -1554,3 +1593,10 @@ fun EditorActionItem(
         }
     }
 }
+
+private data class LocationFields(
+    val latitude: Double,
+    val longitude: Double,
+    val radiusMeters: Int,
+    val placeName: String,
+)
