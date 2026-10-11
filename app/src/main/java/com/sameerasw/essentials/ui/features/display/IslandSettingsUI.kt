@@ -447,7 +447,7 @@ fun IslandSettingsUI(
                         if (provider != null) {
                             IconToggleItem(
                                 dragHandle = handle,
-                                iconRes = R.drawable.rounded_apps_24,
+                                leadingIcon = ProviderAppIcon(provider.packageName),
                                 title = provider.label,
                                 isChecked = true,
                                 onCheckedChange = {

@@ -55,7 +55,7 @@ fun IslandProvidersSection(onChanged: () -> Unit = {}) {
     RoundedCardContainer(spacing = 2.dp, cornerRadius = 24.dp) {
         providers.forEach { provider ->
             IconToggleItem(
-                iconRes = R.drawable.rounded_apps_24,
+                leadingIcon = ProviderAppIcon(provider.packageName),
                 title = provider.label,
                 isChecked = remember(refresh, provider.packageName) { trust.isEnabled(provider.packageName) },
                 onCheckedChange = { checked ->
