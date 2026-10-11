@@ -264,7 +264,7 @@ class MainViewModel : ViewModel() {
     val isIslandShowCalendar = mutableStateOf(false)
     val isIslandShowConsciousGate = mutableStateOf(true)
     val isIslandShowTimeBattery = mutableStateOf(false)
-    val isIslandShowBatteryAlerts = mutableStateOf(false)
+    val isIslandShowBatteryAlerts = mutableStateOf(true)
     val isIslandShowFlashlight = mutableStateOf(true)
     val islandBatteryStyle = mutableStateOf(SettingsRepository.ISLAND_BATTERY_STYLE_RING)
     val isIslandBatteryPercentageEnabled = mutableStateOf(false)
