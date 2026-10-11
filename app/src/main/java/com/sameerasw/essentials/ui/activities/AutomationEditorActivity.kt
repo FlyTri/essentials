@@ -87,6 +87,7 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.domain.diy.ActionRegistry
 import com.sameerasw.essentials.domain.diy.Automation
+import com.sameerasw.essentials.domain.model.AppPermission
 import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.domain.diy.Trigger
 import com.sameerasw.essentials.domain.model.AppSelection
@@ -484,16 +485,7 @@ class AutomationEditorActivity : ComponentActivity() {
                             }.distinct()
 
                     return resolvedPermissions.filter { permKey ->
-                        when (permKey) {
-                            "SHIZUKU" -> !viewModel.isShizukuPermissionGranted.value
-                            "ROOT" -> !viewModel.isRootPermissionGranted.value
-                            "WRITE_SETTINGS" -> !viewModel.isWriteSettingsEnabled.value
-                            "NOTIFICATION_POLICY" -> !viewModel.isNotificationPolicyAccessGranted.value
-                            "WRITE_SECURE_SETTINGS" -> !viewModel.isWriteSecureSettingsEnabled.value
-                            "DRAW_OVERLAYS" -> !viewModel.isOverlayPermissionGranted.value
-                            "ACCESSIBILITY" -> !viewModel.isAccessibilityEnabled.value
-                            else -> false
-                        }
+                        AppPermission.fromKey(permKey)?.isGranted(context) == false
                     }
                 }
 

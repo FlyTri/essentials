@@ -1496,6 +1496,11 @@
     <string name="error_app_uninstalled">App not found or uninstalled</string>
 
     <!-- Notifications -->
+    <string name="automation_channel_name">Automations</string>
+    <string name="automation_failed_title">Automation failed</string>
+    <string name="automation_failed_text">%1$s: %2$s</string>
+    <string name="automation_failed_missing">Missing permission: %1$s</string>
+    <string name="automation_failed_apps">Could not change: %1$s</string>
     <string name="update_channel_name">App Updates</string>
     <string name="update_channel_desc">Notifications for new app updates</string>
     <string name="notification_update_available">Update Available!</string>

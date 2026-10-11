@@ -45,6 +45,7 @@ import com.sameerasw.essentials.services.NotificationLightingService
 import com.sameerasw.essentials.services.NotificationListener
 import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 import com.sameerasw.essentials.ui.activities.PixelSearchResultsActivity
+import com.sameerasw.essentials.utils.AutomationFailureNotifier
 import com.sameerasw.essentials.utils.DeviceLockUtils
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.PermissionUtils
@@ -136,10 +137,17 @@ object CombinedActionExecutor {
     ) {
         actions.forEachIndexed { index, action ->
             if (index > 0) delay(ACTION_SEQUENCE_GAP_MS)
+            val missing = AutomationFailureNotifier.missingPermissions(context, action)
+            if (missing.isNotEmpty()) {
+                Log.e("CombinedActionExecutor", "Action ${action::class.simpleName} missing permissions")
+                AutomationFailureNotifier.notifyMissingPermissions(context, action, missing)
+                return@forEachIndexed
+            }
             try {
                 execute(context, action)
             } catch (e: Exception) {
                 Log.e("CombinedActionExecutor", "Action ${action::class.simpleName} failed", e)
+                AutomationFailureNotifier.notifyFailure(context, action, e.message ?: e::class.java.simpleName)
             }
         }
     }
@@ -920,16 +928,20 @@ object CombinedActionExecutor {
                 is Action.TurnOffAutoBrightness -> setAutoBrightnessEnabled(context, false)
                 is Action.ToggleAutoBrightness -> setAutoBrightnessEnabled(context, !isAutoBrightnessEnabled(context))
                 is Action.FreezeApps -> {
-                    action.packageNames.forEach { pkg ->
-                        com.sameerasw.essentials.utils.FreezeManager
-                            .freezeApp(context, pkg)
-                    }
+                    val failed =
+                        action.packageNames.filterNot { pkg ->
+                            com.sameerasw.essentials.utils.FreezeManager
+                                .freezeApp(context, pkg)
+                        }
+                    if (failed.isNotEmpty()) error(context.getString(R.string.automation_failed_apps, failed.joinToString()))
                 }
                 is Action.UnfreezeApps -> {
-                    action.packageNames.forEach { pkg ->
-                        com.sameerasw.essentials.utils.FreezeManager
-                            .unfreezeApp(context, pkg)
-                    }
+                    val failed =
+                        action.packageNames.filterNot { pkg ->
+                            com.sameerasw.essentials.utils.FreezeManager
+                                .unfreezeApp(context, pkg)
+                        }
+                    if (failed.isNotEmpty()) error(context.getString(R.string.automation_failed_apps, failed.joinToString()))
                 }
 
                 is Action.Keyboard -> {
