@@ -2981,6 +2981,8 @@
     <string name="island_enable_desc">Display dynamic island</string>
     <string name="island_section_position">Position and dimensions</string>
     <string name="island_section_placement">Placement</string>
+    <string name="keep_in_full_screen_title">Keep in full screen</string>
+    <string name="disable_interactions_in_full_screen_title">Disable interactions in full screen</string>
     <string name="island_keep_on_landscape_title">Keep on landscape</string>
     <string name="island_landscape_top_spacing_title">Landscape top spacing</string>
     <string name="island_bond_edge_title">Bond with notch when inactive</string>

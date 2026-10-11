@@ -41,6 +41,7 @@ class IslandWindowHost(
     private var targetBounds: IntRect? = null
     private var stage = IslandStage.Hidden
     private var textInput = false
+    private var interactionsDisabled = false
 
     var maxWidthPx: Int = 0
 
@@ -123,6 +124,12 @@ class IslandWindowHost(
         layoutTouchWindow()
     }
 
+    fun setInteractionsDisabled(disabled: Boolean) {
+        if (interactionsDisabled == disabled) return
+        interactionsDisabled = disabled
+        layoutTouchWindow()
+    }
+
     fun setAlwaysGestures(enabled: Boolean) {
         if (alwaysGestures == enabled) return
         alwaysGestures = enabled
@@ -202,7 +209,7 @@ class IslandWindowHost(
     @SuppressLint("ClickableViewAccessibility")
     private fun layoutGestureWindow() {
         val geo = geometry
-        if (geo == null || drawParams == null || !alwaysGestures || (stage != IslandStage.Hidden && !gestureTouching) || textInput) {
+        if (geo == null || drawParams == null || !alwaysGestures || (stage != IslandStage.Hidden && !gestureTouching) || textInput || interactionsDisabled) {
             removeGestureWindow()
             return
         }
@@ -251,7 +258,7 @@ class IslandWindowHost(
         layoutGestureWindow()
         val draw = drawParams
         val bounds = targetBounds
-        if (draw == null || bounds == null || stage == IslandStage.Hidden || textInput) {
+        if (draw == null || bounds == null || stage == IslandStage.Hidden || textInput || interactionsDisabled) {
             removeTouchWindow()
             return
         }

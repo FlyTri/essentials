@@ -159,7 +159,7 @@ class IslandCoordinator(
     private var foregroundPackage: String? = null
     private var textInputActive = false
 
-    private val isWindowSuppressed get() = isFullscreenApp ||
+    private val isWindowSuppressed get() = (isFullscreenApp && !settings.isIslandKeepInFullscreenEnabled()) ||
         if (settings.isFoldableDevice()) {
             settings.isIslandHiddenInCurrentOrientation()
         } else {
@@ -620,6 +620,9 @@ class IslandCoordinator(
 
     private fun applySuppression() {
         controller.setSuppressed(isContentSuppressed || revealing || hiding)
+        windowHost.setInteractionsDisabled(
+            isFullscreenApp && settings.isIslandKeepInFullscreenEnabled() && settings.isIslandDisableInteractionsInFullscreenEnabled(),
+        )
         syncGestureHitbox()
     }
 
@@ -644,7 +647,8 @@ class IslandCoordinator(
         key ?: return
         val baseKey = key.substringBefore('@')
         when (baseKey) {
-            SettingsRepository.KEY_ISLAND_ENABLED, SettingsRepository.KEY_ISLAND_KEEP_ON_LANDSCAPE -> updateState()
+            SettingsRepository.KEY_ISLAND_ENABLED, SettingsRepository.KEY_ISLAND_KEEP_ON_LANDSCAPE,
+            SettingsRepository.KEY_ISLAND_KEEP_IN_FULLSCREEN, SettingsRepository.KEY_ISLAND_DISABLE_INTERACTIONS_IN_FULLSCREEN -> updateState()
             SettingsRepository.KEY_ISLAND_HIDE_PORTRAIT,
             SettingsRepository.KEY_ISLAND_HIDE_LANDSCAPE -> updateState()
             SettingsRepository.KEY_ISLAND_ALWAYS_GESTURES -> syncGestureHitbox()

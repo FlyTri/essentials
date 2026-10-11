@@ -450,6 +450,8 @@ class SettingsRepository(
         const val KEY_DUO_ISLAND_COMBINED = "duo_island_combined"
         const val KEY_DUO_TAP_FOR_BRIEF = "duo_tap_for_brief"
         const val KEY_DUO_HIDE_ON_SHADE = "duo_hide_on_shade"
+        const val KEY_DUO_KEEP_IN_FULLSCREEN = "duo_keep_in_fullscreen"
+        const val KEY_DUO_DISABLE_INTERACTIONS_IN_FULLSCREEN = "duo_disable_interactions_in_fullscreen"
         const val KEY_DUO_USE_AUTO_DETECT = "duo_use_auto_detect"
         const val KEY_DUO_CAMERA_OFFSET_X = "duo_camera_offset_x"
         const val KEY_DUO_CAMERA_OFFSET_Y = "duo_camera_offset_y"
@@ -558,6 +560,8 @@ class SettingsRepository(
         const val KEY_ISLAND_HIDE_IN_OWNER_APP = "island_hide_in_owner_app"
         const val KEY_ISLAND_HIDE_ON_SHADE = "island_hide_on_shade"
         const val KEY_ISLAND_KEEP_ON_LANDSCAPE = "island_keep_on_landscape"
+        const val KEY_ISLAND_KEEP_IN_FULLSCREEN = "island_keep_in_fullscreen"
+        const val KEY_ISLAND_DISABLE_INTERACTIONS_IN_FULLSCREEN = "island_disable_interactions_in_fullscreen"
         const val KEY_ISLAND_LANDSCAPE_TOP_SPACING = "island_landscape_top_spacing"
         const val KEY_ISLAND_BOND_EDGE = "island_bond_edge"
         const val KEY_ISLAND_MAX_ITEMS = "island_max_items"
@@ -3556,6 +3560,14 @@ class SettingsRepository(
     fun isDuoHideOnShadeEnabled(): Boolean = getBoolean(KEY_DUO_HIDE_ON_SHADE, false)
 
     fun setDuoHideOnShadeEnabled(enabled: Boolean) = putBoolean(KEY_DUO_HIDE_ON_SHADE, enabled)
+
+    fun isDuoKeepInFullscreenEnabled(): Boolean = getBoolean(KEY_DUO_KEEP_IN_FULLSCREEN, false)
+
+    fun setDuoKeepInFullscreenEnabled(enabled: Boolean) = putBoolean(KEY_DUO_KEEP_IN_FULLSCREEN, enabled)
+
+    fun isDuoDisableInteractionsInFullscreenEnabled(): Boolean = getBoolean(KEY_DUO_DISABLE_INTERACTIONS_IN_FULLSCREEN, false)
+
+    fun setDuoDisableInteractionsInFullscreenEnabled(enabled: Boolean) = putBoolean(KEY_DUO_DISABLE_INTERACTIONS_IN_FULLSCREEN, enabled)
     fun setDuoIslandCombined(enabled: Boolean) = putBoolean(KEY_DUO_ISLAND_COMBINED, enabled)
 
     // Only effective while both features are on
@@ -4071,6 +4083,14 @@ class SettingsRepository(
     fun isIslandKeepOnLandscapeEnabled(): Boolean = getBoolean(KEY_ISLAND_KEEP_ON_LANDSCAPE, false)
 
     fun setIslandKeepOnLandscapeEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_KEEP_ON_LANDSCAPE, enabled)
+
+    fun isIslandKeepInFullscreenEnabled(): Boolean = getBoolean(KEY_ISLAND_KEEP_IN_FULLSCREEN, false)
+
+    fun setIslandKeepInFullscreenEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_KEEP_IN_FULLSCREEN, enabled)
+
+    fun isIslandDisableInteractionsInFullscreenEnabled(): Boolean = getBoolean(KEY_ISLAND_DISABLE_INTERACTIONS_IN_FULLSCREEN, false)
+
+    fun setIslandDisableInteractionsInFullscreenEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_DISABLE_INTERACTIONS_IN_FULLSCREEN, enabled)
 
     fun isIslandAlwaysGesturesEnabled(): Boolean = getBoolean(KEY_ISLAND_ALWAYS_GESTURES, false)
 
