@@ -232,16 +232,7 @@ class IslandWindowHost(
             }
             gestureView = v
         }
-        try {
-            if (gestureAdded) {
-                wm.updateViewLayout(view, lp)
-            } else {
-                wm.addView(view, lp)
-                gestureAdded = true
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to place island gesture window", e)
-        }
+        gestureAdded = placeWindow(view, lp, gestureAdded, "gesture")
     }
 
     private fun removeGestureWindow() {
@@ -271,16 +262,7 @@ class IslandWindowHost(
             v.setOnTouchListener { _, event -> forward(event) }
             touchView = v
         }
-        try {
-            if (touchAdded) {
-                wm.updateViewLayout(view, lp)
-            } else {
-                wm.addView(view, lp)
-                touchAdded = true
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to place island touch window", e)
-        }
+        touchAdded = placeWindow(view, lp, touchAdded, "touch")
     }
 
     private fun forward(event: MotionEvent): Boolean {
@@ -296,6 +278,31 @@ class IslandWindowHost(
         target.dispatchTouchEvent(copy)
         copy.recycle()
         return true
+    }
+
+    private fun placeWindow(
+        view: View,
+        lp: WindowManager.LayoutParams,
+        added: Boolean,
+        name: String,
+    ): Boolean {
+        try {
+            if (added) wm.updateViewLayout(view, lp) else wm.addView(view, lp)
+            return true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to place island $name window, re-adding", e)
+        }
+        try {
+            wm.removeViewImmediate(view)
+        } catch (_: Exception) {
+        }
+        return try {
+            wm.addView(view, lp)
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to re-add island $name window", e)
+            false
+        }
     }
 
     private fun removeTouchWindow() {
