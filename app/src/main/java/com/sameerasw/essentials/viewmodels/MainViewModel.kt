@@ -157,6 +157,8 @@ class MainViewModel : ViewModel() {
     val isDuoIslandCombined = mutableStateOf(false)
     val isDuoTapForBrief = mutableStateOf(false)
     val isDuoHideOnShade = mutableStateOf(false)
+    val isDuoKeepInFullscreen = mutableStateOf(false)
+    val isDuoDisableInteractionsInFullscreen = mutableStateOf(false)
     val isDuoAutoDetect = mutableStateOf(true)
     val isFoldableCameraDevice = mutableStateOf(false)
     val isDuoOrientationProfiles = mutableStateOf(false)
@@ -217,6 +219,8 @@ class MainViewModel : ViewModel() {
     val isIslandHideInOwnerApp = mutableStateOf(false)
     val isIslandHideOnShade = mutableStateOf(false)
     val isIslandKeepOnLandscape = mutableStateOf(false)
+    val isIslandKeepInFullscreen = mutableStateOf(false)
+    val isIslandDisableInteractionsInFullscreen = mutableStateOf(false)
     val isIslandBondEdge = mutableStateOf(false)
     val islandMaxItems = mutableStateOf(2)
     val isIslandAlwaysGestures = mutableStateOf(false)
@@ -2367,6 +2371,8 @@ class MainViewModel : ViewModel() {
         isIslandHideInOwnerApp.value = settingsRepository.isIslandHideInOwnerAppEnabled()
         isIslandHideOnShade.value = settingsRepository.isIslandHideOnShadeEnabled()
         isIslandKeepOnLandscape.value = settingsRepository.isIslandKeepOnLandscapeEnabled()
+        isIslandKeepInFullscreen.value = settingsRepository.isIslandKeepInFullscreenEnabled()
+        isIslandDisableInteractionsInFullscreen.value = settingsRepository.isIslandDisableInteractionsInFullscreenEnabled()
         isIslandBondEdge.value = settingsRepository.isIslandBondEdgeEnabled()
         islandMaxItems.value = settingsRepository.getIslandMaxItems()
         isIslandAlwaysGestures.value = settingsRepository.isIslandAlwaysGesturesEnabled()
@@ -2389,6 +2395,8 @@ class MainViewModel : ViewModel() {
         isDuoIslandCombined.value = settingsRepository.isDuoIslandCombinedSetting()
         isDuoTapForBrief.value = settingsRepository.isDuoTapForBriefEnabled()
         isDuoHideOnShade.value = settingsRepository.isDuoHideOnShadeEnabled()
+        isDuoKeepInFullscreen.value = settingsRepository.isDuoKeepInFullscreenEnabled()
+        isDuoDisableInteractionsInFullscreen.value = settingsRepository.isDuoDisableInteractionsInFullscreenEnabled()
         isIslandShowCaffeinate.value = settingsRepository.isIslandShowCaffeinateEnabled()
         isIslandShowDevices.value = settingsRepository.isIslandShowDevicesEnabled()
         isIslandBriefEnabled.value = settingsRepository.isIslandBriefEnabled()
@@ -5352,6 +5360,16 @@ class MainViewModel : ViewModel() {
 
     private fun combinedActive(): Boolean = settingsRepository.isDuoIslandCombined()
 
+    fun setDuoKeepInFullscreen(enabled: Boolean) {
+        isDuoKeepInFullscreen.value = enabled
+        settingsRepository.setDuoKeepInFullscreenEnabled(enabled)
+    }
+
+    fun setDuoDisableInteractionsInFullscreen(enabled: Boolean) {
+        isDuoDisableInteractionsInFullscreen.value = enabled
+        settingsRepository.setDuoDisableInteractionsInFullscreenEnabled(enabled)
+    }
+
     fun setDuoHideOnShade(enabled: Boolean) {
         isDuoHideOnShade.value = enabled
         settingsRepository.setDuoHideOnShadeEnabled(enabled)
@@ -5586,6 +5604,16 @@ class MainViewModel : ViewModel() {
     fun setIslandBondEdge(enabled: Boolean) {
         isIslandBondEdge.value = enabled
         settingsRepository.setIslandBondEdgeEnabled(enabled)
+    }
+
+    fun setIslandKeepInFullscreen(enabled: Boolean) {
+        isIslandKeepInFullscreen.value = enabled
+        settingsRepository.setIslandKeepInFullscreenEnabled(enabled)
+    }
+
+    fun setIslandDisableInteractionsInFullscreen(enabled: Boolean) {
+        isIslandDisableInteractionsInFullscreen.value = enabled
+        settingsRepository.setIslandDisableInteractionsInFullscreenEnabled(enabled)
     }
 
     fun setIslandKeepOnLandscape(enabled: Boolean) {

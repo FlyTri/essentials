@@ -357,9 +357,17 @@ class DuoOverlayHandler(
     fun setFullscreen(fullscreen: Boolean) {
         if (isFullscreen != fullscreen) {
             isFullscreen = fullscreen
-            overlayView?.isFullscreen = fullscreen
+            overlayView?.isFullscreen = shouldHideForFullscreen()
+            if (settingsRepository.isDuoKeepInFullscreenEnabled()) updateState()
         }
     }
+
+    private fun shouldHideForFullscreen(): Boolean = isFullscreen && !settingsRepository.isDuoKeepInFullscreenEnabled()
+
+    private fun shouldBlockTouchForFullscreen(): Boolean =
+        isFullscreen &&
+            settingsRepository.isDuoKeepInFullscreenEnabled() &&
+            settingsRepository.isDuoDisableInteractionsInFullscreenEnabled()
 
     var openBrief: (() -> Unit)? = null
 
@@ -887,7 +895,7 @@ class DuoOverlayHandler(
                 this.dotRadiusPx = settingsRepository.getDuoDotSize() * density
                 this.isDarkTheme = isNightMode
                 this.isScreenOff = this@DuoOverlayHandler.isScreenOff
-                this.isFullscreen = this@DuoOverlayHandler.isFullscreen
+                this.isFullscreen = shouldHideForFullscreen()
                 this.isYieldingToIsland = shouldYieldToIsland()
                 this.isShadeHidden = shouldHideForShade()
                 this.isLockedHidden = shouldHideForLock()
@@ -964,7 +972,7 @@ class DuoOverlayHandler(
                 unregisterTimeReceiver()
             }
 
-            val isTouchEnabled = !hideForOrientation && (settingsRepository.getDuoTapAction() != null ||
+            val isTouchEnabled = !hideForOrientation && !shouldBlockTouchForFullscreen() && (settingsRepository.getDuoTapAction() != null ||
                 settingsRepository.isDuoTapForBriefActive() ||
                 settingsRepository.getDuoDoubleTapAction() != null ||
                 settingsRepository.getDuoLongPressAction() != null ||

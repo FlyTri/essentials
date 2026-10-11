@@ -2139,7 +2139,7 @@ class NotificationListener : NotificationListenerService() {
         if (actions != null) {
             for (action in actions) {
                 val actionTitle = action.title?.toString()
-                if (!actionTitle.isNullOrBlank()) {
+                if (!actionTitle.isNullOrBlank() && action.actionIntent != null) {
                     val remoteInputs = action.remoteInputs
                     val hasReply = !remoteInputs.isNullOrEmpty()
                     actionList.add(
@@ -2186,6 +2186,15 @@ class NotificationListener : NotificationListenerService() {
         }
     }
 
+    private fun backgroundStartOptions(): Bundle? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            android.app.ActivityOptions.makeBasic().apply {
+                pendingIntentBackgroundActivityStartMode = android.app.ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
+            }.toBundle()
+        } else {
+            null
+        }
+
     fun performNotificationAction(
         actionItem: NotificationActionItem,
         replyText: String? = null
@@ -2201,11 +2210,15 @@ class NotificationListener : NotificationListenerService() {
                         results.putCharSequence(ri.resultKey, replyText)
                     }
                     android.app.RemoteInput.addResultsToIntent(remoteInputs, intent, results)
-                    pendingIntent.send(this, 0, intent)
+                    pendingIntent.send(this, 0, intent, null, null, null, backgroundStartOptions())
                     return true
                 }
             }
-            pendingIntent.send()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                pendingIntent.send(this, 0, null, null, null, null, backgroundStartOptions())
+            } else {
+                pendingIntent.send()
+            }
             true
         } catch (e: Exception) {
             Log.e("NotificationListener", "Error performing notification action: ${e.message}")

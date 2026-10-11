@@ -1496,6 +1496,11 @@
     <string name="error_app_uninstalled">App not found or uninstalled</string>
 
     <!-- Notifications -->
+    <string name="automation_channel_name">Automations</string>
+    <string name="automation_failed_title">Automation failed</string>
+    <string name="automation_failed_text">%1$s: %2$s</string>
+    <string name="automation_failed_missing">Missing permission: %1$s</string>
+    <string name="automation_failed_apps">Could not change: %1$s</string>
     <string name="update_channel_name">App Updates</string>
     <string name="update_channel_desc">Notifications for new app updates</string>
     <string name="notification_update_available">Update Available!</string>
@@ -2473,6 +2478,8 @@
     <string name="qs_tiles_widget_description">Trigger your favorite Quick Settings tiles directly from your home screen.</string>
     <string name="qs_tiles_widget_empty_state">No favorite tiles pinned yet. No tiles pinned yet. Long press to pin some!!</string>
     <!-- External Control Permission -->
+    <string name="external_control_token_title">External control token</string>
+    <string name="external_control_token_saved">Token saved</string>
     <string name="perm_external_control_label">control Essentials features</string>
     <string name="perm_external_control_desc">read, update and control Essentials features and settings</string>
     <string name="pixel_searchbar_settings_title">Pixel Searchbar Customization</string>
@@ -2976,6 +2983,8 @@
     <string name="island_enable_desc">Display dynamic island</string>
     <string name="island_section_position">Position and dimensions</string>
     <string name="island_section_placement">Placement</string>
+    <string name="keep_in_full_screen_title">Keep in full screen</string>
+    <string name="disable_interactions_in_full_screen_title">Disable interactions in full screen</string>
     <string name="island_keep_on_landscape_title">Keep on landscape</string>
     <string name="island_landscape_top_spacing_title">Landscape top spacing</string>
     <string name="island_bond_edge_title">Bond with notch when inactive</string>
@@ -3139,7 +3148,7 @@
     <string name="toast_granting_permissions">Granting permissions…</string>
     <string name="toast_permissions_granted">Granted all available permissions</string>
     <string name="island_battery_only_low_title">Only show when low</string>
-    <string name="island_devices_battery_desc">Pick devices to show battery for. Only one is shown at a time: the highest one in this list that is connected.</string>
+    <string name="island_devices_battery_desc">Pick devices to show connection status and battery for. Only one battery is shown at a time: the highest one in this list that is connected.</string>
     <string name="island_devices_battery_empty">No paired devices</string>
     <string name="island_devices_battery_section">Devices</string>
     <string name="island_devices_move_up">Move up</string>
@@ -3174,6 +3183,7 @@
     <string name="island_call_answer">Answer</string>
     <string name="island_call_decline">Decline</string>
     <string name="island_call_end">End</string>
+    <string name="island_call_open">Open</string>
     <string name="island_call_mute">Mute</string>
     <string name="island_call_speaker">Speaker</string>
     <string name="island_calendar_view_event">View event</string>
