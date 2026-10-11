@@ -84,7 +84,6 @@ import com.sameerasw.essentials.utils.AppIconUtil
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.PermissionUtils
-import com.sameerasw.essentials.weather.overcast.OvercastWeather
 import com.sameerasw.essentials.utils.RefreshRateUtils
 import com.sameerasw.essentials.utils.RootUtils
 import com.sameerasw.essentials.utils.PrivilegedMode
@@ -228,7 +227,6 @@ class MainViewModel : ViewModel() {
     val islandCameraPosition = mutableStateOf(SettingsRepository.ISLAND_CAMERA_POSITION_CENTER)
     val isIslandShowCalls = mutableStateOf(true)
     val isIslandShowTimers = mutableStateOf(true)
-    val isIslandShowWeather = mutableStateOf(false)
     val isIslandTimersShowScreenRecorder = mutableStateOf(true)
     val isIslandTimersFilterApps = mutableStateOf(false)
     val isIslandShowNetwork = mutableStateOf(true)
@@ -281,6 +279,8 @@ class MainViewModel : ViewModel() {
     val isIslandShowCalendar = mutableStateOf(false)
     val isIslandShowConsciousGate = mutableStateOf(true)
     val isIslandShowTimeBattery = mutableStateOf(false)
+    val isIslandShowBatteryAlerts = mutableStateOf(true)
+    val isIslandShowBattery = mutableStateOf(false)
     val isIslandShowFlashlight = mutableStateOf(true)
     val islandBatteryStyle = mutableStateOf(SettingsRepository.ISLAND_BATTERY_STYLE_RING)
     val isIslandBatteryPercentageEnabled = mutableStateOf(false)
@@ -347,7 +347,6 @@ class MainViewModel : ViewModel() {
     val isFlashlightPocketTurnOffEnabled = mutableStateOf(false)
     val isFlashlightOverheatEnabled = mutableStateOf(true)
     val isLocationPermissionGranted = mutableStateOf(false)
-    val isOvercastWeatherPermissionGranted = mutableStateOf(false)
     val isBackgroundLocationPermissionGranted = mutableStateOf(false)
     val isFullScreenIntentPermissionGranted = mutableStateOf(false)
     val isBluetoothPermissionGranted = mutableStateOf(false)
@@ -1958,7 +1957,6 @@ class MainViewModel : ViewModel() {
             PermissionUtils.isNotificationLightingAccessibilityServiceEnabled(context)
         isDefaultBrowserSet.value = PermissionUtils.isDefaultBrowser(context)
         isLocationPermissionGranted.value = PermissionUtils.hasLocationPermission(context)
-        isOvercastWeatherPermissionGranted.value = OvercastWeather.hasPermission(context)
         isBackgroundLocationPermissionGranted.value =
             PermissionUtils.hasBackgroundLocationPermission(context)
         isFullScreenIntentPermissionGranted.value = PermissionUtils.canUseFullScreenIntent(context)
@@ -2379,7 +2377,6 @@ class MainViewModel : ViewModel() {
         islandCameraPosition.value = settingsRepository.getIslandCameraPosition()
         isIslandShowCalls.value = settingsRepository.isIslandShowCallsEnabled()
         isIslandShowTimers.value = settingsRepository.isIslandShowTimersEnabled()
-        isIslandShowWeather.value = settingsRepository.isIslandShowWeatherEnabled()
         isIslandTimersShowScreenRecorder.value = settingsRepository.isIslandTimersShowScreenRecorderEnabled()
         isIslandTimersFilterApps.value = settingsRepository.isIslandTimersFilterAppsEnabled()
         isIslandShowNetwork.value = settingsRepository.isIslandShowNetworkEnabled()
@@ -2443,6 +2440,8 @@ class MainViewModel : ViewModel() {
         isIslandShowCalendar.value = settingsRepository.isIslandShowCalendarEnabled()
         isIslandShowConsciousGate.value = settingsRepository.isIslandShowConsciousGateEnabled()
         isIslandShowTimeBattery.value = settingsRepository.isIslandShowTimeBatteryEnabled()
+        isIslandShowBatteryAlerts.value = settingsRepository.isIslandShowBatteryAlertsEnabled()
+        isIslandShowBattery.value = settingsRepository.isIslandShowBatteryEnabled()
         isIslandShowFlashlight.value = settingsRepository.isIslandShowFlashlightEnabled()
         islandBatteryStyle.value = settingsRepository.getIslandBatteryStyle()
         isIslandBatteryPercentageEnabled.value = settingsRepository.isIslandBatteryPercentageEnabled()
@@ -4262,6 +4261,14 @@ class MainViewModel : ViewModel() {
         context: Context,
         enabled: Boolean,
     ) {
+        writePixelSearchbarSetting(context, enabled)
+        forceStopNexusLauncher()
+    }
+
+    private fun writePixelSearchbarSetting(
+        context: Context,
+        enabled: Boolean,
+    ) {
         val value = if (enabled) "com.sameerasw.essentials" else null
         val key = "selected_search_engine"
 
@@ -4287,8 +4294,9 @@ class MainViewModel : ViewModel() {
                 RootUtils.runCommand(command)
             }
         }
+    }
 
-        // Force stop nexus launcher to apply setting
+    private fun forceStopNexusLauncher() {
         val forceStopCommand = "am force-stop com.google.android.apps.nexuslauncher"
         if (ShizukuUtils.hasPermission()) {
             ShizukuUtils.runCommand(forceStopCommand)
@@ -4314,12 +4322,15 @@ class MainViewModel : ViewModel() {
         }
         updatePixelSearchbarWidget(context)
 
-        // Force stop nexus launcher to apply setting
-        val forceStopCommand = "am force-stop com.google.android.apps.nexuslauncher"
-        if (ShizukuUtils.hasPermission()) {
-            ShizukuUtils.runCommand(forceStopCommand)
-        } else if (RootUtils.isRootPermissionGranted()) {
-            RootUtils.runCommand(forceStopCommand)
+        if (isPixelSearchbarEnabled.value) {
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                writePixelSearchbarSetting(context, false)
+                kotlinx.coroutines.delay(300)
+                writePixelSearchbarSetting(context, true)
+                forceStopNexusLauncher()
+            }
+        } else {
+            forceStopNexusLauncher()
         }
     }
 
@@ -4394,6 +4405,15 @@ class MainViewModel : ViewModel() {
      * @param context [Context] Target context.
      */
     fun clearPixelSearchbarWidget(context: Context) {
+        val previousId = pixelSearchbarWidgetId.intValue
+        if (previousId != android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID) {
+            try {
+                android.appwidget
+                    .AppWidgetHost(context, com.sameerasw.essentials.services.widgets.WidgetScraperService.HOST_ID)
+                    .deleteAppWidgetId(previousId)
+            } catch (_: Exception) {
+            }
+        }
         pixelSearchbarWidgetId.intValue = android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID
         pixelSearchbarWidgetProvider.value = null
         settingsRepository.setPixelSearchbarWidgetId(android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID)
@@ -5290,6 +5310,7 @@ class MainViewModel : ViewModel() {
         if (enabled && combinedActive()) {
             isIslandShowTimeBattery.value = false
             settingsRepository.setIslandShowTimeBatteryEnabled(false)
+            setIslandShowBattery(false)
         }
         if (enabled) {
             isDuoShowNetworks.value = false
@@ -5349,6 +5370,7 @@ class MainViewModel : ViewModel() {
         setDuoShowBattery(true)
         setDuoShowNetworks(true)
         setIslandShowTimeBattery(false)
+        setIslandShowBattery(false)
         isDuoShowMedia.value = false
         settingsRepository.setDuoShowMediaEnabled(false)
         isDuoShowFlashlight.value = false
@@ -5489,11 +5511,6 @@ class MainViewModel : ViewModel() {
     fun setIslandCalendarEmoji(calendarId: Long, emoji: String?) {
         settingsRepository.setIslandCalendarEmoji(calendarId, emoji)
         islandCalendarEmojis.value = settingsRepository.getIslandCalendarEmojis()
-    }
-
-    fun setIslandShowWeather(enabled: Boolean) {
-        isIslandShowWeather.value = enabled
-        settingsRepository.setIslandShowWeatherEnabled(enabled)
     }
 
     fun setIslandShowTimers(enabled: Boolean) {
@@ -5824,6 +5841,16 @@ class MainViewModel : ViewModel() {
     fun setIslandBatteryStyle(value: String) {
         islandBatteryStyle.value = value
         settingsRepository.setIslandBatteryStyle(value)
+    }
+
+    fun setIslandShowBattery(enabled: Boolean) {
+        isIslandShowBattery.value = enabled
+        settingsRepository.setIslandShowBatteryEnabled(enabled)
+    }
+
+    fun setIslandShowBatteryAlerts(enabled: Boolean) {
+        isIslandShowBatteryAlerts.value = enabled
+        settingsRepository.setIslandShowBatteryAlertsEnabled(enabled)
     }
 
     fun setIslandBatteryPercentageEnabled(enabled: Boolean) {
@@ -7832,19 +7859,6 @@ class MainViewModel : ViewModel() {
             activity,
             arrayOf(Manifest.permission.READ_PHONE_STATE),
             1001,
-        )
-    }
-
-    /**
-     * Executes the request Overcast weather permission operation.
-     *
-     * @param activity [androidx.activity.ComponentActivity] Target activity.
-     */
-    fun requestOvercastWeatherPermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(OvercastWeather.PERMISSION),
-            1007,
         )
     }
 

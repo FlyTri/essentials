@@ -78,6 +78,7 @@ fun IconToggleItem(
     infoText: String? = null,
     onInfoClick: (() -> Unit)? = null,
     dragHandle: (@Composable () -> Unit)? = null,
+    leadingIcon: (@Composable () -> Unit)? = null,
 ) {
     val view = LocalView.current
     val context = LocalContext.current
@@ -153,7 +154,9 @@ fun IconToggleItem(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     leadingContent =
-                        if (finalIconRes != 0) {
+                        if (leadingIcon != null) {
+                            leadingIcon
+                        } else if (finalIconRes != 0) {
                             {
                                 Icon(
                                     painter = painterResource(id = finalIconRes),
@@ -265,7 +268,9 @@ fun IconToggleItem(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     leadingContent =
-                        if (finalIconRes != 0) {
+                        if (leadingIcon != null) {
+                            leadingIcon
+                        } else if (finalIconRes != 0) {
                             {
                                 Icon(
                                     painter = painterResource(id = finalIconRes),
@@ -384,7 +389,9 @@ fun IconToggleItem(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 leadingContent =
-                    if (finalIconRes != 0) {
+                    if (leadingIcon != null) {
+                            leadingIcon
+                        } else if (finalIconRes != 0) {
                         {
                             Icon(
                                 painter = painterResource(id = finalIconRes),

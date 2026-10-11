@@ -97,13 +97,14 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <uses-permission android:name="com.sameerasw.overcast.permission.READ_WEATHER" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
     <queries>
         <package android:name="com.sameerasw.overcast" />
         <package android:name="eu.darken.porter" />
-        <provider android:authorities="com.sameerasw.overcast.weather" />
+        <intent>
+            <action android:name="com.sameerasw.island.PROVIDER" />
+        </intent>
     </queries>
 
     <application

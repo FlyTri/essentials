@@ -20,14 +20,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.PixelFormat
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.os.Parcel
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
-import android.util.SizeF
 import android.view.Gravity
 import android.view.WindowManager
 import android.widget.FrameLayout
@@ -36,7 +33,6 @@ import androidx.core.content.ContextCompat
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.WidgetStackRepository
 import com.sameerasw.essentials.domain.model.WidgetStackConfig
 import java.util.concurrent.ConcurrentHashMap
@@ -280,8 +276,8 @@ object StackHost {
         id: Int,
         raw: RemoteViews,
     ) {
-        val resolved = resolveSized(context, raw, StackWidgetProvider.innerSize(id))
-        if (checkedLayouts[id] == resolved.layoutId || canRender(context, resolved)) {
+        val resolved = NestedWidgetSupport.resolveSized(context, raw, StackWidgetProvider.innerSize(id))
+        if (checkedLayouts[id] == resolved.layoutId || NestedWidgetSupport.canRender(context, resolved)) {
             checkedLayouts[id] = resolved.layoutId
             contents[id] = resolved
             unsupported.remove(id)
@@ -292,22 +288,6 @@ object StackHost {
         }
     }
 
-    private fun resolveSized(
-        context: Context,
-        remoteViews: RemoteViews,
-        size: SizeF?,
-    ): RemoteViews {
-        if (size == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return remoteViews
-        return try {
-            RemoteViews::class.java
-                .getMethod("getRemoteViewsToApply", Context::class.java, SizeF::class.java)
-                .invoke(remoteViews, context, size) as? RemoteViews ?: remoteViews
-        } catch (e: Throwable) {
-            Log.w(TAG, "Couldn't pick a layout for $size", e)
-            remoteViews
-        }
-    }
-
     fun onInnerSizeChanged(
         context: Context,
         hostedId: Int,
@@ -315,28 +295,6 @@ object StackHost {
         val raw = rawContents[hostedId] ?: return
         accept(context, hostedId, raw)
         onHostedWidgetChanged(hostedId)
-    }
-
-    private fun canRender(
-        context: Context,
-        remoteViews: RemoteViews,
-    ): Boolean {
-        val parcel = Parcel.obtain()
-        return try {
-            val page = RemoteViews(context.packageName, R.layout.widget_stack_page)
-            page.addView(R.id.stack_page, remoteViews)
-            val probe = RemoteViews(context.packageName, R.layout.widget_stack)
-            probe.addView(R.id.stack_flipper, page)
-            probe.writeToParcel(parcel, 0)
-            parcel.setDataPosition(0)
-            RemoteViews.CREATOR.createFromParcel(parcel).apply(context, FrameLayout(context))
-            true
-        } catch (e: Throwable) {
-            Log.w(TAG, "Widget can't be shown in a stack: $e")
-            false
-        } finally {
-            parcel.recycle()
-        }
     }
 
     private fun onHostedWidgetChanged(hostedWidgetId: Int) {

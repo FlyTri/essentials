@@ -529,6 +529,7 @@ class SettingsRepository(
         const val KEY_ISLAND_SHOW_CALENDAR = "island_show_calendar"
         const val KEY_ISLAND_SHOW_CONSCIOUS_GATE = "island_show_conscious_gate"
         const val KEY_ISLAND_SHOW_TIME_BATTERY = "island_show_time_battery"
+        const val KEY_ISLAND_SHOW_BATTERY = "island_show_battery"
         const val KEY_ISLAND_SHOW_FLASHLIGHT = "island_show_flashlight"
         const val KEY_ISLAND_BATTERY_STYLE = "island_battery_style"
         const val ISLAND_BATTERY_STYLE_RING = "ring"
@@ -543,6 +544,13 @@ class SettingsRepository(
         const val KEY_ISLAND_BATTERY_ICON_CONDITIONAL = "island_battery_icon_conditional"
         const val KEY_ISLAND_BATTERY_ONLY_LOW = "island_battery_only_low"
         const val KEY_ISLAND_DEVICES_BATTERY_ONLY_LOW = "island_devices_battery_only_low"
+        const val KEY_ISLAND_SHOW_BATTERY_ALERTS = "island_show_battery_alerts"
+        const val KEY_ISLAND_BATTERY_ALERT_CHARGING = "island_battery_alert_charging"
+        const val KEY_ISLAND_BATTERY_ALERT_LOW = "island_battery_alert_low"
+        const val KEY_ISLAND_BATTERY_ALERT_CRITICAL = "island_battery_alert_critical"
+        const val KEY_ISLAND_BATTERY_ALERT_ICON_POSITION = "island_battery_alert_icon_position"
+        const val ISLAND_BATTERY_ALERT_ICON_POSITION_RIGHT = "right"
+        const val ISLAND_BATTERY_ALERT_ICON_POSITION_LEFT = "left"
         const val ISLAND_BATTERY_LOW_LEVEL = 20
         const val ISLAND_BATTERY_CRITICAL_LEVEL = 10
         const val KEY_ISLAND_EXPANDED_SCALE = "island_expanded_scale"
@@ -572,20 +580,9 @@ class SettingsRepository(
         const val ISLAND_CALL_SHOW_PEEK = "peek"
         const val ISLAND_CALL_SHOW_COMPACT = "compact"
         const val KEY_ISLAND_SHOW_TIMERS = "island_show_timers"
-        const val KEY_ISLAND_SHOW_WEATHER = "island_show_weather"
-        const val KEY_ISLAND_WEATHER_MODE = "island_weather_mode"
-        const val KEY_ISLAND_WEATHER_PEEK_ALERTS = "island_weather_peek_alerts"
-        const val KEY_ISLAND_WEATHER_EFFECTS = "island_weather_effects"
-        const val KEY_ISLAND_WEATHER_HAPTICS = "island_weather_haptics"
-        const val ISLAND_WEATHER_MODE_BRIEF = "brief"
-        const val ISLAND_WEATHER_MODE_COMPACT = "compact"
-        const val ISLAND_WEATHER_MODE_ALERTS = "alerts"
+        const val KEY_ISLAND_PROVIDERS = "island_providers"
 
-        const val KEY_WEATHER_UNITS = "weather_units"
         private const val LEGACY_WEATHER_API_KEY_PREFIX = "weather_api_key"
-        const val WEATHER_UNITS_SYSTEM = "system"
-        const val WEATHER_UNITS_CELSIUS = "celsius"
-        const val WEATHER_UNITS_FAHRENHEIT = "fahrenheit"
         const val KEY_ISLAND_CALENDAR_EMOJIS = "island_calendar_emojis"
         const val KEY_ISLAND_TIMERS_SHOW_SCREEN_RECORDER = "island_timers_show_screen_recorder"
         const val KEY_ISLAND_TIMERS_FILTER_APPS = "island_timers_filter_apps"
@@ -602,7 +599,6 @@ class SettingsRepository(
         const val KEY_ISLAND_SOUND_MODE_KEEP_ICON = "island_sound_mode_keep_icon"
         const val KEY_ISLAND_SHOW_ALARM = "island_show_alarm"
         const val KEY_ISLAND_TIME_BATTERY_LAUNCHER_ONLY = "island_time_battery_launcher_only"
-        const val KEY_ISLAND_WEATHER_LAUNCHER_ONLY = "island_weather_launcher_only"
         const val KEY_ISLAND_CALENDAR_LAUNCHER_ONLY = "island_calendar_launcher_only"
         const val KEY_ISLAND_ALARM_LAUNCHER_ONLY = "island_alarm_launcher_only"
         const val KEY_ISLAND_ALARM_WINDOW_HOURS = "island_alarm_window_hours"
@@ -2331,6 +2327,7 @@ class SettingsRepository(
     fun incrementPixelSearchbarWidgetRevision() {
         val current = getPixelSearchbarWidgetRevision()
         prefs.edit().putInt(KEY_PIXEL_SEARCHBAR_WIDGET_REVISION, current + 1).apply()
+        com.sameerasw.essentials.services.widgets.SearchbarRenderState.bump()
     }
 
     /**
@@ -3919,6 +3916,18 @@ class SettingsRepository(
     fun isIslandShowTimeBatteryEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_TIME_BATTERY, false)
     fun setIslandShowTimeBatteryEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_TIME_BATTERY, enabled)
 
+    fun isIslandShowBatteryEnabled(): Boolean =
+        if (contains(KEY_ISLAND_SHOW_BATTERY)) getBoolean(KEY_ISLAND_SHOW_BATTERY, false) else isIslandShowTimeBatteryEnabled()
+    fun setIslandShowBatteryEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_BATTERY, enabled)
+
+    fun isIslandShowBatteryAlertsEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_BATTERY_ALERTS, true)
+    fun setIslandShowBatteryAlertsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_BATTERY_ALERTS, enabled)
+
+    fun getIslandBatteryAlertIconPosition(): String =
+        getString(KEY_ISLAND_BATTERY_ALERT_ICON_POSITION, ISLAND_BATTERY_ALERT_ICON_POSITION_RIGHT) ?: ISLAND_BATTERY_ALERT_ICON_POSITION_RIGHT
+    fun setIslandBatteryAlertIconPosition(position: String) =
+        putString(KEY_ISLAND_BATTERY_ALERT_ICON_POSITION, position)
+
     fun getIslandBatteryStyle(): String =
         getString(KEY_ISLAND_BATTERY_STYLE, ISLAND_BATTERY_STYLE_RING) ?: ISLAND_BATTERY_STYLE_RING
     fun setIslandBatteryStyle(value: String) = putString(KEY_ISLAND_BATTERY_STYLE, value)
@@ -3967,24 +3976,6 @@ class SettingsRepository(
         updated.forEach { (id, value) -> json.put(id.toString(), value) }
         putString(KEY_ISLAND_CALENDAR_EMOJIS, json.toString())
     }
-
-    fun isIslandShowWeatherEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_WEATHER, false)
-    fun setIslandShowWeatherEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_WEATHER, enabled)
-
-    fun getIslandWeatherMode(): String = getString(KEY_ISLAND_WEATHER_MODE, ISLAND_WEATHER_MODE_BRIEF) ?: ISLAND_WEATHER_MODE_BRIEF
-    fun setIslandWeatherMode(mode: String) = putString(KEY_ISLAND_WEATHER_MODE, mode)
-
-    fun isIslandWeatherPeekAlertsEnabled(): Boolean = getBoolean(KEY_ISLAND_WEATHER_PEEK_ALERTS, true)
-    fun setIslandWeatherPeekAlertsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_WEATHER_PEEK_ALERTS, enabled)
-
-    fun isIslandWeatherEffectsEnabled(): Boolean = getBoolean(KEY_ISLAND_WEATHER_EFFECTS, true)
-    fun setIslandWeatherEffectsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_WEATHER_EFFECTS, enabled)
-
-    fun isIslandWeatherHapticsEnabled(): Boolean = getBoolean(KEY_ISLAND_WEATHER_HAPTICS, true)
-    fun setIslandWeatherHapticsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_WEATHER_HAPTICS, enabled)
-
-    fun getWeatherUnits(): String = getString(KEY_WEATHER_UNITS, WEATHER_UNITS_SYSTEM) ?: WEATHER_UNITS_SYSTEM
-    fun setWeatherUnits(units: String) = putString(KEY_WEATHER_UNITS, units)
 
     fun isIslandShowTimersEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_TIMERS, true)
     fun setIslandShowTimersEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_TIMERS, enabled)

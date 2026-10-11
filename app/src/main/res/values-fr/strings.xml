@@ -1625,7 +1625,6 @@ Option nativement disponible sur les appareils Samsung (appli QuickStar)</string
     <string name="feat_aod_wallpaper_title">Fond d\'écran sur AOD</string>
     <string name="island_enable_title">Activer Island</string>
     <string name="island_show_calls_title">Appels</string>
-    <string name="island_show_time_battery_title">Horloge et batterie</string>
     <string name="island_show_timers_title">Minuteurs et chronomètres</string>
     <string name="duo_action_horizontal_slide_sound_mode">Mode son</string>
     <string name="island_devices_battery_section">Appareils</string>
@@ -1652,7 +1651,6 @@ Option nativement disponible sur les appareils Samsung (appli QuickStar)</string
     <string name="perm_storage_title">Accès à tout les fichiers</string>
     <string name="perm_files_media_desc">Pour chercher et afficher les photos, vidéos, audios, et documents dans les résultats de Pixel Search, Essentials a besoin de cette permission pour accéder aux fichiers et médias.</string>
     <string name="perm_bubbles_title">Bulles flottantes</string>
-    <string name="perm_overcast_weather_title">Accès à la météo via Overcast</string>
     <string name="island_font_scale_title">Taille du texte</string>
     <string name="duo_tap_for_brief_title">Appuyez pour un sommaire</string>
     <string name="duo_battery_low_color_title">Batterie faible (&lt;20%)</string>

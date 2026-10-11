@@ -17,7 +17,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.SizeF
@@ -231,43 +230,19 @@ class StackWidgetProvider : AppWidgetProvider() {
                     ) - reserved
                 ).coerceAtLeast(0)
 
-            val forwarded = Bundle(options)
-            forwarded.putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, width)
-            forwarded.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, width)
-            forwarded.putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, height)
-            forwarded.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, height)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                forwarded.putParcelableArrayList(
-                    AppWidgetManager.OPTION_APPWIDGET_SIZES,
-                    arrayListOf(SizeF(width.toFloat(), height.toFloat())),
-                )
-            }
-
+            val forwarded = NestedWidgetSupport.sizedOptions(options, width, height)
             val size = width to height
             config.hostedWidgetIds.forEach { hostedId ->
                 try {
                     awm.updateAppWidgetOptions(hostedId, forwarded)
                     if (forwardedSizes.put(hostedId, size) != size) {
                         StackHost.onInnerSizeChanged(context, hostedId)
-                        requestUpdate(context, awm, hostedId)
+                        NestedWidgetSupport.requestUpdate(context, awm, hostedId)
                     }
                 } catch (e: Exception) {
                     Log.w(TAG, "Failed to forward size to $hostedId", e)
                 }
             }
-        }
-
-        private fun requestUpdate(
-            context: Context,
-            awm: AppWidgetManager,
-            hostedId: Int,
-        ) {
-            val provider = awm.getAppWidgetInfo(hostedId)?.provider ?: return
-            context.sendBroadcast(
-                Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-                    .setComponent(provider)
-                    .putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(hostedId)),
-            )
         }
 
         private fun placeholder(

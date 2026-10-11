@@ -1042,6 +1042,7 @@ fun IslandRoot(
                 Box(layerModifier) {
                     CompositionLocalProvider(
                         LocalIslandBackdropSlot provides backdropSlot.takeIf { current },
+                        LocalIslandCollapse provides { if (current) collapse.value else 0f },
                         LocalLineInset provides if (current) lineInsets else (0.dp to 0.dp),
                     ) {
                         StageContent(
@@ -1204,6 +1205,7 @@ private fun StageContent(
                 onOpen = a::onOpenFocused,
                 onTextInput = a::onTextInputChanged,
                 onKeepAlive = a::onInteraction,
+                current = interactive,
             )
         }
     }

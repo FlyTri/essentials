@@ -9,7 +9,6 @@
 
 package com.sameerasw.essentials.ui.components
 
-import androidx.activity.ComponentActivity
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -48,7 +47,7 @@ import com.sameerasw.essentials.ui.core.sheets.HiddenDebuggingAutoDetectCard
 import com.sameerasw.essentials.ui.theme.GoogleSansFlexRounded
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel
-import com.sameerasw.essentials.weather.overcast.OvercastWeather
+import com.sameerasw.essentials.island.remote.OvercastLink
 
 /**
  * Slot for custom content to be displayed in the "What's New" screen.
@@ -66,8 +65,7 @@ fun WhatsNewCustomContent(
         onPauseOrDispose { }
     }
 
-    val isInstalled = OvercastWeather.isInstalled(context)
-    val hasPermission = OvercastWeather.hasPermission(context)
+    val isInstalled = OvercastLink.isInstalled(context)
 
     fun toggle(section: Int) {
         HapticUtil.performUIHaptic(view)
@@ -101,30 +99,21 @@ fun WhatsNewCustomContent(
                 iconRes = R.drawable.rounded_cloud_24,
                 title = stringResource(R.string.whats_new_overcast_card_title),
                 description =
-                    when {
-                        !isInstalled -> stringResource(R.string.whats_new_overcast_status_not_installed)
-                        !hasPermission -> stringResource(R.string.whats_new_overcast_status_permission_needed)
-                        else -> stringResource(R.string.whats_new_overcast_status_installed)
+                    if (isInstalled) {
+                        stringResource(R.string.whats_new_overcast_status_installed)
+                    } else {
+                        stringResource(R.string.whats_new_overcast_status_not_installed)
                     },
                 actionLabel =
-                    when {
-                        !isInstalled -> stringResource(R.string.whats_new_overcast_action_install)
-                        !hasPermission -> stringResource(R.string.whats_new_overcast_action_allow_permission)
-                        else -> stringResource(R.string.whats_new_overcast_action_open)
+                    if (isInstalled) {
+                        stringResource(R.string.whats_new_overcast_action_open)
+                    } else {
+                        stringResource(R.string.whats_new_overcast_action_install)
                     },
-                actionIconRes =
-                    when {
-                        !isInstalled -> R.drawable.rounded_download_24
-                        hasPermission -> R.drawable.rounded_open_in_new_24
-                        else -> null
-                    },
-                isPrimaryAction = !(isInstalled && hasPermission),
+                actionIconRes = if (isInstalled) R.drawable.rounded_open_in_new_24 else R.drawable.rounded_download_24,
+                isPrimaryAction = !isInstalled,
                 onAction = {
-                    when {
-                        !isInstalled -> OvercastWeather.openInstallPage(context)
-                        !hasPermission -> (context as? ComponentActivity)?.let { mainViewModel.requestOvercastWeatherPermission(it) }
-                        else -> OvercastWeather.openApp(context)
-                    }
+                    if (isInstalled) OvercastLink.openApp(context) else OvercastLink.openInstallPage(context)
                 },
             )
         }
