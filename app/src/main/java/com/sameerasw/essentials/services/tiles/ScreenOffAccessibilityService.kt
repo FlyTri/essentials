@@ -56,6 +56,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicBoolean
 
 class ScreenOffAccessibilityService :
     AccessibilityService(),
@@ -563,24 +566,11 @@ class ScreenOffAccessibilityService :
         if (event == null) return
 
         val trustsEventPackage = event.eventType != AccessibilityEvent.TYPE_WINDOWS_CHANGED
-        var detectedPackage = if (trustsEventPackage) event.packageName?.toString() else null
+        val detectedPackage = if (trustsEventPackage) event.packageName?.toString() else null
         if (detectedPackage == null || detectedPackage == "android") {
-            try {
-                val activePkg = windows
-                    ?.firstOrNull { it.type == android.view.accessibility.AccessibilityWindowInfo.TYPE_APPLICATION && it.isFocused }
-                    ?.root?.packageName?.toString()
-                    ?: rootInActiveWindow?.packageName?.toString()
-                    ?: windows?.firstOrNull { it.isFocused }?.root?.packageName?.toString()
-                if (activePkg != null) {
-                    detectedPackage = activePkg
-                }
-            } catch (_: Exception) {}
-        }
-
-        if (detectedPackage != null) {
-            appFlowHandler.onPackageChanged(detectedPackage)
-            islandOverlayHandler.onForegroundPackage(detectedPackage)
-            islandOverlayHandler.updateConsciousGateState()
+            resolveActivePackageAsync()
+        } else {
+            applyDetectedPackage(detectedPackage)
         }
 
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED ||
@@ -596,6 +586,37 @@ class ScreenOffAccessibilityService :
         }
     }
 
+    private fun applyDetectedPackage(detectedPackage: String) {
+        appFlowHandler.onPackageChanged(detectedPackage)
+        islandOverlayHandler.onForegroundPackage(detectedPackage)
+        islandOverlayHandler.updateConsciousGateState()
+    }
+
+    private val isResolvingPackage = AtomicBoolean(false)
+
+    private fun resolveActivePackageAsync() {
+        if (!isResolvingPackage.compareAndSet(false, true)) return
+        serviceScope.launch {
+            try {
+                val activePkg =
+                    withContext(Dispatchers.Default) {
+                        try {
+                            windows
+                                ?.firstOrNull { it.type == android.view.accessibility.AccessibilityWindowInfo.TYPE_APPLICATION && it.isFocused }
+                                ?.root?.packageName?.toString()
+                                ?: rootInActiveWindow?.packageName?.toString()
+                                ?: windows?.firstOrNull { it.isFocused }?.root?.packageName?.toString()
+                        } catch (_: Exception) {
+                            null
+                        }
+                    }
+                if (activePkg != null) applyDetectedPackage(activePkg)
+            } finally {
+                isResolvingPackage.set(false)
+            }
+        }
+    }
+
     private fun checkVolumeDialogState() {
         try {
             val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
@@ -606,7 +627,6 @@ class ScreenOffAccessibilityService :
             val currentWindows = windows
             val isVisible = currentWindows?.any { window ->
                 window.type == android.view.accessibility.AccessibilityWindowInfo.TYPE_SYSTEM &&
-                    window.root?.packageName?.toString() == "com.android.systemui" &&
                     window.title?.contains("Volume", ignoreCase = true) == true
             } ?: false
             buttonRemapHandler.isVolumeDialogVisible = isVisible
@@ -813,8 +833,7 @@ class ScreenOffAccessibilityService :
                 return true
             }
             // Bypass logic for Camera apps to resolve conflicts with shutter/zoom functions
-            val foregroundPackage =
-                rootInActiveWindow?.packageName?.toString() ?: appFlowHandler.currentPackage
+            val foregroundPackage = appFlowHandler.currentPackage
             if (appFlowHandler.isCameraApp(foregroundPackage)) {
                 return false
             }
