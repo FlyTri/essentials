@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Essentials</string>
     <string name="diy_genai_lazy_title">I’m lazy, Do it for me</string>
     <string name="settings_genai_automation_title">Enable GenAI use</string>
@@ -2984,6 +2984,9 @@
     <string name="island_battery_alert_charging">Charging</string>
     <string name="island_battery_alert_low">Low battery</string>
     <string name="island_battery_alert_critical">Critical battery</string>
+    <string name="island_battery_alert_icon_position_title" tools:ignore="MissingTranslation">Icon position</string>
+    <string name="island_battery_alert_icon_position_right" tools:ignore="MissingTranslation">Right</string>
+    <string name="island_battery_alert_icon_position_left" tools:ignore="MissingTranslation">Left</string>
     <string name="slider_value_label">Value</string>
     <string name="island_font_scale_title">Font size</string>
     <string name="island_hide_in_owner_app_title">Hide complication inside the app</string>

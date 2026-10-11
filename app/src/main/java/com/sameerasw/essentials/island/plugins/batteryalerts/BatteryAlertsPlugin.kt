@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.graphics.Color as AndroidColor
 import android.os.BatteryManager
 import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.toColorInt
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.island.model.CompactCell
@@ -18,7 +19,6 @@ import com.sameerasw.essentials.island.model.PluginRequest
 import com.sameerasw.essentials.island.plugins.BaseIslandPlugin
 import com.sameerasw.essentials.island.plugins.soften
 import com.sameerasw.essentials.island.ui.components.BatteryGlyph
-import androidx.core.graphics.toColorInt
 
 class BatteryAlertsPlugin : BaseIslandPlugin() {
     override val id = "battery_alerts_plugin"
@@ -28,6 +28,7 @@ class BatteryAlertsPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_BATTERY_ALERT_CHARGING,
         SettingsRepository.KEY_ISLAND_BATTERY_ALERT_LOW,
         SettingsRepository.KEY_ISLAND_BATTERY_ALERT_CRITICAL,
+        SettingsRepository.KEY_ISLAND_BATTERY_ALERT_ICON_POSITION,
         SettingsRepository.KEY_DUO_BATTERY_CHARGING_COLOR_ENABLED,
         SettingsRepository.KEY_DUO_BATTERY_CHARGING_COLOR,
         SettingsRepository.KEY_DUO_BATTERY_LOW_COLOR_ENABLED,
@@ -177,8 +178,8 @@ class BatteryAlertsPlugin : BaseIslandPlugin() {
         }
 
         val alertTitle = context.getString(alertTitleRes)
-
         val alertColor = getBatteryColor(state)
+        val isIconOnRight = settings.getIslandBatteryAlertIconPosition() == SettingsRepository.ISLAND_BATTERY_ALERT_ICON_POSITION_RIGHT
 
         val item = IslandItem(
             key = ITEM_KEY,
@@ -191,11 +192,23 @@ class BatteryAlertsPlugin : BaseIslandPlugin() {
                     BatteryGlyph(level = level, color = alertColor, showLevel = true)
                 }
             ),
-            line = LineContent(
-                icon = { BatteryGlyph(level = level, color = alertColor, showLevel = false) },
-                start = alertTitle,
-                end = "$level%"
-            )
+            line = if (isIconOnRight) {
+                LineContent(
+                    icon = { },
+                    start = alertTitle,
+                    end = "$level%",
+                    endSlot = { BatteryGlyph(level = level, color = alertColor, showLevel = false) },
+                    showLeftIcon = false,
+                )
+            } else {
+                LineContent(
+                    icon = { BatteryGlyph(level = level, color = alertColor, showLevel = false) },
+                    start = alertTitle,
+                    end = "$level%",
+                    endSlot = null,
+                    showLeftIcon = true,
+                )
+            }
         )
 
         publish(item)

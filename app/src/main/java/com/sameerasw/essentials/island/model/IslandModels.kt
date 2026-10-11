@@ -51,6 +51,7 @@ class LineContent(
     val start: String,
     val end: String,
     val endSlot: (@Composable () -> Unit)? = null,
+    val showLeftIcon: Boolean = true,
 )
 
 interface IslandExpandedScope {
