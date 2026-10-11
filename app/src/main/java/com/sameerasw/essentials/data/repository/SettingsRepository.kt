@@ -2331,6 +2331,7 @@ class SettingsRepository(
     fun incrementPixelSearchbarWidgetRevision() {
         val current = getPixelSearchbarWidgetRevision()
         prefs.edit().putInt(KEY_PIXEL_SEARCHBAR_WIDGET_REVISION, current + 1).apply()
+        com.sameerasw.essentials.services.widgets.SearchbarRenderState.bump()
     }
 
     /**

@@ -4262,6 +4262,14 @@ class MainViewModel : ViewModel() {
         context: Context,
         enabled: Boolean,
     ) {
+        writePixelSearchbarSetting(context, enabled)
+        forceStopNexusLauncher()
+    }
+
+    private fun writePixelSearchbarSetting(
+        context: Context,
+        enabled: Boolean,
+    ) {
         val value = if (enabled) "com.sameerasw.essentials" else null
         val key = "selected_search_engine"
 
@@ -4287,8 +4295,9 @@ class MainViewModel : ViewModel() {
                 RootUtils.runCommand(command)
             }
         }
+    }
 
-        // Force stop nexus launcher to apply setting
+    private fun forceStopNexusLauncher() {
         val forceStopCommand = "am force-stop com.google.android.apps.nexuslauncher"
         if (ShizukuUtils.hasPermission()) {
             ShizukuUtils.runCommand(forceStopCommand)
@@ -4314,12 +4323,15 @@ class MainViewModel : ViewModel() {
         }
         updatePixelSearchbarWidget(context)
 
-        // Force stop nexus launcher to apply setting
-        val forceStopCommand = "am force-stop com.google.android.apps.nexuslauncher"
-        if (ShizukuUtils.hasPermission()) {
-            ShizukuUtils.runCommand(forceStopCommand)
-        } else if (RootUtils.isRootPermissionGranted()) {
-            RootUtils.runCommand(forceStopCommand)
+        if (isPixelSearchbarEnabled.value) {
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                writePixelSearchbarSetting(context, false)
+                kotlinx.coroutines.delay(300)
+                writePixelSearchbarSetting(context, true)
+                forceStopNexusLauncher()
+            }
+        } else {
+            forceStopNexusLauncher()
         }
     }
 
@@ -4394,6 +4406,15 @@ class MainViewModel : ViewModel() {
      * @param context [Context] Target context.
      */
     fun clearPixelSearchbarWidget(context: Context) {
+        val previousId = pixelSearchbarWidgetId.intValue
+        if (previousId != android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID) {
+            try {
+                android.appwidget
+                    .AppWidgetHost(context, com.sameerasw.essentials.services.widgets.WidgetScraperService.HOST_ID)
+                    .deleteAppWidgetId(previousId)
+            } catch (_: Exception) {
+            }
+        }
         pixelSearchbarWidgetId.intValue = android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID
         pixelSearchbarWidgetProvider.value = null
         settingsRepository.setPixelSearchbarWidgetId(android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID)
