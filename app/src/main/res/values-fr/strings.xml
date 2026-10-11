@@ -1652,7 +1652,6 @@ Option nativement disponible sur les appareils Samsung (appli QuickStar)</string
     <string name="perm_storage_title">Accès à tout les fichiers</string>
     <string name="perm_files_media_desc">Pour chercher et afficher les photos, vidéos, audios, et documents dans les résultats de Pixel Search, Essentials a besoin de cette permission pour accéder aux fichiers et médias.</string>
     <string name="perm_bubbles_title">Bulles flottantes</string>
-    <string name="perm_overcast_weather_title">Accès à la météo via Overcast</string>
     <string name="island_font_scale_title">Taille du texte</string>
     <string name="duo_tap_for_brief_title">Appuyez pour un sommaire</string>
     <string name="duo_battery_low_color_title">Batterie faible (&lt;20%)</string>

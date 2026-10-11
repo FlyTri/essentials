@@ -47,7 +47,7 @@ import com.sameerasw.essentials.island.plugins.devices.DevicesPlugin
 import com.sameerasw.essentials.island.plugins.brief.BriefPlugin
 import com.sameerasw.essentials.island.plugins.progress.ProgressPlugin
 import com.sameerasw.essentials.island.plugins.soundmode.SoundModePlugin
-import com.sameerasw.essentials.island.plugins.weather.WeatherPlugin
+import com.sameerasw.essentials.island.remote.RemoteProvidersPlugin
 import com.sameerasw.essentials.island.plugins.travel.TravelPlugin
 import com.sameerasw.essentials.island.plugins.caffeinate.CaffeinatePlugin
 import com.sameerasw.essentials.island.plugins.media.MediaPlugin
@@ -132,7 +132,7 @@ class IslandCoordinator(
         TimerPlugin(),
         SoundModePlugin(),
         AlarmPlugin(),
-        WeatherPlugin(),
+        RemoteProvidersPlugin(),
         CaffeinatePlugin(),
         TravelPlugin(),
         NetworkPlugin(),
@@ -666,7 +666,6 @@ class IslandCoordinator(
         const val PREVIEW_KEY = "preview.sample"
         val LAUNCHER_ONLY_KEYS = mapOf(
             "time_battery" to SettingsRepository.KEY_ISLAND_TIME_BATTERY_LAUNCHER_ONLY,
-            "weather" to SettingsRepository.KEY_ISLAND_WEATHER_LAUNCHER_ONLY,
             "calendar" to SettingsRepository.KEY_ISLAND_CALENDAR_LAUNCHER_ONLY,
             "alarm" to SettingsRepository.KEY_ISLAND_ALARM_LAUNCHER_ONLY,
         )

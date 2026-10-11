@@ -63,7 +63,6 @@ import com.sameerasw.essentials.ui.features.display.sheets.IslandNotificationOpt
 import com.sameerasw.essentials.ui.features.display.sheets.IslandPulseShadowOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandTimeBatteryOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandTimerOptionsBottomSheet
-import com.sameerasw.essentials.ui.features.display.sheets.IslandWeatherOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.StatusGlanceCalendarOptionsBottomSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.HapticUtil

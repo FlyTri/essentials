@@ -79,10 +79,8 @@ import com.sameerasw.essentials.ui.features.display.sheets.IslandSoundModeOption
 import com.sameerasw.essentials.ui.features.display.sheets.IslandTimeBatteryOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandSignalOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandTimerOptionsBottomSheet
-import com.sameerasw.essentials.ui.features.display.sheets.IslandWeatherOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.StatusGlanceCalendarOptionsBottomSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
-import com.sameerasw.essentials.weather.overcast.OvercastWeather
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.PermissionUIHelper
 import com.sameerasw.essentials.utils.PermissionUtils
@@ -112,11 +110,6 @@ fun IslandSettingsUI(
     val view = LocalView.current
     var requestingPermissionsFor by remember { mutableStateOf<Pair<Int, List<String>>?>(null) }
 
-    LaunchedEffect(Unit) {
-        if (viewModel.isIslandShowWeather.value && !OvercastWeather.isAvailable(context)) {
-            requestingPermissionsFor = Pair(R.string.lock_screen_clock_weather, listOf("OVERCAST_WEATHER"))
-        }
-    }
     val prioritySettings = remember { SettingsRepository(context) }
     var reorderMode by remember { mutableStateOf(false) }
     var savedOrder by remember { mutableStateOf(IslandPriorityEntries.normalize(prioritySettings.getIslandPriorityOrder().orEmpty())) }
@@ -134,7 +127,6 @@ fun IslandSettingsUI(
     var showNotificationOptionsSheet by remember {
         mutableStateOf(highlightSetting in notificationSheetSettings)
     }
-    var showWeatherOptionsSheet by remember { mutableStateOf(false) }
     var pickingGesture by remember { mutableStateOf<String?>(null) }
     var showSlideModeSheet by remember { mutableStateOf(false) }
 
@@ -318,27 +310,6 @@ fun IslandSettingsUI(
                         },
                         onSettingsClick = { showTimerOptionsSheet = true },
                         modifier = Modifier.highlight(highlightSetting == "island_show_timers"),
-                    )
-                    "weather" -> IconToggleItem(
-                        dragHandle = handle,
-                        iconRes = R.drawable.rounded_partly_cloudy_day_24,
-                        title = stringResource(R.string.lock_screen_clock_weather),
-                        description =
-                            if (viewModel.isIslandShowWeather.value && !viewModel.isOvercastWeatherPermissionGranted.value) {
-                                stringResource(R.string.weather_error_overcast_permission)
-                            } else {
-                                null
-                            },
-                        isChecked = viewModel.isIslandShowWeather.value,
-                        onCheckedChange = { checked ->
-                            HapticUtil.performVirtualKeyHaptic(view)
-                            viewModel.setIslandShowWeather(checked)
-                            if (checked && !OvercastWeather.isAvailable(context)) {
-                                requestingPermissionsFor = Pair(R.string.lock_screen_clock_weather, listOf("OVERCAST_WEATHER"))
-                            }
-                        },
-                        onSettingsClick = { showWeatherOptionsSheet = true },
-                        modifier = Modifier.highlight(highlightSetting == "island_show_weather"),
                     )
                     "media" -> IconToggleItem(
                         dragHandle = handle,
@@ -528,6 +499,8 @@ fun IslandSettingsUI(
                 modifier = Modifier.highlight(highlightSetting == "island_brief_enabled"),
             )
         }
+
+        IslandProvidersSection()
 
         Text(
             text = stringResource(R.string.duo_section_actions),
@@ -750,13 +723,6 @@ fun IslandSettingsUI(
                     )
                 }
             },
-        )
-    }
-
-    if (showWeatherOptionsSheet) {
-        IslandWeatherOptionsBottomSheet(
-            viewModel = viewModel,
-            onDismissRequest = { showWeatherOptionsSheet = false },
         )
     }
 

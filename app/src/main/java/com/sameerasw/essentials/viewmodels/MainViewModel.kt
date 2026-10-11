@@ -84,7 +84,6 @@ import com.sameerasw.essentials.utils.AppIconUtil
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.PermissionUtils
-import com.sameerasw.essentials.weather.overcast.OvercastWeather
 import com.sameerasw.essentials.utils.RefreshRateUtils
 import com.sameerasw.essentials.utils.RootUtils
 import com.sameerasw.essentials.utils.PrivilegedMode
@@ -228,7 +227,6 @@ class MainViewModel : ViewModel() {
     val islandCameraPosition = mutableStateOf(SettingsRepository.ISLAND_CAMERA_POSITION_CENTER)
     val isIslandShowCalls = mutableStateOf(true)
     val isIslandShowTimers = mutableStateOf(true)
-    val isIslandShowWeather = mutableStateOf(false)
     val isIslandTimersShowScreenRecorder = mutableStateOf(true)
     val isIslandTimersFilterApps = mutableStateOf(false)
     val isIslandShowNetwork = mutableStateOf(true)
@@ -347,7 +345,6 @@ class MainViewModel : ViewModel() {
     val isFlashlightPocketTurnOffEnabled = mutableStateOf(false)
     val isFlashlightOverheatEnabled = mutableStateOf(true)
     val isLocationPermissionGranted = mutableStateOf(false)
-    val isOvercastWeatherPermissionGranted = mutableStateOf(false)
     val isBackgroundLocationPermissionGranted = mutableStateOf(false)
     val isFullScreenIntentPermissionGranted = mutableStateOf(false)
     val isBluetoothPermissionGranted = mutableStateOf(false)
@@ -1958,7 +1955,6 @@ class MainViewModel : ViewModel() {
             PermissionUtils.isNotificationLightingAccessibilityServiceEnabled(context)
         isDefaultBrowserSet.value = PermissionUtils.isDefaultBrowser(context)
         isLocationPermissionGranted.value = PermissionUtils.hasLocationPermission(context)
-        isOvercastWeatherPermissionGranted.value = OvercastWeather.hasPermission(context)
         isBackgroundLocationPermissionGranted.value =
             PermissionUtils.hasBackgroundLocationPermission(context)
         isFullScreenIntentPermissionGranted.value = PermissionUtils.canUseFullScreenIntent(context)
@@ -2379,7 +2375,6 @@ class MainViewModel : ViewModel() {
         islandCameraPosition.value = settingsRepository.getIslandCameraPosition()
         isIslandShowCalls.value = settingsRepository.isIslandShowCallsEnabled()
         isIslandShowTimers.value = settingsRepository.isIslandShowTimersEnabled()
-        isIslandShowWeather.value = settingsRepository.isIslandShowWeatherEnabled()
         isIslandTimersShowScreenRecorder.value = settingsRepository.isIslandTimersShowScreenRecorderEnabled()
         isIslandTimersFilterApps.value = settingsRepository.isIslandTimersFilterAppsEnabled()
         isIslandShowNetwork.value = settingsRepository.isIslandShowNetworkEnabled()
@@ -5512,11 +5507,6 @@ class MainViewModel : ViewModel() {
         islandCalendarEmojis.value = settingsRepository.getIslandCalendarEmojis()
     }
 
-    fun setIslandShowWeather(enabled: Boolean) {
-        isIslandShowWeather.value = enabled
-        settingsRepository.setIslandShowWeatherEnabled(enabled)
-    }
-
     fun setIslandShowTimers(enabled: Boolean) {
         isIslandShowTimers.value = enabled
         settingsRepository.setIslandShowTimersEnabled(enabled)
@@ -7853,19 +7843,6 @@ class MainViewModel : ViewModel() {
             activity,
             arrayOf(Manifest.permission.READ_PHONE_STATE),
             1001,
-        )
-    }
-
-    /**
-     * Executes the request Overcast weather permission operation.
-     *
-     * @param activity [androidx.activity.ComponentActivity] Target activity.
-     */
-    fun requestOvercastWeatherPermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(OvercastWeather.PERMISSION),
-            1007,
         )
     }
 

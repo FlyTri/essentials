@@ -1697,7 +1697,4 @@
     <string name="island_suppress_system_heads_up_title">Verberg systeemmeldingen</string>
     <string name="island_dynamic_hide_status_bar_title">Verberg dynamisch statusbalk elementen</string>
     <string name="duo_enable_title">Duo Inschakelen</string>
-    <string name="weather_units_title">Eenheden</string>
-    <string name="island_weather_effects_title">Weer effecten</string>
-    <string name="island_weather_haptics_title">Simulatie trillingen</string>
 </resources>

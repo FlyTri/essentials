@@ -1628,9 +1628,6 @@
     <string name="duo_action_horizontal_slide_track">切换曲目</string>
     <string name="duo_action_horizontal_slide_track_desc">仅在播放时起效</string>
     <string name="setting_hidden_debugging_title">隐藏调试选项</string>
-    <string name="island_weather_effects_title">天氣特效</string>
-    <string name="weather_units_title">單位</string>
-    <string name="island_weather_haptics_title">震動觸覺模擬</string>
     <string name="duo_enable_title">啟用 Duo</string>
     <string name="duo_enable_desc">不真的能摺，但看起來也滿酷的</string>
     <string name="duo_auto_detect_title">自動偵測鏡頭</string>
