@@ -3148,7 +3148,7 @@
     <string name="toast_granting_permissions">Granting permissions…</string>
     <string name="toast_permissions_granted">Granted all available permissions</string>
     <string name="island_battery_only_low_title">Only show when low</string>
-    <string name="island_devices_battery_desc">Pick devices to show battery for. Only one is shown at a time: the highest one in this list that is connected.</string>
+    <string name="island_devices_battery_desc">Pick devices to show connection status and battery for. Only one battery is shown at a time: the highest one in this list that is connected.</string>
     <string name="island_devices_battery_empty">No paired devices</string>
     <string name="island_devices_battery_section">Devices</string>
     <string name="island_devices_move_up">Move up</string>

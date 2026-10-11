@@ -166,7 +166,7 @@ class DevicesPlugin : BaseIslandPlugin() {
     private fun announce(device: BluetoothDevice, connected: Boolean) {
         val c = ctx ?: return
         if (!settings.isIslandShowDevicesEnabled() || !settings.isIslandLineStageEnabled() || !hasPermission()) return
-        if (isComputer(device)) return
+        if (isComputer(device) || device.address !in settings.getIslandDevicesBatteryOrder()) return
         val name = nameOf(device)
         val battery = if (connected) batteryOf(device) else -1
         event = DeviceEvent(device.address, connected, name, iconFor(device, name), battery)
