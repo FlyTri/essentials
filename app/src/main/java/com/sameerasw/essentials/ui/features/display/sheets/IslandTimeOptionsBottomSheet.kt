@@ -3,8 +3,8 @@
  * License: MIT License
  *
  * Feature Module: UI Feature - Display
- * File: IslandTimeBatteryOptionsBottomSheet.kt
- * Description: Bottom sheet for configuring the Island time and battery indicator style.
+ * File: IslandTimeOptionsBottomSheet.kt
+ * Description: Bottom sheet for configuring the Island time indicator.
  */
 
 package com.sameerasw.essentials.ui.features.display.sheets
@@ -39,8 +39,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IslandTimeBatteryOptionsBottomSheet(
-    viewModel: MainViewModel,
+fun IslandTimeOptionsBottomSheet(
     onDismissRequest: () -> Unit,
 ) {
     EssentialsBottomSheet(onDismissRequest = onDismissRequest) {
@@ -52,12 +51,6 @@ fun IslandTimeBatteryOptionsBottomSheet(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            IslandBatteryOptions(
-                viewModel = viewModel,
-                onlyLow = viewModel.isIslandBatteryOnlyLow.value,
-                onOnlyLowChange = viewModel::setIslandBatteryOnlyLow,
-                showIconConditional = true,
-            )
             IslandLauncherOnlyToggle(SettingsRepository.KEY_ISLAND_TIME_BATTERY_LAUNCHER_ONLY)
         }
     }

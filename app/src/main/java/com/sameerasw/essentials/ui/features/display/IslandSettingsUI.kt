@@ -76,7 +76,7 @@ import com.sameerasw.essentials.ui.features.display.actions.GestureActionPickerS
 import com.sameerasw.essentials.ui.features.display.actions.HorizontalSlideModeSheet
 import com.sameerasw.essentials.ui.features.display.actions.horizontalSlideDescription
 import com.sameerasw.essentials.ui.features.display.sheets.IslandAlarmOptionsBottomSheet
-import com.sameerasw.essentials.ui.features.display.sheets.IslandBatteryAlertsOptionsBottomSheet
+import com.sameerasw.essentials.ui.features.display.sheets.IslandBatteryOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBorderOutlineOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBriefOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandCallOptionsBottomSheet
@@ -84,7 +84,7 @@ import com.sameerasw.essentials.ui.features.display.sheets.IslandDevicesBatteryB
 import com.sameerasw.essentials.ui.features.display.sheets.IslandNotificationOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandPulseShadowOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandSoundModeOptionsBottomSheet
-import com.sameerasw.essentials.ui.features.display.sheets.IslandTimeBatteryOptionsBottomSheet
+import com.sameerasw.essentials.ui.features.display.sheets.IslandTimeOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandSignalOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandTimerOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.StatusGlanceCalendarOptionsBottomSheet
@@ -130,8 +130,8 @@ fun IslandSettingsUI(
     var showCalendarOptionsSheet by remember { mutableStateOf(false) }
     var showSoundModeOptionsSheet by remember { mutableStateOf(false) }
     var showDevicesBatterySheet by remember { mutableStateOf(false) }
-    var showTimeBatteryOptionsSheet by remember { mutableStateOf(false) }
-    var showBatteryAlertsOptionsSheet by remember { mutableStateOf(false) }
+    var showTimeOptionsSheet by remember { mutableStateOf(false) }
+    var showBatteryOptionsSheet by remember { mutableStateOf(false) }
     var showTimerOptionsSheet by remember { mutableStateOf(false) }
     var showCallOptionsSheet by remember { mutableStateOf(false) }
     var showSignalOptionsSheet by remember { mutableStateOf(false) }
@@ -289,29 +289,29 @@ fun IslandSettingsUI(
                         onSettingsClick = { showNotificationOptionsSheet = true },
                         modifier = Modifier.highlight(highlightSetting == "island_show_notifications"),
                     )
-                    "time_battery" -> IconToggleItem(
+                    "time" -> IconToggleItem(
                         dragHandle = handle,
                         iconRes = R.drawable.rounded_schedule_24,
-                        title = stringResource(R.string.island_show_time_battery_title),
+                        title = stringResource(R.string.island_show_time_title),
                         isChecked = viewModel.isIslandShowTimeBattery.value,
                         onCheckedChange = { checked ->
                             HapticUtil.performVirtualKeyHaptic(view)
                             viewModel.setIslandShowTimeBattery(checked)
                         },
-                        onSettingsClick = { showTimeBatteryOptionsSheet = true },
+                        onSettingsClick = { showTimeOptionsSheet = true },
                         modifier = Modifier.highlight(highlightSetting == "island_show_time_battery"),
                     )
-                    "battery_alerts" -> IconToggleItem(
+                    "battery" -> IconToggleItem(
                         dragHandle = handle,
-                        iconRes = R.drawable.rounded_battery_alert_24,
-                        title = stringResource(R.string.island_battery_alerts_title),
-                        isChecked = viewModel.isIslandShowBatteryAlerts.value,
+                        iconRes = R.drawable.rounded_battery_android_0_24,
+                        title = stringResource(R.string.island_show_battery_title),
+                        isChecked = viewModel.isIslandShowBattery.value,
                         onCheckedChange = { checked ->
                             HapticUtil.performVirtualKeyHaptic(view)
-                            viewModel.setIslandShowBatteryAlerts(checked)
+                            viewModel.setIslandShowBattery(checked)
                         },
-                        onSettingsClick = { showBatteryAlertsOptionsSheet = true },
-                        modifier = Modifier.highlight(highlightSetting == "island_show_battery_alerts"),
+                        onSettingsClick = { showBatteryOptionsSheet = true },
+                        modifier = Modifier.highlight(highlightSetting == "island_show_battery"),
                     )
                     "flashlight" -> IconToggleItem(
                         dragHandle = handle,
@@ -477,7 +477,7 @@ fun IslandSettingsUI(
                 }
             }
             renderEntry("calls", null)
-            renderEntry("time_battery", null)
+            renderEntry("time", null)
             ReorderableColumn(
                 list = if (reorderMode) workingOrder else savedOrder,
                 onSettle = { from, to -> workingOrder = workingOrder.toMutableList().apply { add(to, removeAt(from)) } },
@@ -814,16 +814,16 @@ fun IslandSettingsUI(
         )
     }
 
-    if (showTimeBatteryOptionsSheet) {
-        IslandTimeBatteryOptionsBottomSheet(
-            viewModel = viewModel,
-            onDismissRequest = { showTimeBatteryOptionsSheet = false },
+    if (showTimeOptionsSheet) {
+        IslandTimeOptionsBottomSheet(
+            onDismissRequest = { showTimeOptionsSheet = false },
         )
     }
 
-    if (showBatteryAlertsOptionsSheet) {
-        IslandBatteryAlertsOptionsBottomSheet(
-            onDismissRequest = { showBatteryAlertsOptionsSheet = false },
+    if (showBatteryOptionsSheet) {
+        IslandBatteryOptionsBottomSheet(
+            viewModel = viewModel,
+            onDismissRequest = { showBatteryOptionsSheet = false },
         )
     }
 

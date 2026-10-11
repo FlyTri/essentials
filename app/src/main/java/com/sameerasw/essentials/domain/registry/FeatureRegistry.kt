@@ -759,14 +759,14 @@ object FeatureRegistry {
                 searchableSettings =
                     listOf(
                         SearchSetting(
-                            R.string.island_show_time_battery_title,
-                            R.string.island_battery_style_title,
+                            R.string.island_show_time_title,
+                            R.string.island_show_time_title,
                             "island_show_time_battery",
                         ),
                         SearchSetting(
-                            R.string.island_battery_alerts_title,
-                            R.string.island_battery_alerts_options_title,
-                            "island_show_battery_alerts",
+                            R.string.island_show_battery_title,
+                            R.string.island_battery_style_title,
+                            "island_show_battery",
                             R.array.keywords_battery,
                         ),
                         SearchSetting(

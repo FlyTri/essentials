@@ -1834,7 +1834,6 @@ Zugriff auf die Barrierefreiheit ist erforderlich, um die Überlagerung zu zeich
     <string name="island_catch_up_title">Nachholen</string>
     <string name="island_catch_up_desc">Letzte Benachrichtigung länger auf der Insel anzeigen</string>
     <string name="conscious_gate_feel_every_second_title">Spüre jede verschwendete Sekunde</string>
-    <string name="island_show_time_battery_title">Uhrzeit und Akku</string>
     <string name="island_hide_on_shade_title">Ausblenden, wenn die Statusleiste erweitert ist</string>
     <string name="island_expanded_scale_title">Erweiterter Maßstab</string>
     <string name="island_expanded_scale_desc">Vergrößern Sie die Insel gleichmäßig auf allen Seiten</string>

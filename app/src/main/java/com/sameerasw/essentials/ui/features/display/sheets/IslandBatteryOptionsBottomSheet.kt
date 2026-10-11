@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,13 +23,16 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
 import com.sameerasw.essentials.ui.core.cards.ConfigPickerItem
+import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IslandBatteryAlertsOptionsBottomSheet(
+fun IslandBatteryOptionsBottomSheet(
+    viewModel: MainViewModel,
     onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -40,9 +45,17 @@ fun IslandBatteryAlertsOptionsBottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 24.dp),
+                .padding(bottom = 24.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            IslandBatteryOptions(
+                viewModel = viewModel,
+                onlyLow = viewModel.isIslandBatteryOnlyLow.value,
+                onOnlyLowChange = viewModel::setIslandBatteryOnlyLow,
+                showIconConditional = true,
+            )
+
             Text(
                 text = stringResource(R.string.island_battery_alerts_options_title),
                 style = MaterialTheme.typography.titleLarge,
@@ -51,6 +64,15 @@ fun IslandBatteryAlertsOptionsBottomSheet(
             )
 
             RoundedCardContainer(spacing = 2.dp, cornerRadius = 24.dp) {
+                IconToggleItem(
+                    iconRes = R.drawable.rounded_battery_alert_24,
+                    title = stringResource(R.string.island_battery_alerts_title),
+                    isChecked = viewModel.isIslandShowBatteryAlerts.value,
+                    onCheckedChange = { checked ->
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        viewModel.setIslandShowBatteryAlerts(checked)
+                    },
+                )
                 IslandPrefToggle(
                     settingKey = SettingsRepository.KEY_ISLAND_BATTERY_ALERT_CHARGING,
                     iconRes = R.drawable.rounded_bolt_24,

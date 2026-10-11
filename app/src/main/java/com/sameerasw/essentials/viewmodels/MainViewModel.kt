@@ -280,6 +280,7 @@ class MainViewModel : ViewModel() {
     val isIslandShowConsciousGate = mutableStateOf(true)
     val isIslandShowTimeBattery = mutableStateOf(false)
     val isIslandShowBatteryAlerts = mutableStateOf(true)
+    val isIslandShowBattery = mutableStateOf(false)
     val isIslandShowFlashlight = mutableStateOf(true)
     val islandBatteryStyle = mutableStateOf(SettingsRepository.ISLAND_BATTERY_STYLE_RING)
     val isIslandBatteryPercentageEnabled = mutableStateOf(false)
@@ -2440,6 +2441,7 @@ class MainViewModel : ViewModel() {
         isIslandShowConsciousGate.value = settingsRepository.isIslandShowConsciousGateEnabled()
         isIslandShowTimeBattery.value = settingsRepository.isIslandShowTimeBatteryEnabled()
         isIslandShowBatteryAlerts.value = settingsRepository.isIslandShowBatteryAlertsEnabled()
+        isIslandShowBattery.value = settingsRepository.isIslandShowBatteryEnabled()
         isIslandShowFlashlight.value = settingsRepository.isIslandShowFlashlightEnabled()
         islandBatteryStyle.value = settingsRepository.getIslandBatteryStyle()
         isIslandBatteryPercentageEnabled.value = settingsRepository.isIslandBatteryPercentageEnabled()
@@ -5308,6 +5310,7 @@ class MainViewModel : ViewModel() {
         if (enabled && combinedActive()) {
             isIslandShowTimeBattery.value = false
             settingsRepository.setIslandShowTimeBatteryEnabled(false)
+            setIslandShowBattery(false)
         }
         if (enabled) {
             isDuoShowNetworks.value = false
@@ -5367,6 +5370,7 @@ class MainViewModel : ViewModel() {
         setDuoShowBattery(true)
         setDuoShowNetworks(true)
         setIslandShowTimeBattery(false)
+        setIslandShowBattery(false)
         isDuoShowMedia.value = false
         settingsRepository.setDuoShowMediaEnabled(false)
         isDuoShowFlashlight.value = false
@@ -5837,6 +5841,11 @@ class MainViewModel : ViewModel() {
     fun setIslandBatteryStyle(value: String) {
         islandBatteryStyle.value = value
         settingsRepository.setIslandBatteryStyle(value)
+    }
+
+    fun setIslandShowBattery(enabled: Boolean) {
+        isIslandShowBattery.value = enabled
+        settingsRepository.setIslandShowBatteryEnabled(enabled)
     }
 
     fun setIslandShowBatteryAlerts(enabled: Boolean) {

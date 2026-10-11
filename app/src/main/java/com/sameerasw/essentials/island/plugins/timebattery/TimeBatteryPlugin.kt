@@ -32,6 +32,7 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
 
     override val settingKeys = setOf(
         SettingsRepository.KEY_ISLAND_SHOW_TIME_BATTERY,
+        SettingsRepository.KEY_ISLAND_SHOW_BATTERY,
         SettingsRepository.KEY_ISLAND_BATTERY_STYLE,
         SettingsRepository.KEY_ISLAND_BATTERY_PERCENTAGE,
         SettingsRepository.KEY_ISLAND_BATTERY_PERCENTAGE_CONDITIONAL,
@@ -126,7 +127,7 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
 
     private fun peekCharging() {
         val c = ctx ?: return
-        if (!settings.isIslandShowTimeBatteryEnabled()) return
+        if (!settings.isIslandShowBatteryEnabled()) return
         val duration = settings.getIslandPeekDurationMs()
         
         chargePeekUntil = System.currentTimeMillis() + duration
@@ -138,7 +139,9 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
 
     private fun render() {
         ctx ?: return
-        if (!settings.isIslandShowTimeBatteryEnabled()) {
+        val showTime = settings.isIslandShowTimeBatteryEnabled()
+        val showBatteryItem = settings.isIslandShowBatteryEnabled()
+        if (!showTime && !showBatteryItem) {
             publish(emptyList())
             return
         }
@@ -188,12 +191,12 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
                 null
             },
         )
-        val showBattery = batteryLevel >= 0 && (
+        val showBattery = showBatteryItem && batteryLevel >= 0 && (
             !settings.isIslandBatteryOnlyLowEnabled() ||
                 batteryLevel <= SettingsRepository.ISLAND_BATTERY_LOW_LEVEL ||
                 System.currentTimeMillis() < chargePeekUntil
             )
-        publish(if (showBattery) listOf(timeItem, batteryItem) else listOf(timeItem))
+        publish(listOfNotNull(timeItem.takeIf { showTime }, batteryItem.takeIf { showBattery }))
     }
 
     private fun idleColor(): Color? {

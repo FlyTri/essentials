@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">Essentials</string>
     <string name="diy_genai_lazy_title">I’m lazy, Do it for me</string>
     <string name="settings_genai_automation_title">Enable GenAI use</string>
@@ -3002,7 +3002,8 @@
     <string name="island_action_tap_title">Single tap</string>
     <string name="island_action_tap_desc">Open app</string>
     <string name="island_tap_action_title">Tap action</string>
-    <string name="island_show_time_battery_title">Time and battery</string>
+    <string name="island_show_time_title">Time</string>
+    <string name="island_show_battery_title">Battery</string>
     <string name="island_battery_style_title">Battery style</string>
     <string name="island_battery_style_ring">Ring</string>
     <string name="island_battery_style_icon">Icon</string>
