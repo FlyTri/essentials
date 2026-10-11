@@ -47,6 +47,7 @@ import com.sameerasw.essentials.island.plugins.devices.DevicesPlugin
 import com.sameerasw.essentials.island.plugins.brief.BriefPlugin
 import com.sameerasw.essentials.island.plugins.progress.ProgressPlugin
 import com.sameerasw.essentials.island.plugins.soundmode.SoundModePlugin
+import com.sameerasw.essentials.island.remote.ProviderPriorities
 import com.sameerasw.essentials.island.remote.RemoteProvidersPlugin
 import com.sameerasw.essentials.island.plugins.travel.TravelPlugin
 import com.sameerasw.essentials.island.plugins.caffeinate.CaffeinatePlugin
@@ -110,13 +111,15 @@ class IslandCoordinator(
 
     private fun publishItems(pluginId: String, items: List<IslandItem>) {
         latestItems[pluginId] = items
-        val priority = userPriorities[pluginId]
-        items.forEach { it.userPriority = priority }
+        items.forEach { it.userPriority = userPriorities[it.priorityGroup ?: pluginId] }
         controller.setItems(pluginId, items)
     }
 
+    private fun resolvePriorities(): Map<String, Int> =
+        IslandPriorityEntries.resolve(settings.getIslandPriorityOrder(), ProviderPriorities.entries(service, settings))
+
     private fun reloadPriorities() {
-        userPriorities = IslandPriorityEntries.resolve(settings.getIslandPriorityOrder())
+        userPriorities = resolvePriorities()
         latestItems.toMap().forEach { (id, items) -> publishItems(id, items) }
     }
 
@@ -448,7 +451,7 @@ class IslandCoordinator(
             focusedKey = { controller.state.value.focusedKey },
         )
         latestItems.clear()
-        userPriorities = IslandPriorityEntries.resolve(settings.getIslandPriorityOrder())
+        userPriorities = resolvePriorities()
         plugins.forEach { plugin ->
             plugin.start(context)
             newScope.launch { plugin.items.collect { publishItems(plugin.id, it) } }
@@ -643,7 +646,7 @@ class IslandCoordinator(
             SettingsRepository.KEY_ISLAND_HIDE_PORTRAIT,
             SettingsRepository.KEY_ISLAND_HIDE_LANDSCAPE -> updateState()
             SettingsRepository.KEY_ISLAND_ALWAYS_GESTURES -> syncGestureHitbox()
-            SettingsRepository.KEY_ISLAND_PRIORITY_ORDER -> if (running) reloadPriorities()
+            SettingsRepository.KEY_ISLAND_PRIORITY_ORDER, SettingsRepository.KEY_ISLAND_PROVIDERS -> if (running) reloadPriorities()
             SettingsRepository.KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR, SettingsRepository.KEY_ISLAND_COMPACT_HIDE_STATUS_BAR -> syncStatusBar()
             SettingsRepository.KEY_ISLAND_HIDE_WHEN_SCREEN_OFF, SettingsRepository.KEY_ISLAND_SHOW_WHEN -> applySuppression()
             SettingsRepository.KEY_ISLAND_HIDE_IN_OWNER_APP -> applyOwnerAppHiding()

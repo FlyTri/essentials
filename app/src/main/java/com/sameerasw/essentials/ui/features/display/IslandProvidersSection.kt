@@ -31,7 +31,7 @@ import com.sameerasw.essentials.ui.features.display.sheets.IslandProviderPairing
 import com.sameerasw.essentials.utils.HapticUtil
 
 @Composable
-fun IslandProvidersSection() {
+fun IslandProvidersSection(onChanged: () -> Unit = {}) {
     val context = LocalContext.current
     val view = LocalView.current
     val trust = remember { ProviderTrustStore(SettingsRepository(context)) }
@@ -67,6 +67,7 @@ fun IslandProvidersSection() {
                         scope.launch { ProviderPairing.revoke(context, provider) }
                     }
                     refresh++
+                    onChanged()
                 },
                 onSettingsClick = { ProviderDiscovery.openSettings(context, provider) },
             )
@@ -98,6 +99,7 @@ fun IslandProvidersSection() {
                     }
                     busy = false
                     refresh++
+                    onChanged()
                 }
             },
             onDismissRequest = { if (!busy) pending = null },

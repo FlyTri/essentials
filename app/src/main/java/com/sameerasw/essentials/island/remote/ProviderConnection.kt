@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.toArgb
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.island.model.IslandExpandedScope
 import com.sameerasw.essentials.island.model.IslandItem
+import com.sameerasw.essentials.island.model.IslandPriorityEntries
 import com.sameerasw.essentials.island.model.PluginRequest
 import com.sameerasw.essentials.island.ui.IslandLayoutSpec
 import com.sameerasw.essentials.utils.DeviceUtils
@@ -263,6 +264,8 @@ class ProviderConnection(
         } catch (_: Exception) {
         }
     }
+
+    override val priorityGroup: String = IslandPriorityEntries.providerId(info.packageName)
 
     override fun namespaced(rawKey: String): String = "${info.packageName}:$rawKey"
 

@@ -129,6 +129,7 @@ class IslandItem(
     val bypassLauncherOnly: Boolean = false,
     
     val stack: List<StackIcon> = emptyList(),
+    val priorityGroup: String? = null,
 ) {
     var userPriority: Int? = null
 

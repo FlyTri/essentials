@@ -23,6 +23,7 @@ import com.sameerasw.island.sdk.IslandItemPayload
 import com.sameerasw.island.sdk.IslandPlacement
 
 interface RemoteItemHandler {
+    val priorityGroup: String
     fun namespaced(rawKey: String): String
     fun invoke(action: IslandAction, itemKey: String, siblings: Set<String>): Boolean
     fun surfaceSession(rawKey: String): RemoteSurfaceSession?
@@ -79,6 +80,7 @@ object RemoteItemMapper {
                 onExpandedTap = interactions.onExpandedTap?.let { action -> { handler.invoke(action, rawKey, siblings) } },
             ),
             compactVisible = payload.compactVisible,
+            priorityGroup = handler.priorityGroup,
         )
     }
 

@@ -14,6 +14,13 @@ import androidx.compose.material3.IconButton
 import sh.calvin.reorderable.ReorderableColumn
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.island.model.IslandPriorityEntries
+import com.sameerasw.essentials.island.remote.ProviderDiscovery
+import com.sameerasw.essentials.island.remote.ProviderPairing
+import com.sameerasw.essentials.island.remote.ProviderPriorities
+import com.sameerasw.essentials.island.remote.ProviderTrustStore
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import com.sameerasw.essentials.ui.core.pickers.ColorSwatchPicker
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
@@ -112,8 +119,12 @@ fun IslandSettingsUI(
 
     val prioritySettings = remember { SettingsRepository(context) }
     var reorderMode by remember { mutableStateOf(false) }
-    var savedOrder by remember { mutableStateOf(IslandPriorityEntries.normalize(prioritySettings.getIslandPriorityOrder().orEmpty())) }
+    var providerVersion by remember { mutableIntStateOf(0) }
+    val providerEntries = remember(providerVersion) { ProviderPriorities.entries(context, prioritySettings) }
+    var savedRaw by remember { mutableStateOf(prioritySettings.getIslandPriorityOrder().orEmpty()) }
+    val savedOrder = remember(savedRaw, providerEntries) { IslandPriorityEntries.normalize(savedRaw, providerEntries) }
     var workingOrder by remember { mutableStateOf(savedOrder) }
+    val providerScope = rememberCoroutineScope()
     var showMediaAppSelectionSheet by remember { mutableStateOf(false) }
     var showCalendarOptionsSheet by remember { mutableStateOf(false) }
     var showSoundModeOptionsSheet by remember { mutableStateOf(false) }
@@ -430,7 +441,25 @@ fun IslandSettingsUI(
                         onSettingsClick = { showDevicesBatterySheet = true },
                         modifier = Modifier.highlight(highlightSetting == "island_show_devices"),
                     )
-        
+                    else -> if (IslandPriorityEntries.isProvider(entryId)) {
+                        val packageName = IslandPriorityEntries.providerPackage(entryId)
+                        val provider = remember(packageName, providerVersion) { ProviderDiscovery.find(context, packageName) }
+                        if (provider != null) {
+                            IconToggleItem(
+                                dragHandle = handle,
+                                iconRes = R.drawable.rounded_apps_24,
+                                title = provider.label,
+                                isChecked = true,
+                                onCheckedChange = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    ProviderTrustStore(prioritySettings).disable(packageName)
+                                    providerScope.launch { ProviderPairing.revoke(context, provider) }
+                                    providerVersion++
+                                },
+                                onSettingsClick = { ProviderDiscovery.openSettings(context, provider) },
+                            )
+                        }
+                    }
                 }
             }
             renderEntry("calls", null)
@@ -475,11 +504,11 @@ fun IslandSettingsUI(
                 reorderMode = true
             },
             onSave = {
-                prioritySettings.setIslandPriorityOrder(workingOrder.takeIf { it != IslandPriorityEntries.defaultOrder })
-                savedOrder = workingOrder
+                prioritySettings.setIslandPriorityOrder(workingOrder.takeIf { it != IslandPriorityEntries.defaultOrder(providerEntries) })
+                savedRaw = workingOrder
                 reorderMode = false
             },
-            onReset = { workingOrder = IslandPriorityEntries.defaultOrder },
+            onReset = { workingOrder = IslandPriorityEntries.defaultOrder(providerEntries) },
         )
 
         RoundedCardContainer(
@@ -500,7 +529,7 @@ fun IslandSettingsUI(
             )
         }
 
-        IslandProvidersSection()
+        IslandProvidersSection(onChanged = { providerVersion++ })
 
         Text(
             text = stringResource(R.string.duo_section_actions),
