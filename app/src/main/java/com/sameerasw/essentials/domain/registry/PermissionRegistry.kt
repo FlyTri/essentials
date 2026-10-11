@@ -135,6 +135,7 @@ fun initPermissionRegistry() {
 
     // Draw over other apps permission
     PermissionRegistry.register("DRAW_OVER_OTHER_APPS", R.string.feat_notification_lighting_title)
+    PermissionRegistry.register("DRAW_OVER_OTHER_APPS", R.string.feat_widget_stack_title)
 
     // Post notifications permission
     PermissionRegistry.register("POST_NOTIFICATIONS", R.string.feat_caffeinate_title)
@@ -149,7 +150,6 @@ fun initPermissionRegistry() {
 
     // Location permission
     PermissionRegistry.register("LOCATION", R.string.feat_location_reached_title)
-    PermissionRegistry.register("OVERCAST_WEATHER", R.string.lock_screen_clock_weather)
     PermissionRegistry.register("BACKGROUND_LOCATION", R.string.feat_location_reached_title)
     PermissionRegistry.register("USE_FULL_SCREEN_INTENT", R.string.feat_location_reached_title)
 

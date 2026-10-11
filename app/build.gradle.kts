@@ -229,6 +229,7 @@ dependencies {
     implementation(libs.androidx.wear.remote.interactions)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.gson)
+    implementation(project(":island-sdk"))
 
     // Kotlin Reflect for dynamic sealed class serialization
     implementation(kotlin("reflect"))

@@ -22,6 +22,7 @@ import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.AppTag
 import com.sameerasw.essentials.domain.model.DnsPreset
 import com.sameerasw.essentials.domain.model.HilightEffect
+import com.sameerasw.essentials.domain.model.HilightProgressColorMode
 import com.sameerasw.essentials.domain.model.NotificationLightingColorMode
 import com.sameerasw.essentials.domain.model.NotificationLightingSide
 import com.sameerasw.essentials.domain.model.NotificationLightingStyle
@@ -179,6 +180,10 @@ class SettingsRepository(
         const val KEY_HILIGHT_APP_EFFECTS = "hilight_app_effects"
         const val KEY_HILIGHT_ONLY_SCREEN_OFF = "hilight_only_screen_off"
         const val KEY_HILIGHT_COOLDOWN_SECONDS = "hilight_cooldown_seconds"
+        const val KEY_HILIGHT_PROGRESS_ENABLED = "hilight_progress_enabled"
+        const val KEY_HILIGHT_PROGRESS_COLOR_MODE = "hilight_progress_color_mode"
+        const val KEY_HILIGHT_PROGRESS_COLOR = "hilight_progress_color"
+        const val KEY_HILIGHT_PROGRESS_DURATION_MS = "hilight_progress_duration_ms"
         const val KEY_HILIGHT_SKIP_DND = "hilight_skip_dnd"
         const val KEY_EDGE_LIGHTING_ONLY_SCREEN_OFF = "edge_lighting_only_screen_off"
         const val KEY_EDGE_LIGHTING_AMBIENT_DISPLAY = "edge_lighting_ambient_display"
@@ -574,20 +579,9 @@ class SettingsRepository(
         const val ISLAND_CALL_SHOW_PEEK = "peek"
         const val ISLAND_CALL_SHOW_COMPACT = "compact"
         const val KEY_ISLAND_SHOW_TIMERS = "island_show_timers"
-        const val KEY_ISLAND_SHOW_WEATHER = "island_show_weather"
-        const val KEY_ISLAND_WEATHER_MODE = "island_weather_mode"
-        const val KEY_ISLAND_WEATHER_PEEK_ALERTS = "island_weather_peek_alerts"
-        const val KEY_ISLAND_WEATHER_EFFECTS = "island_weather_effects"
-        const val KEY_ISLAND_WEATHER_HAPTICS = "island_weather_haptics"
-        const val ISLAND_WEATHER_MODE_BRIEF = "brief"
-        const val ISLAND_WEATHER_MODE_COMPACT = "compact"
-        const val ISLAND_WEATHER_MODE_ALERTS = "alerts"
+        const val KEY_ISLAND_PROVIDERS = "island_providers"
 
-        const val KEY_WEATHER_UNITS = "weather_units"
         private const val LEGACY_WEATHER_API_KEY_PREFIX = "weather_api_key"
-        const val WEATHER_UNITS_SYSTEM = "system"
-        const val WEATHER_UNITS_CELSIUS = "celsius"
-        const val WEATHER_UNITS_FAHRENHEIT = "fahrenheit"
         const val KEY_ISLAND_CALENDAR_EMOJIS = "island_calendar_emojis"
         const val KEY_ISLAND_TIMERS_SHOW_SCREEN_RECORDER = "island_timers_show_screen_recorder"
         const val KEY_ISLAND_TIMERS_FILTER_APPS = "island_timers_filter_apps"
@@ -604,7 +598,6 @@ class SettingsRepository(
         const val KEY_ISLAND_SOUND_MODE_KEEP_ICON = "island_sound_mode_keep_icon"
         const val KEY_ISLAND_SHOW_ALARM = "island_show_alarm"
         const val KEY_ISLAND_TIME_BATTERY_LAUNCHER_ONLY = "island_time_battery_launcher_only"
-        const val KEY_ISLAND_WEATHER_LAUNCHER_ONLY = "island_weather_launcher_only"
         const val KEY_ISLAND_CALENDAR_LAUNCHER_ONLY = "island_calendar_launcher_only"
         const val KEY_ISLAND_ALARM_LAUNCHER_ONLY = "island_alarm_launcher_only"
         const val KEY_ISLAND_ALARM_WINDOW_HOURS = "island_alarm_window_hours"
@@ -1307,6 +1300,24 @@ class SettingsRepository(
     fun getHilightCooldownSeconds(): Int = getInt(KEY_HILIGHT_COOLDOWN_SECONDS, 60)
 
     fun setHilightCooldownSeconds(seconds: Int) = putInt(KEY_HILIGHT_COOLDOWN_SECONDS, seconds)
+
+    fun isHilightProgressEnabled(): Boolean = getBoolean(KEY_HILIGHT_PROGRESS_ENABLED, false)
+
+    fun setHilightProgressEnabled(enabled: Boolean) = putBoolean(KEY_HILIGHT_PROGRESS_ENABLED, enabled)
+
+    fun getHilightProgressColorMode(): HilightProgressColorMode =
+        HilightProgressColorMode.entries.find { it.name == getString(KEY_HILIGHT_PROGRESS_COLOR_MODE) }
+            ?: HilightProgressColorMode.VIBGYOR
+
+    fun setHilightProgressColorMode(mode: HilightProgressColorMode) = putString(KEY_HILIGHT_PROGRESS_COLOR_MODE, mode.name)
+
+    fun getHilightProgressColor(): Int = getInt(KEY_HILIGHT_PROGRESS_COLOR, HilightEffect.DEFAULT_COLOR)
+
+    fun setHilightProgressColor(color: Int) = putInt(KEY_HILIGHT_PROGRESS_COLOR, color)
+
+    fun getHilightProgressDurationMs(): Long = getLong(KEY_HILIGHT_PROGRESS_DURATION_MS, HilightEffect.DEFAULT_DURATION_MS)
+
+    fun setHilightProgressDurationMs(durationMs: Long) = putLong(KEY_HILIGHT_PROGRESS_DURATION_MS, durationMs)
 
     /**
      * Executes the save notification lighting selected apps operation.
@@ -2315,6 +2326,7 @@ class SettingsRepository(
     fun incrementPixelSearchbarWidgetRevision() {
         val current = getPixelSearchbarWidgetRevision()
         prefs.edit().putInt(KEY_PIXEL_SEARCHBAR_WIDGET_REVISION, current + 1).apply()
+        com.sameerasw.essentials.services.widgets.SearchbarRenderState.bump()
     }
 
     /**
@@ -3959,24 +3971,6 @@ class SettingsRepository(
         updated.forEach { (id, value) -> json.put(id.toString(), value) }
         putString(KEY_ISLAND_CALENDAR_EMOJIS, json.toString())
     }
-
-    fun isIslandShowWeatherEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_WEATHER, false)
-    fun setIslandShowWeatherEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_WEATHER, enabled)
-
-    fun getIslandWeatherMode(): String = getString(KEY_ISLAND_WEATHER_MODE, ISLAND_WEATHER_MODE_BRIEF) ?: ISLAND_WEATHER_MODE_BRIEF
-    fun setIslandWeatherMode(mode: String) = putString(KEY_ISLAND_WEATHER_MODE, mode)
-
-    fun isIslandWeatherPeekAlertsEnabled(): Boolean = getBoolean(KEY_ISLAND_WEATHER_PEEK_ALERTS, true)
-    fun setIslandWeatherPeekAlertsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_WEATHER_PEEK_ALERTS, enabled)
-
-    fun isIslandWeatherEffectsEnabled(): Boolean = getBoolean(KEY_ISLAND_WEATHER_EFFECTS, true)
-    fun setIslandWeatherEffectsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_WEATHER_EFFECTS, enabled)
-
-    fun isIslandWeatherHapticsEnabled(): Boolean = getBoolean(KEY_ISLAND_WEATHER_HAPTICS, true)
-    fun setIslandWeatherHapticsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_WEATHER_HAPTICS, enabled)
-
-    fun getWeatherUnits(): String = getString(KEY_WEATHER_UNITS, WEATHER_UNITS_SYSTEM) ?: WEATHER_UNITS_SYSTEM
-    fun setWeatherUnits(units: String) = putString(KEY_WEATHER_UNITS, units)
 
     fun isIslandShowTimersEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_TIMERS, true)
     fun setIslandShowTimersEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_TIMERS, enabled)
