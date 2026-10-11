@@ -2202,6 +2202,7 @@ object FeatureRegistry {
             },
             object : Feature(
                 id = "Widget stack",
+                contributors = listOf("jawzf"),
                 title = R.string.feat_widget_stack_title,
                 iconRes = R.drawable.rounded_widgets_24,
                 category = R.string.cat_interface,
