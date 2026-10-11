@@ -2478,6 +2478,8 @@
     <string name="qs_tiles_widget_description">Trigger your favorite Quick Settings tiles directly from your home screen.</string>
     <string name="qs_tiles_widget_empty_state">No favorite tiles pinned yet. No tiles pinned yet. Long press to pin some!!</string>
     <!-- External Control Permission -->
+    <string name="external_control_token_title">External control token</string>
+    <string name="external_control_token_saved">Token saved</string>
     <string name="perm_external_control_label">control Essentials features</string>
     <string name="perm_external_control_desc">read, update and control Essentials features and settings</string>
     <string name="pixel_searchbar_settings_title">Pixel Searchbar Customization</string>

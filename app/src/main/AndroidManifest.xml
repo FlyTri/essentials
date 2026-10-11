@@ -1650,6 +1650,10 @@
             android:permission="com.sameerasw.essentials.permission.EXTERNAL_CONTROL" />
 
         <receiver
+            android:name=".external.ExternalTokenActionReceiver"
+            android:exported="true" />
+
+        <receiver
             android:name=".external.ExternalActionReceiver"
             android:exported="true"
             android:permission="com.sameerasw.essentials.permission.EXTERNAL_CONTROL">
