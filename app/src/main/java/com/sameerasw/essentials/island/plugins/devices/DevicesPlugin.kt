@@ -55,6 +55,7 @@ class DevicesPlugin : BaseIslandPlugin() {
     private var event: DeviceEvent? = null
     private var batteryDevice: BatteryDevice? = null
     private var registered = false
+    private val pendingDisconnects = mutableMapOf<String, Runnable>()
     private val clearEvent = Runnable {
         event = null
         render()
@@ -65,8 +66,23 @@ class DevicesPlugin : BaseIslandPlugin() {
             val device = intent?.deviceExtra() ?: return
             ctx?.mainHandler?.postDelayed({ refreshBattery() }, BATTERY_SETTLE_MS)
             when (intent.action) {
-                BluetoothDevice.ACTION_ACL_CONNECTED -> announce(device, connected = true)
-                BluetoothDevice.ACTION_ACL_DISCONNECTED -> announce(device, connected = false)
+                BluetoothDevice.ACTION_ACL_CONNECTED -> {
+                    val pending = pendingDisconnects.remove(device.address)
+                    if (pending != null) {
+                        ctx?.mainHandler?.removeCallbacks(pending)
+                    } else {
+                        announce(device, connected = true)
+                    }
+                }
+                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                    pendingDisconnects.remove(device.address)?.let { ctx?.mainHandler?.removeCallbacks(it) }
+                    val confirm = Runnable {
+                        pendingDisconnects.remove(device.address)
+                        announce(device, connected = false)
+                    }
+                    pendingDisconnects[device.address] = confirm
+                    ctx?.mainHandler?.postDelayed(confirm, DISCONNECT_SETTLE_MS)
+                }
                 ACTION_BATTERY_LEVEL_CHANGED -> {
                     val current = event ?: return
                     val level = intent.getIntExtra(EXTRA_BATTERY_LEVEL, -1)
@@ -93,6 +109,8 @@ class DevicesPlugin : BaseIslandPlugin() {
 
     override fun onStop() {
         ctx?.mainHandler?.removeCallbacks(clearEvent)
+        pendingDisconnects.values.forEach { ctx?.mainHandler?.removeCallbacks(it) }
+        pendingDisconnects.clear()
         event = null
         batteryDevice = null
         if (registered) {
@@ -281,6 +299,7 @@ class DevicesPlugin : BaseIslandPlugin() {
         const val ITEM_KEY = "devices"
         const val BATTERY_KEY = "devices.battery"
         private const val BATTERY_SETTLE_MS = 1500L
+        private const val DISCONNECT_SETTLE_MS = 2000L
         private const val ACTION_BATTERY_LEVEL_CHANGED = "android.bluetooth.device.action.BATTERY_LEVEL_CHANGED"
         private const val EXTRA_BATTERY_LEVEL = "android.bluetooth.device.extra.BATTERY_LEVEL"
     }
