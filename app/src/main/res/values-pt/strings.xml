@@ -1628,8 +1628,6 @@
     <string name="island_section_behavior">Comportamento</string>
     <string name="island_call_options_title">chamadas</string>
     <string name="island_section_notifications">notificações </string>
-    <string name="island_show_time_battery_title">
-tempo e bateria</string>
     <string name="island_show_timers_title">Temporizadores e cronômetros</string>
     <string name="diy_volume_channel_alarm">Alarme</string>
     <string name="duo_slide_mirror_direction_title">Espelhar direções </string>

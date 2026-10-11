@@ -1670,7 +1670,6 @@
     <string name="island_expanded_timeout_desc">De duur voordat het eiland weer inklapt (0 voor oneindig)</string>
     <string name="island_call_options_title">Telefoon</string>
     <string name="island_section_notifications">Meldingen</string>
-    <string name="island_show_time_battery_title">Tijd en batterij</string>
     <string name="island_show_timers_title">Timers en stopwatches</string>
     <string name="status_glance_show_calendar_title">Agenda afspraken</string>
     <string name="duo_action_horizontal_slide_sound_mode">Geluidsmodus</string>

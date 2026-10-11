@@ -4,6 +4,7 @@ object IslandPriorityEntries {
     class Entry(val id: String, val pluginIds: Set<String>, val defaultPriority: Int)
 
     val all = listOf(
+        Entry("battery", setOf("battery_alerts_plugin"), IslandPriority.BATTERY_ALERT),
         Entry("notifications", setOf("notifications"), IslandPriority.NOTIFICATION),
         Entry("flashlight", setOf("flashlight"), IslandPriority.FLASHLIGHT),
         Entry("timer", setOf("timer"), IslandPriority.TIMER),

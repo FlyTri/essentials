@@ -1776,7 +1776,6 @@
     <string name="island_dynamic_hide_status_bar_title">ステータスバーの項目を動的に非表示にする</string>
     <string name="island_catch_up_title">追いつく</string>
     <string name="island_catch_up_desc">最後の通知をアイランドに長時間表示する</string>
-    <string name="island_show_time_battery_title">時刻とバッテリー</string>
     <string name="diy_action_media_play_pause">メディアの一時停止または再生</string>
     <string name="diy_action_open_now_playing_app">再生中のアプリを開く</string>
     <string name="diy_action_wifi_on">Wi-Fiをオンにする</string>

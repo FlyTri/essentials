@@ -1812,7 +1812,6 @@ Cần có quyền quản trị thiết bị nếu sử dụng chế độ khóa.
     <string name="island_catch_up_desc">Giữ thông báo cuối cùng trên island lâu hơn</string>
     <string name="island_catch_up_timeout_title">Thời gian bắt kịp</string>
     <string name="island_show_calls_title">Cuộc gọi</string>
-    <string name="island_show_time_battery_title">Thời gian và pin</string>
     <string name="island_battery_only_low_title">Chỉ hiển thị khi pin yếu</string>
     <string name="island_battery_style_title">Kiểu icon pin</string>
     <string name="island_battery_percentage_title">Hiển thị phần trăm pin</string>

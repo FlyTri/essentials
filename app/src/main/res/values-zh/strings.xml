@@ -1594,7 +1594,6 @@
     <string name="status_glance_show_calendar_title">日历事件</string>
     <string name="duo_show_media_title">媒體播放</string>
     <string name="island_show_timers_title">计时器与停表</string>
-    <string name="island_show_time_battery_title">时间与电池</string>
     <string name="island_show_calls_title">电话</string>
     <string name="duo_hide_when_screen_off_title">熄屏时隐藏</string>
     <string name="duo_action_long_press_title">按住</string>
