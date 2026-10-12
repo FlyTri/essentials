@@ -35,6 +35,7 @@ import android.widget.Toast
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.HapticFeedbackType
+import com.sameerasw.essentials.domain.controller.CaffeinateController
 import com.sameerasw.essentials.domain.controller.HilightController
 import com.sameerasw.essentials.domain.controller.HotspotController
 import com.sameerasw.essentials.domain.diy.Action
@@ -161,6 +162,9 @@ object CombinedActionExecutor {
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
             when (action) {
                 is Action.TurnOnLowPower -> setLowPowerMode(context, true)
+                is Action.TurnOnCaffeinate -> CaffeinateController.start(context)
+                is Action.TurnOffCaffeinate -> CaffeinateController.cancelAll(context)
+                is Action.Wait -> delay(action.seconds * 1000L)
                 is Action.TurnOffLowPower -> setLowPowerMode(context, false)
                 is Action.SetChargingMode ->
                     com.sameerasw.essentials.utils.battery.ChargingModeUtil

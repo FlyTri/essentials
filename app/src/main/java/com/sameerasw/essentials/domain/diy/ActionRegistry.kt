@@ -49,6 +49,8 @@ object ActionRegistry {
                 add(Action.TurnOffAutoBrightness)
                 add(Action.ToggleAutoBrightness)
                 add(Action.DimWallpaper())
+                add(Action.TurnOnCaffeinate)
+                add(Action.TurnOffCaffeinate)
                 add(Action.ScreenOff())
                 if (sdkInt >= 35) add(Action.DeviceEffects())
             }
@@ -78,6 +80,7 @@ object ActionRegistry {
                 add(Action.TurnOffLowPower)
                 add(Action.SetChargingMode())
                 add(Action.CustomSettings())
+                add(Action.Wait())
                 add(Action.CircleToSearch)
                 // TakeScreenshot only available on screen-on context (null means no filter = include always)
                 if (screenOnOnly == null || screenOnOnly == true) {
