@@ -430,6 +430,21 @@ fun IslandSettingsUI(
                         onSettingsClick = { showAlarmOptionsSheet = true },
                         modifier = Modifier.highlight(highlightSetting == "island_show_alarm"),
                     )
+                    "hotspot" -> IconToggleItem(
+                        dragHandle = handle,
+                        iconRes = R.drawable.rounded_wifi_tethering_24,
+                        title = stringResource(R.string.island_show_hotspot_title),
+                        description = stringResource(R.string.island_hotspot_desc),
+                        isChecked = viewModel.isIslandShowHotspot.value,
+                        onCheckedChange = { checked ->
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            viewModel.setIslandShowHotspot(checked)
+                            if (checked && !PermissionUtils.hasUsageStatsPermission(context)) {
+                                requestingPermissionsFor = Pair(R.string.island_title, listOf("USAGE_STATS"))
+                            }
+                        },
+                        modifier = Modifier.highlight(highlightSetting == "island_show_hotspot"),
+                    )
                     "devices" -> IconToggleItem(
                         dragHandle = handle,
                         iconRes = R.drawable.rounded_bluetooth_24,

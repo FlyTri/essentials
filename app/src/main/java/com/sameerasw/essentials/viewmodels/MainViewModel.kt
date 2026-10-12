@@ -241,6 +241,7 @@ class MainViewModel : ViewModel() {
     val islandAlarmWindowHours = mutableIntStateOf(12)
     val isIslandShowTravel = mutableStateOf(true)
     val isIslandShowCaffeinate = mutableStateOf(true)
+    val isIslandShowHotspot = mutableStateOf(true)
     val isIslandShowDevices = mutableStateOf(true)
     val isIslandBriefEnabled = mutableStateOf(false)
     val isIslandBriefShowAlarm = mutableStateOf(true)
@@ -2406,6 +2407,7 @@ class MainViewModel : ViewModel() {
         isDuoKeepInFullscreen.value = settingsRepository.isDuoKeepInFullscreenEnabled()
         isDuoDisableInteractionsInFullscreen.value = settingsRepository.isDuoDisableInteractionsInFullscreenEnabled()
         isIslandShowCaffeinate.value = settingsRepository.isIslandShowCaffeinateEnabled()
+        isIslandShowHotspot.value = settingsRepository.isIslandShowHotspotEnabled()
         isIslandShowDevices.value = settingsRepository.isIslandShowDevicesEnabled()
         isIslandBriefEnabled.value = settingsRepository.isIslandBriefEnabled()
         isIslandBriefShowAlarm.value = settingsRepository.isIslandBriefShowAlarmEnabled()
@@ -5490,6 +5492,11 @@ class MainViewModel : ViewModel() {
     fun setIslandShowDevices(enabled: Boolean) {
         isIslandShowDevices.value = enabled
         settingsRepository.setIslandShowDevicesEnabled(enabled)
+    }
+
+    fun setIslandShowHotspot(enabled: Boolean) {
+        isIslandShowHotspot.value = enabled
+        settingsRepository.setIslandShowHotspotEnabled(enabled)
     }
 
     fun setIslandShowCaffeinate(enabled: Boolean) {
