@@ -266,6 +266,16 @@ class NotificationListener : NotificationListenerService() {
         return false
     }
 
+    // Do Not Disturb holds this notification back; apps and conversations allowed through DND still pass.
+    fun isBlockedByDnd(
+        sbn: StatusBarNotification,
+        rankingMap: RankingMap? = null,
+    ): Boolean {
+        val map = rankingMap ?: currentRanking ?: return false
+        val ranking = Ranking()
+        return map.getRanking(sbn.key, ranking) && !ranking.matchesInterruptionFilter()
+    }
+
     private fun populateActiveUnreadNotifications() {
         unreadNotifications.clear()
         try {
@@ -1013,7 +1023,10 @@ class NotificationListener : NotificationListenerService() {
         }
 
         if (!isRepost && isHeadsUpNotification(sbn, rankingMap, allowSilent = true)) {
-            val alert = extractNotificationAlert(sbn)?.copy(isSilent = isSilentNotification(sbn, rankingMap))
+            val alert = extractNotificationAlert(sbn)?.copy(
+                isSilent = isSilentNotification(sbn, rankingMap),
+                blockedByDnd = isBlockedByDnd(sbn, rankingMap),
+            )
             if (alert != null) {
                 notifyAlertPosted(alert)
             }
