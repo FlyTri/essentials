@@ -979,6 +979,11 @@ object FeatureRegistry {
                             "island_notif_skip_silent",
                         ),
                         SearchSetting(
+                            R.string.island_notif_follow_dnd_title,
+                            R.string.island_notif_follow_dnd_desc,
+                            "island_notif_follow_dnd",
+                        ),
+                        SearchSetting(
                             R.string.island_notif_keep_progress_title,
                             R.string.island_notif_keep_progress_desc,
                             "island_notif_keep_progress",

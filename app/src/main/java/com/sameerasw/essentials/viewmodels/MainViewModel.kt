@@ -264,6 +264,7 @@ class MainViewModel : ViewModel() {
     val isIslandNotifKeepProgress = mutableStateOf(true)
     val isIslandNotifQueue = mutableStateOf(true)
     val isIslandNotifSkipSilent = mutableStateOf(true)
+    val isIslandNotifFollowDnd = mutableStateOf(true)
     val isIslandNotifFilterApps = mutableStateOf(false)
     val isIslandShowNotifications = mutableStateOf(true)
     val isIslandNotifTapToOpen = mutableStateOf(false)
@@ -923,6 +924,9 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_ISLAND_NOTIF_SKIP_SILENT ->
                         isIslandNotifSkipSilent.value = settingsRepository.isIslandNotifSkipSilentEnabled()
+
+                    SettingsRepository.KEY_ISLAND_NOTIF_FOLLOW_DND ->
+                        isIslandNotifFollowDnd.value = settingsRepository.isIslandNotifFollowDndEnabled()
 
                     SettingsRepository.KEY_ISLAND_NOTIF_FILTER_APPS ->
                         isIslandNotifFilterApps.value = settingsRepository.isIslandNotifFilterAppsEnabled()
@@ -2433,6 +2437,7 @@ class MainViewModel : ViewModel() {
         isIslandNotifKeepProgress.value = settingsRepository.isIslandNotifKeepProgressEnabled()
         isIslandNotifQueue.value = settingsRepository.isIslandNotifQueueEnabled()
         isIslandNotifSkipSilent.value = settingsRepository.isIslandNotifSkipSilentEnabled()
+        isIslandNotifFollowDnd.value = settingsRepository.isIslandNotifFollowDndEnabled()
         isIslandNotifFilterApps.value = settingsRepository.isIslandNotifFilterAppsEnabled()
         isIslandShowNotifications.value = settingsRepository.isIslandShowNotificationsEnabled()
         isIslandNotifTapToOpen.value = settingsRepository.isIslandNotifTapToOpenEnabled()
@@ -5733,6 +5738,11 @@ class MainViewModel : ViewModel() {
     fun setIslandNotifSkipSilent(enabled: Boolean) {
         isIslandNotifSkipSilent.value = enabled
         settingsRepository.setIslandNotifSkipSilentEnabled(enabled)
+    }
+
+    fun setIslandNotifFollowDnd(enabled: Boolean) {
+        isIslandNotifFollowDnd.value = enabled
+        settingsRepository.setIslandNotifFollowDndEnabled(enabled)
     }
 
     fun setIslandNotifFilterApps(enabled: Boolean) {

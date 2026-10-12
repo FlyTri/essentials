@@ -3221,6 +3221,8 @@
     <string name="island_notif_section_lock_screen">Lock screen</string>
     <string name="island_notif_filter_apps_desc">Only show notifications from the apps you pick</string>
     <string name="island_notif_skip_silent_desc">Ignore notifications that arrive without sound</string>
+    <string name="island_notif_follow_dnd_title">Follow Do Not Disturb</string>
+    <string name="island_notif_follow_dnd_desc">Hide notifications that Do Not Disturb silences</string>
     <string name="island_notif_keep_progress_desc">Show downloads and other ongoing progress</string>
     <string name="island_notif_queue_desc">Keep several notifications instead of replacing the current one</string>
     <string name="island_notif_tap_to_open_desc">Tap an expanded notification to open its app</string>

@@ -42,6 +42,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_SHOW_GLOW,
         SettingsRepository.KEY_ISLAND_NOTIF_QUEUE,
         SettingsRepository.KEY_ISLAND_NOTIF_SKIP_SILENT,
+        SettingsRepository.KEY_ISLAND_NOTIF_FOLLOW_DND,
         SettingsRepository.KEY_ISLAND_NOTIF_FILTER_APPS,
         SettingsRepository.KEY_ISLAND_NOTIF_FILTER_APPS_LIST,
         SettingsRepository.KEY_ISLAND_NOTIF_TAP_TO_OPEN,
@@ -162,6 +163,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private fun passesFilters(alert: ActiveNotificationAlert): Boolean {
         if (alert.isSilent && settings.isIslandNotifSkipSilentEnabled()) return false
+        if (alert.blockedByDnd && settings.isIslandNotifFollowDndEnabled()) return false
         if (!settings.isIslandNotifFilterAppsEnabled()) return true
         return settings.loadIslandNotifFilterApps().any { it.isEnabled && it.packageName == alert.packageName }
     }
