@@ -114,24 +114,31 @@ private fun CondensedLine(line: LineContent, spec: IslandLayoutSpec, startInset:
 
     if (spec.growDirection == 0) {
         val edgePad = spec.cameraGap + spec.compactHeight * OPTICAL_INSET_RATIO
+        val titleWidth = condensedTitleWidth(
+            natural = natural,
+            lineWidth = spec.lineWidth,
+            cameraSlotWidth = spec.cameraSlotWidth,
+            cellSize = spec.cellSize,
+            edgePad = edgePad,
+            endInset = endInset,
+        )
+        // Both halves get the same width so the camera slot stays dead centre and the pill reads balanced; the slack
+        // collects beside the camera while icon and title hug the outer ends, the rule CompactTemplate already uses.
+        // condensedTitleWidth floors at cellSize, so the icon half is never squeezed.
+        val side = titleWidth + edgePad
         Row(
-            modifier = Modifier
-                .height(spec.compactHeight)
-                .padding(horizontal = edgePad),
+            modifier = Modifier.height(spec.compactHeight),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(Modifier.width(spec.cellSize), contentAlignment = Alignment.Center) { icon() }
+            Box(
+                modifier = Modifier.width(side).padding(start = edgePad),
+                contentAlignment = Alignment.CenterStart,
+            ) { icon() }
             Spacer(Modifier.width(spec.cameraSlotWidth))
-            title(
-                condensedTitleWidth(
-                    natural = natural,
-                    lineWidth = spec.lineWidth,
-                    cameraSlotWidth = spec.cameraSlotWidth,
-                    cellSize = spec.cellSize,
-                    edgePad = edgePad,
-                    endInset = endInset,
-                ),
-            )
+            Box(
+                modifier = Modifier.width(side).padding(end = edgePad),
+                contentAlignment = Alignment.CenterEnd,
+            ) { title(titleWidth) }
         }
     } else {
         val opticalInset = if (spec.growDirection > 0) spec.compactHeight * OPTICAL_INSET_RATIO else 0.dp

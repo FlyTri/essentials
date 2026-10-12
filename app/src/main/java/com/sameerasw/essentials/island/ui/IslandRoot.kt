@@ -407,15 +407,7 @@ fun IslandRoot(
         if (spec.growDirection == 0 && hasCompactCells) catchUpAnim.value.coerceAtLeast(0f) * (bubbleSizePx + bubbleGapPx) / 2f else 0f
     val lineShift = remember { Animatable(0f) }
     val liveSurfaceHeight = remember { mutableIntStateOf(0) }
-    val condensedLead = remember { Animatable(0f) }
-    val condensedLeadPx = with(density) {
-        (spec.cameraGap + spec.compactHeight * OPTICAL_INSET_RATIO + spec.cellSize).roundToPx()
-    }
-    fun condensedShift(width: Int): Int = (width - cameraSlotPx) / 2 - condensedLeadPx
-    fun surfaceShiftFor(width: Int): Int = when {
-        spec.growDirection != 0 -> spec.growDirection * (width - cameraSlotPx) / 2
-        else -> lerp(0, condensedShift(width), condensedLead.value)
-    }
+    fun surfaceShiftFor(width: Int): Int = spec.growDirection * (width - cameraSlotPx) / 2
     fun surfaceLeft(width: Int): Int = windowWidth / 2 - width / 2 + surfaceShiftFor(width) +
         lineShift.value.roundToInt() + catchShiftPx().roundToInt()
     fun bubbleX(width: Int): Int =
@@ -437,9 +429,6 @@ fun IslandRoot(
     val lineInset = if (lineInsetActive) spec.compactHeight + spec.cameraGap else 0.dp
     val lineInsets = if (spec.growDirection > 0) 0.dp to lineInset else lineInset to 0.dp
     val condensedLineActive = spec.growDirection == 0 && stage == IslandStage.Line && focusedItem?.line?.condensed == true
-    LaunchedEffect(condensedLineActive) {
-        condensedLead.animateTo(if (condensedLineActive) 1f else 0f, IslandMotion.float())
-    }
     LaunchedEffect(lineInsetActive, spec.growDirection, condensedLineActive) {
         val shift = if (lineInsetActive && spec.growDirection == 0 && !condensedLineActive) {
             (bubbleSizePx + bubbleGapPx) / 2f
@@ -481,12 +470,7 @@ fun IslandRoot(
         } else {
             0
         }
-        val settled = when {
-            spec.growDirection != 0 -> spec.growDirection * (target.width - cameraSlotPx) / 2
-            condensedLineActive -> condensedShift(target.width)
-            else -> 0
-        }
-        val left = windowWidth / 2 - target.width / 2 + settled + shift
+        val left = windowWidth / 2 - target.width / 2 + surfaceShiftFor(target.width) + shift
         val top = (surfaceTopPx - g).coerceAtLeast(0)
         var bounds = IntRect(left, top, left + target.width, surfaceTopPx - g + target.height)
         if (queueShown && stage == IslandStage.Line) {
