@@ -1320,6 +1320,9 @@
     <string name="diy_calendar_include_declined">Include declined events</string>
     <string name="diy_calendar_include_tentative">Include tentative events</string>
     <string name="diy_calendar_include_free">Include events shown as free</string>
+    <string name="diy_summary_every_day">Every day</string>
+    <string name="diy_summary_all_calendars">All calendars</string>
+    <string name="diy_summary_calendars_count">Calendars: %1$d</string>
     <string name="diy_calendar_filters">Filters</string>
     <string name="diy_calendar_calendars">Calendars</string>
     <string name="diy_calendar_permission">Calendar access is needed to pick calendars</string>
