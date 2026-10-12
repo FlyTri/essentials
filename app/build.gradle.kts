@@ -116,7 +116,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 68
-        versionName = "19.0"
+        versionName = "19.1-beta.1"
 
         val whatsNewCounter = 6
         buildConfigField("int", "WHATS_NEW_COUNTER", whatsNewCounter.toString())
@@ -229,6 +229,7 @@ dependencies {
     implementation(libs.androidx.wear.remote.interactions)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.gson)
+    implementation(project(":island-sdk"))
 
     // Kotlin Reflect for dynamic sealed class serialization
     implementation(kotlin("reflect"))

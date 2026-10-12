@@ -53,12 +53,14 @@ import com.sameerasw.essentials.data.repository.UpdateRepository
 import com.sameerasw.essentials.utils.LogManager
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.MapsState
+import com.sameerasw.essentials.domain.controller.CaffeinateController
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.domain.model.AppIcon
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.AppStandbyInfo
 import com.sameerasw.essentials.domain.model.DnsPreset
 import com.sameerasw.essentials.domain.model.HilightEffect
+import com.sameerasw.essentials.domain.model.HilightProgressColorMode
 import com.sameerasw.essentials.domain.model.LockscreenShortcutSide
 import com.sameerasw.essentials.domain.model.NotificationApp
 import com.sameerasw.essentials.domain.model.NotificationLightingColorMode
@@ -82,7 +84,6 @@ import com.sameerasw.essentials.utils.AppIconUtil
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.PermissionUtils
-import com.sameerasw.essentials.weather.overcast.OvercastWeather
 import com.sameerasw.essentials.utils.RefreshRateUtils
 import com.sameerasw.essentials.utils.RootUtils
 import com.sameerasw.essentials.utils.PrivilegedMode
@@ -138,6 +139,10 @@ class MainViewModel : ViewModel() {
     val isHilightOnlyWhenScreenOff = mutableStateOf(true)
     val isHilightSkipDnd = mutableStateOf(true)
     val hilightCooldownSeconds = mutableIntStateOf(60)
+    val isHilightProgressEnabled = mutableStateOf(false)
+    val hilightProgressColorMode = mutableStateOf(HilightProgressColorMode.VIBGYOR)
+    val hilightProgressColor = mutableIntStateOf(HilightEffect.DEFAULT_COLOR)
+    val hilightProgressDurationMs = mutableLongStateOf(HilightEffect.DEFAULT_DURATION_MS)
     val hilightAppEffects = mutableStateMapOf<String, HilightEffect>()
     val isLockscreenShortcutsEnabled = mutableStateOf(false)
     val lockscreenShortcutActions = mutableStateMapOf<LockscreenShortcutSide, List<Action>>()
@@ -152,6 +157,8 @@ class MainViewModel : ViewModel() {
     val isDuoIslandCombined = mutableStateOf(false)
     val isDuoTapForBrief = mutableStateOf(false)
     val isDuoHideOnShade = mutableStateOf(false)
+    val isDuoKeepInFullscreen = mutableStateOf(false)
+    val isDuoDisableInteractionsInFullscreen = mutableStateOf(false)
     val isDuoAutoDetect = mutableStateOf(true)
     val isFoldableCameraDevice = mutableStateOf(false)
     val isDuoOrientationProfiles = mutableStateOf(false)
@@ -212,6 +219,8 @@ class MainViewModel : ViewModel() {
     val isIslandHideInOwnerApp = mutableStateOf(false)
     val isIslandHideOnShade = mutableStateOf(false)
     val isIslandKeepOnLandscape = mutableStateOf(false)
+    val isIslandKeepInFullscreen = mutableStateOf(false)
+    val isIslandDisableInteractionsInFullscreen = mutableStateOf(false)
     val isIslandBondEdge = mutableStateOf(false)
     val islandMaxItems = mutableStateOf(2)
     val isIslandAlwaysGestures = mutableStateOf(false)
@@ -222,7 +231,6 @@ class MainViewModel : ViewModel() {
     val islandCameraPosition = mutableStateOf(SettingsRepository.ISLAND_CAMERA_POSITION_CENTER)
     val isIslandShowCalls = mutableStateOf(true)
     val isIslandShowTimers = mutableStateOf(true)
-    val isIslandShowWeather = mutableStateOf(false)
     val isIslandTimersShowScreenRecorder = mutableStateOf(true)
     val isIslandTimersFilterApps = mutableStateOf(false)
     val isIslandShowNetwork = mutableStateOf(true)
@@ -276,6 +284,8 @@ class MainViewModel : ViewModel() {
     val isIslandShowCalendar = mutableStateOf(false)
     val isIslandShowConsciousGate = mutableStateOf(true)
     val isIslandShowTimeBattery = mutableStateOf(false)
+    val isIslandShowBatteryAlerts = mutableStateOf(true)
+    val isIslandShowBattery = mutableStateOf(false)
     val isIslandShowFlashlight = mutableStateOf(true)
     val islandBatteryStyle = mutableStateOf(SettingsRepository.ISLAND_BATTERY_STYLE_RING)
     val isIslandBatteryPercentageEnabled = mutableStateOf(false)
@@ -342,7 +352,6 @@ class MainViewModel : ViewModel() {
     val isFlashlightPocketTurnOffEnabled = mutableStateOf(false)
     val isFlashlightOverheatEnabled = mutableStateOf(true)
     val isLocationPermissionGranted = mutableStateOf(false)
-    val isOvercastWeatherPermissionGranted = mutableStateOf(false)
     val isBackgroundLocationPermissionGranted = mutableStateOf(false)
     val isFullScreenIntentPermissionGranted = mutableStateOf(false)
     val isBluetoothPermissionGranted = mutableStateOf(false)
@@ -1956,7 +1965,6 @@ class MainViewModel : ViewModel() {
             PermissionUtils.isNotificationLightingAccessibilityServiceEnabled(context)
         isDefaultBrowserSet.value = PermissionUtils.isDefaultBrowser(context)
         isLocationPermissionGranted.value = PermissionUtils.hasLocationPermission(context)
-        isOvercastWeatherPermissionGranted.value = OvercastWeather.hasPermission(context)
         isBackgroundLocationPermissionGranted.value =
             PermissionUtils.hasBackgroundLocationPermission(context)
         isFullScreenIntentPermissionGranted.value = PermissionUtils.canUseFullScreenIntent(context)
@@ -2276,6 +2284,10 @@ class MainViewModel : ViewModel() {
         isHilightOnlyWhenScreenOff.value = settingsRepository.isHilightOnlyWhenScreenOff()
         isHilightSkipDnd.value = settingsRepository.isHilightSkipDnd()
         hilightCooldownSeconds.intValue = settingsRepository.getHilightCooldownSeconds()
+        isHilightProgressEnabled.value = settingsRepository.isHilightProgressEnabled()
+        hilightProgressColorMode.value = settingsRepository.getHilightProgressColorMode()
+        hilightProgressColor.intValue = settingsRepository.getHilightProgressColor()
+        hilightProgressDurationMs.longValue = settingsRepository.getHilightProgressDurationMs()
         hilightAppEffects.clear()
         hilightAppEffects.putAll(settingsRepository.getHilightAppEffects())
         isLockscreenShortcutsEnabled.value = settingsRepository.isLockscreenShortcutsEnabled()
@@ -2363,6 +2375,8 @@ class MainViewModel : ViewModel() {
         isIslandHideInOwnerApp.value = settingsRepository.isIslandHideInOwnerAppEnabled()
         isIslandHideOnShade.value = settingsRepository.isIslandHideOnShadeEnabled()
         isIslandKeepOnLandscape.value = settingsRepository.isIslandKeepOnLandscapeEnabled()
+        isIslandKeepInFullscreen.value = settingsRepository.isIslandKeepInFullscreenEnabled()
+        isIslandDisableInteractionsInFullscreen.value = settingsRepository.isIslandDisableInteractionsInFullscreenEnabled()
         isIslandBondEdge.value = settingsRepository.isIslandBondEdgeEnabled()
         islandMaxItems.value = settingsRepository.getIslandMaxItems()
         isIslandAlwaysGestures.value = settingsRepository.isIslandAlwaysGesturesEnabled()
@@ -2373,7 +2387,6 @@ class MainViewModel : ViewModel() {
         islandCameraPosition.value = settingsRepository.getIslandCameraPosition()
         isIslandShowCalls.value = settingsRepository.isIslandShowCallsEnabled()
         isIslandShowTimers.value = settingsRepository.isIslandShowTimersEnabled()
-        isIslandShowWeather.value = settingsRepository.isIslandShowWeatherEnabled()
         isIslandTimersShowScreenRecorder.value = settingsRepository.isIslandTimersShowScreenRecorderEnabled()
         isIslandTimersFilterApps.value = settingsRepository.isIslandTimersFilterAppsEnabled()
         isIslandShowNetwork.value = settingsRepository.isIslandShowNetworkEnabled()
@@ -2386,6 +2399,8 @@ class MainViewModel : ViewModel() {
         isDuoIslandCombined.value = settingsRepository.isDuoIslandCombinedSetting()
         isDuoTapForBrief.value = settingsRepository.isDuoTapForBriefEnabled()
         isDuoHideOnShade.value = settingsRepository.isDuoHideOnShadeEnabled()
+        isDuoKeepInFullscreen.value = settingsRepository.isDuoKeepInFullscreenEnabled()
+        isDuoDisableInteractionsInFullscreen.value = settingsRepository.isDuoDisableInteractionsInFullscreenEnabled()
         isIslandShowCaffeinate.value = settingsRepository.isIslandShowCaffeinateEnabled()
         isIslandShowDevices.value = settingsRepository.isIslandShowDevicesEnabled()
         isIslandBriefEnabled.value = settingsRepository.isIslandBriefEnabled()
@@ -2438,6 +2453,8 @@ class MainViewModel : ViewModel() {
         isIslandShowCalendar.value = settingsRepository.isIslandShowCalendarEnabled()
         isIslandShowConsciousGate.value = settingsRepository.isIslandShowConsciousGateEnabled()
         isIslandShowTimeBattery.value = settingsRepository.isIslandShowTimeBatteryEnabled()
+        isIslandShowBatteryAlerts.value = settingsRepository.isIslandShowBatteryAlertsEnabled()
+        isIslandShowBattery.value = settingsRepository.isIslandShowBatteryEnabled()
         isIslandShowFlashlight.value = settingsRepository.isIslandShowFlashlightEnabled()
         islandBatteryStyle.value = settingsRepository.getIslandBatteryStyle()
         isIslandBatteryPercentageEnabled.value = settingsRepository.isIslandBatteryPercentageEnabled()
@@ -4257,6 +4274,14 @@ class MainViewModel : ViewModel() {
         context: Context,
         enabled: Boolean,
     ) {
+        writePixelSearchbarSetting(context, enabled)
+        forceStopNexusLauncher()
+    }
+
+    private fun writePixelSearchbarSetting(
+        context: Context,
+        enabled: Boolean,
+    ) {
         val value = if (enabled) "com.sameerasw.essentials" else null
         val key = "selected_search_engine"
 
@@ -4282,8 +4307,9 @@ class MainViewModel : ViewModel() {
                 RootUtils.runCommand(command)
             }
         }
+    }
 
-        // Force stop nexus launcher to apply setting
+    private fun forceStopNexusLauncher() {
         val forceStopCommand = "am force-stop com.google.android.apps.nexuslauncher"
         if (ShizukuUtils.hasPermission()) {
             ShizukuUtils.runCommand(forceStopCommand)
@@ -4309,12 +4335,15 @@ class MainViewModel : ViewModel() {
         }
         updatePixelSearchbarWidget(context)
 
-        // Force stop nexus launcher to apply setting
-        val forceStopCommand = "am force-stop com.google.android.apps.nexuslauncher"
-        if (ShizukuUtils.hasPermission()) {
-            ShizukuUtils.runCommand(forceStopCommand)
-        } else if (RootUtils.isRootPermissionGranted()) {
-            RootUtils.runCommand(forceStopCommand)
+        if (isPixelSearchbarEnabled.value) {
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                writePixelSearchbarSetting(context, false)
+                kotlinx.coroutines.delay(300)
+                writePixelSearchbarSetting(context, true)
+                forceStopNexusLauncher()
+            }
+        } else {
+            forceStopNexusLauncher()
         }
     }
 
@@ -4389,6 +4418,15 @@ class MainViewModel : ViewModel() {
      * @param context [Context] Target context.
      */
     fun clearPixelSearchbarWidget(context: Context) {
+        val previousId = pixelSearchbarWidgetId.intValue
+        if (previousId != android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID) {
+            try {
+                android.appwidget
+                    .AppWidgetHost(context, com.sameerasw.essentials.services.widgets.WidgetScraperService.HOST_ID)
+                    .deleteAppWidgetId(previousId)
+            } catch (_: Exception) {
+            }
+        }
         pixelSearchbarWidgetId.intValue = android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID
         pixelSearchbarWidgetProvider.value = null
         settingsRepository.setPixelSearchbarWidgetId(android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID)
@@ -5285,6 +5323,7 @@ class MainViewModel : ViewModel() {
         if (enabled && combinedActive()) {
             isIslandShowTimeBattery.value = false
             settingsRepository.setIslandShowTimeBatteryEnabled(false)
+            setIslandShowBattery(false)
         }
         if (enabled) {
             isDuoShowNetworks.value = false
@@ -5326,6 +5365,16 @@ class MainViewModel : ViewModel() {
 
     private fun combinedActive(): Boolean = settingsRepository.isDuoIslandCombined()
 
+    fun setDuoKeepInFullscreen(enabled: Boolean) {
+        isDuoKeepInFullscreen.value = enabled
+        settingsRepository.setDuoKeepInFullscreenEnabled(enabled)
+    }
+
+    fun setDuoDisableInteractionsInFullscreen(enabled: Boolean) {
+        isDuoDisableInteractionsInFullscreen.value = enabled
+        settingsRepository.setDuoDisableInteractionsInFullscreenEnabled(enabled)
+    }
+
     fun setDuoHideOnShade(enabled: Boolean) {
         isDuoHideOnShade.value = enabled
         settingsRepository.setDuoHideOnShadeEnabled(enabled)
@@ -5344,6 +5393,7 @@ class MainViewModel : ViewModel() {
         setDuoShowBattery(true)
         setDuoShowNetworks(true)
         setIslandShowTimeBattery(false)
+        setIslandShowBattery(false)
         isDuoShowMedia.value = false
         settingsRepository.setDuoShowMediaEnabled(false)
         isDuoShowFlashlight.value = false
@@ -5486,11 +5536,6 @@ class MainViewModel : ViewModel() {
         islandCalendarEmojis.value = settingsRepository.getIslandCalendarEmojis()
     }
 
-    fun setIslandShowWeather(enabled: Boolean) {
-        isIslandShowWeather.value = enabled
-        settingsRepository.setIslandShowWeatherEnabled(enabled)
-    }
-
     fun setIslandShowTimers(enabled: Boolean) {
         isIslandShowTimers.value = enabled
         settingsRepository.setIslandShowTimersEnabled(enabled)
@@ -5564,6 +5609,16 @@ class MainViewModel : ViewModel() {
     fun setIslandBondEdge(enabled: Boolean) {
         isIslandBondEdge.value = enabled
         settingsRepository.setIslandBondEdgeEnabled(enabled)
+    }
+
+    fun setIslandKeepInFullscreen(enabled: Boolean) {
+        isIslandKeepInFullscreen.value = enabled
+        settingsRepository.setIslandKeepInFullscreenEnabled(enabled)
+    }
+
+    fun setIslandDisableInteractionsInFullscreen(enabled: Boolean) {
+        isIslandDisableInteractionsInFullscreen.value = enabled
+        settingsRepository.setIslandDisableInteractionsInFullscreenEnabled(enabled)
     }
 
     fun setIslandKeepOnLandscape(enabled: Boolean) {
@@ -5824,6 +5879,16 @@ class MainViewModel : ViewModel() {
     fun setIslandBatteryStyle(value: String) {
         islandBatteryStyle.value = value
         settingsRepository.setIslandBatteryStyle(value)
+    }
+
+    fun setIslandShowBattery(enabled: Boolean) {
+        isIslandShowBattery.value = enabled
+        settingsRepository.setIslandShowBatteryEnabled(enabled)
+    }
+
+    fun setIslandShowBatteryAlerts(enabled: Boolean) {
+        isIslandShowBatteryAlerts.value = enabled
+        settingsRepository.setIslandShowBatteryAlertsEnabled(enabled)
     }
 
     fun setIslandBatteryPercentageEnabled(enabled: Boolean) {
@@ -7836,19 +7901,6 @@ class MainViewModel : ViewModel() {
     }
 
     /**
-     * Executes the request Overcast weather permission operation.
-     *
-     * @param activity [androidx.activity.ComponentActivity] Target activity.
-     */
-    fun requestOvercastWeatherPermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(OvercastWeather.PERMISSION),
-            1007,
-        )
-    }
-
-    /**
      * Executes the request location permission operation.
      *
      * @param activity [androidx.activity.ComponentActivity] Target activity.
@@ -8006,6 +8058,7 @@ class MainViewModel : ViewModel() {
     fun startCaffeinate(context: Context) {
         context.startService(Intent(context, CaffeinateWakeLockService::class.java))
         isCaffeinateActive.value = true
+        CaffeinateController.isActive.value = true
     }
 
     /**
@@ -8014,7 +8067,7 @@ class MainViewModel : ViewModel() {
      * @param context [Context] Target context.
      */
     fun stopCaffeinate(context: Context) {
-        context.stopService(Intent(context, CaffeinateWakeLockService::class.java))
+        CaffeinateController.cancelAll(context)
         isCaffeinateActive.value = false
     }
 
@@ -8079,6 +8132,26 @@ class MainViewModel : ViewModel() {
     fun setHilightCooldownSeconds(seconds: Int) {
         hilightCooldownSeconds.intValue = seconds
         settingsRepository.setHilightCooldownSeconds(seconds)
+    }
+
+    fun setHilightProgressEnabled(enabled: Boolean) {
+        isHilightProgressEnabled.value = enabled
+        settingsRepository.setHilightProgressEnabled(enabled)
+    }
+
+    fun setHilightProgressColorMode(mode: HilightProgressColorMode) {
+        hilightProgressColorMode.value = mode
+        settingsRepository.setHilightProgressColorMode(mode)
+    }
+
+    fun setHilightProgressColor(color: Int) {
+        hilightProgressColor.intValue = color
+        settingsRepository.setHilightProgressColor(color)
+    }
+
+    fun setHilightProgressDurationMs(durationMs: Long) {
+        hilightProgressDurationMs.longValue = durationMs
+        settingsRepository.setHilightProgressDurationMs(durationMs)
     }
 
     fun setHilightAppEffect(

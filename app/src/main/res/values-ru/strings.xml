@@ -1717,7 +1717,6 @@
     <string name="island_catch_up_title">Удержание</string>
     <string name="island_catch_up_desc">Держать последнее уведомление в острове дольше</string>
     <string name="island_catch_up_timeout_title">Время удержания </string>
-    <string name="island_show_time_battery_title">Время и батарея</string>
     <string name="island_show_timers_title">Таймеры и секундомеры </string>
     <string name="feat_conscious_gate_title">Осознанная пауза</string>
     <string name="island_show_glow_title">Показывать акцентное свечение</string>
@@ -1753,8 +1752,6 @@
     <string name="island_timeout_title">Продолжительность показа</string>
     <string name="island_expanded_timeout_title">Тайм-аут раскрытости</string>
     <string name="island_expanded_timeout_desc">Длительность после второго всё сворачиваться в капсулу (от 0 до бесконечности)</string>
-    <string name="island_weather_effects_title">Погодные эффекты</string>
-    <string name="island_weather_haptics_title">Тактильный отклик</string>
     <string name="feat_conscious_gate_desc">Пауза перед открыванием выбранных приложений</string>
     <string name="haptic_mode_stronger">Повышенная</string>
     <string name="island_section_notifications">Уведомления</string>
@@ -1764,7 +1761,6 @@
     <string name="island_section_duration">Длительность</string>
     <string name="island_section_behavior">Поведение</string>
     <string name="duo_hide_when_locked_title">Скрывать когда заблокировано</string>
-    <string name="weather_units_title">Единицы</string>
     <string name="island_preview_ring_title">Показывать подсказку выравнивания</string>
     <string name="diy_volume_channel_alarm">Будильник</string>
     <string name="island_brief_two_line_header_title">2-линейный заголовок </string>
@@ -1786,8 +1782,6 @@
     <string name="about_desc_conscious_gate">Добавляет короткий экран осознанного контроля перед открытием приложений, к которым вы решили подходить более осознанно, например, соц сетей
 
 Кнопка Продолжить остается неактивной в течение нескольких секунд, чтобы у вас было время принять решение, и при желании пауза может появиться снова, если вы продолжите использовать приложение после истечения установленного времени</string>
-    <string name="perm_overcast_weather_title">Доступ к Overcast weather</string>
-    <string name="weather_error_overcast_permission">Разрешить доступ к Overcast weather</string>
     <string name="perm_contacts_title">Разрешение на контакты</string>
     <string name="perm_contacts_desc">Чтобы показывать контакты в результатах Pixel Search, Essentials требуется доступ к вашим контактам.</string>
     <string name="perm_install_packages_title">Установка неизвестных приложений</string>
@@ -1826,4 +1820,14 @@
     <string name="label_battery_current_now">Скорость разрядки</string>
     <string name="label_thermal_system_thermals">Температуры</string>
     <string name="label_charging_mode_title">Режим зарядки</string>
+    <string name="feat_face_unlock_brightness_title">Подсветка лица </string>
+    <string name="feat_face_unlock_brightness_desc">Поднимает яркость когда света мало</string>
+    <string name="face_unlock_ambient_threshold_title">Порог срабатывания </string>
+    <string name="face_unlock_ambient_now">Сейчас: %1$s</string>
+    <string name="face_unlock_auto_illuminate_title">Автоматически подсветить при включении</string>
+    <string name="face_unlock_light_tint_title">Светлый оттенок </string>
+    <string name="face_unlock_trigger_unlock_title">Реакция на разблокировку</string>
+    <string name="island_hide_live_updates_title">Скрыыать live updates Динамично</string>
+    <string name="feat_activity_launcher_title">Запускаешь Activity</string>
+    <string name="feat_activity_launcher_desc">Откройте или закрепите любой экран приложения</string>
 </resources>

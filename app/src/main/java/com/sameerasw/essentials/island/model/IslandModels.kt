@@ -15,6 +15,7 @@ object IslandPriority {
     const val CALL = -10
     const val TIME = 0
     const val BATTERY = 1
+    const val BATTERY_ALERT = 2
 
     const val TIMER_OVERRIDE = 5
     const val CALENDAR_OVERRIDE = 6
@@ -27,11 +28,9 @@ object IslandPriority {
     const val CONSCIOUS_GATE = 40
     const val CAFFEINATE = 44
     const val TRAVEL = 45
-    const val WEATHER_ALERT = 48
     const val CALENDAR = 50
     const val SOUND_MODE = 55
     const val SIGNAL = 57
-    const val WEATHER = 58
     const val NETWORK = 60
     const val DEVICES = 62
     const val ALARM = 90
@@ -50,6 +49,7 @@ class LineContent(
     val start: String,
     val end: String,
     val endSlot: (@Composable () -> Unit)? = null,
+    val showLeftIcon: Boolean = true,
     // Icon + title only on line peek
     val condensed: Boolean = false,
 )
@@ -57,6 +57,7 @@ class LineContent(
 interface IslandExpandedScope {
     val spec: IslandLayoutSpec
     val accent: Color
+    val current: Boolean get() = true
     fun collapse()
     fun dismiss()
     fun openApp()
@@ -135,6 +136,7 @@ class IslandItem(
     val bypassLauncherOnly: Boolean = false,
     
     val stack: List<StackIcon> = emptyList(),
+    val priorityGroup: String? = null,
 ) {
     var userPriority: Int? = null
 

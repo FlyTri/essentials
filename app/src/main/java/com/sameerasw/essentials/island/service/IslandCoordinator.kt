@@ -2,6 +2,7 @@ package com.sameerasw.essentials.island.service
 
 import android.provider.Settings
 import com.sameerasw.essentials.island.plugins.alarm.AlarmPlugin
+import com.sameerasw.essentials.island.plugins.batteryalerts.BatteryAlertsPlugin
 import com.sameerasw.essentials.island.plugins.timer.TimerPlugin
 import com.sameerasw.essentials.island.plugins.call.CallPlugin
 import android.accessibilityservice.AccessibilityService
@@ -47,7 +48,8 @@ import com.sameerasw.essentials.island.plugins.devices.DevicesPlugin
 import com.sameerasw.essentials.island.plugins.brief.BriefPlugin
 import com.sameerasw.essentials.island.plugins.progress.ProgressPlugin
 import com.sameerasw.essentials.island.plugins.soundmode.SoundModePlugin
-import com.sameerasw.essentials.island.plugins.weather.WeatherPlugin
+import com.sameerasw.essentials.island.remote.ProviderPriorities
+import com.sameerasw.essentials.island.remote.RemoteProvidersPlugin
 import com.sameerasw.essentials.island.plugins.travel.TravelPlugin
 import com.sameerasw.essentials.island.plugins.caffeinate.CaffeinatePlugin
 import com.sameerasw.essentials.island.plugins.media.MediaPlugin
@@ -110,13 +112,15 @@ class IslandCoordinator(
 
     private fun publishItems(pluginId: String, items: List<IslandItem>) {
         latestItems[pluginId] = items
-        val priority = userPriorities[pluginId]
-        items.forEach { it.userPriority = priority }
+        items.forEach { it.userPriority = userPriorities[it.priorityGroup ?: pluginId] }
         controller.setItems(pluginId, items)
     }
 
+    private fun resolvePriorities(): Map<String, Int> =
+        IslandPriorityEntries.resolve(settings.getIslandPriorityOrder(), ProviderPriorities.entries(service, settings))
+
     private fun reloadPriorities() {
-        userPriorities = IslandPriorityEntries.resolve(settings.getIslandPriorityOrder())
+        userPriorities = resolvePriorities()
         latestItems.toMap().forEach { (id, items) -> publishItems(id, items) }
     }
 
@@ -132,13 +136,14 @@ class IslandCoordinator(
         TimerPlugin(),
         SoundModePlugin(),
         AlarmPlugin(),
-        WeatherPlugin(),
+        RemoteProvidersPlugin(),
         CaffeinatePlugin(),
         TravelPlugin(),
         NetworkPlugin(),
         SignalPlugin(),
         DevicesPlugin(),
         BriefPlugin(),
+        BatteryAlertsPlugin(),
     )
 
     private var scope: CoroutineScope? = null
@@ -154,7 +159,7 @@ class IslandCoordinator(
     private var foregroundPackage: String? = null
     private var textInputActive = false
 
-    private val isWindowSuppressed get() = isFullscreenApp ||
+    private val isWindowSuppressed get() = (isFullscreenApp && !settings.isIslandKeepInFullscreenEnabled()) ||
         if (settings.isFoldableDevice()) {
             settings.isIslandHiddenInCurrentOrientation()
         } else {
@@ -448,7 +453,7 @@ class IslandCoordinator(
             focusedKey = { controller.state.value.focusedKey },
         )
         latestItems.clear()
-        userPriorities = IslandPriorityEntries.resolve(settings.getIslandPriorityOrder())
+        userPriorities = resolvePriorities()
         plugins.forEach { plugin ->
             plugin.start(context)
             newScope.launch { plugin.items.collect { publishItems(plugin.id, it) } }
@@ -615,6 +620,9 @@ class IslandCoordinator(
 
     private fun applySuppression() {
         controller.setSuppressed(isContentSuppressed || revealing || hiding)
+        windowHost.setInteractionsDisabled(
+            isFullscreenApp && settings.isIslandKeepInFullscreenEnabled() && settings.isIslandDisableInteractionsInFullscreenEnabled(),
+        )
         syncGestureHitbox()
     }
 
@@ -639,11 +647,12 @@ class IslandCoordinator(
         key ?: return
         val baseKey = key.substringBefore('@')
         when (baseKey) {
-            SettingsRepository.KEY_ISLAND_ENABLED, SettingsRepository.KEY_ISLAND_KEEP_ON_LANDSCAPE -> updateState()
+            SettingsRepository.KEY_ISLAND_ENABLED, SettingsRepository.KEY_ISLAND_KEEP_ON_LANDSCAPE,
+            SettingsRepository.KEY_ISLAND_KEEP_IN_FULLSCREEN, SettingsRepository.KEY_ISLAND_DISABLE_INTERACTIONS_IN_FULLSCREEN -> updateState()
             SettingsRepository.KEY_ISLAND_HIDE_PORTRAIT,
             SettingsRepository.KEY_ISLAND_HIDE_LANDSCAPE -> updateState()
             SettingsRepository.KEY_ISLAND_ALWAYS_GESTURES -> syncGestureHitbox()
-            SettingsRepository.KEY_ISLAND_PRIORITY_ORDER -> if (running) reloadPriorities()
+            SettingsRepository.KEY_ISLAND_PRIORITY_ORDER, SettingsRepository.KEY_ISLAND_PROVIDERS -> if (running) reloadPriorities()
             SettingsRepository.KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR, SettingsRepository.KEY_ISLAND_COMPACT_HIDE_STATUS_BAR -> syncStatusBar()
             SettingsRepository.KEY_ISLAND_HIDE_WHEN_SCREEN_OFF, SettingsRepository.KEY_ISLAND_SHOW_WHEN -> applySuppression()
             SettingsRepository.KEY_ISLAND_HIDE_IN_OWNER_APP -> applyOwnerAppHiding()
@@ -666,7 +675,6 @@ class IslandCoordinator(
         const val PREVIEW_KEY = "preview.sample"
         val LAUNCHER_ONLY_KEYS = mapOf(
             "time_battery" to SettingsRepository.KEY_ISLAND_TIME_BATTERY_LAUNCHER_ONLY,
-            "weather" to SettingsRepository.KEY_ISLAND_WEATHER_LAUNCHER_ONLY,
             "calendar" to SettingsRepository.KEY_ISLAND_CALENDAR_LAUNCHER_ONLY,
             "alarm" to SettingsRepository.KEY_ISLAND_ALARM_LAUNCHER_ONLY,
         )

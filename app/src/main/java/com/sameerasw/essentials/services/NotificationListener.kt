@@ -12,6 +12,7 @@ package com.sameerasw.essentials.services
 import android.graphics.drawable.Icon
 import android.content.pm.LauncherApps
 import com.sameerasw.essentials.domain.controller.HilightController
+import com.sameerasw.essentials.domain.controller.HilightProgressTracker
 import com.sameerasw.essentials.utils.PriorityModeUtil
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.notification.NotificationRepostFilter
@@ -1006,6 +1007,9 @@ class NotificationListener : NotificationListenerService() {
         val extras = sbn.notification.extras
         if (extras != null && (extras.getInt(Notification.EXTRA_PROGRESS_MAX, 0) > 0 || extras.containsKey(Notification.EXTRA_PROGRESS_INDETERMINATE))) {
             scheduleProgressRefresh()
+        } else if (HilightProgressTracker.isTracking(sbn.key)) {
+            // Its progress bar was replaced, e.g. by "Download complete"
+            scheduleProgressRefresh()
         }
 
         if (!isRepost && isHeadsUpNotification(sbn, rankingMap, allowSilent = true)) {
@@ -1412,6 +1416,7 @@ class NotificationListener : NotificationListenerService() {
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         if (LiveUpdateSnoozer.isSnoozedByUs(sbn.key)) return
         NotificationRepostFilter.forget(sbn.key)
+        HilightProgressTracker.onRemoved(sbn.key)
         CallStateRepository.onCallNotificationRemoved(sbn.key)
         ChronometerRepository.onRemoved(sbn.key)
         unreadNotifications.remove(sbn.key)
@@ -1853,6 +1858,7 @@ class NotificationListener : NotificationListenerService() {
                         Log.e("NotificationListener", "Failed to extract progress notification", e)
                         return@execute
                     }
+                HilightProgressTracker.onProgress(applicationContext, data)
                 progressHandler.post { notifyProgressListeners(data) }
             }
         }
@@ -2133,7 +2139,7 @@ class NotificationListener : NotificationListenerService() {
         if (actions != null) {
             for (action in actions) {
                 val actionTitle = action.title?.toString()
-                if (!actionTitle.isNullOrBlank()) {
+                if (!actionTitle.isNullOrBlank() && action.actionIntent != null) {
                     val remoteInputs = action.remoteInputs
                     val hasReply = !remoteInputs.isNullOrEmpty()
                     actionList.add(
@@ -2165,8 +2171,9 @@ class NotificationListener : NotificationListenerService() {
         )
     }
 
+    // Ranking.getConversationShortcutInfo is missing from Android 11 framework builds
     private fun conversationShortcutIcon(sbn: StatusBarNotification): Bitmap? {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return null
         return try {
             val ranking = Ranking()
             if (!currentRanking.getRanking(sbn.key, ranking)) return null
@@ -2174,10 +2181,19 @@ class NotificationListener : NotificationListenerService() {
             val launcherApps = getSystemService(LauncherApps::class.java) ?: return null
             launcherApps.getShortcutIconDrawable(shortcut, resources.displayMetrics.densityDpi)
                 ?.let { AppUtil.drawableToBitmap(it) }
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
             null
         }
     }
+
+    private fun backgroundStartOptions(): Bundle? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            android.app.ActivityOptions.makeBasic().apply {
+                pendingIntentBackgroundActivityStartMode = android.app.ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
+            }.toBundle()
+        } else {
+            null
+        }
 
     fun performNotificationAction(
         actionItem: NotificationActionItem,
@@ -2194,11 +2210,15 @@ class NotificationListener : NotificationListenerService() {
                         results.putCharSequence(ri.resultKey, replyText)
                     }
                     android.app.RemoteInput.addResultsToIntent(remoteInputs, intent, results)
-                    pendingIntent.send(this, 0, intent)
+                    pendingIntent.send(this, 0, intent, null, null, null, backgroundStartOptions())
                     return true
                 }
             }
-            pendingIntent.send()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                pendingIntent.send(this, 0, null, null, null, null, backgroundStartOptions())
+            } else {
+                pendingIntent.send()
+            }
             true
         } catch (e: Exception) {
             Log.e("NotificationListener", "Error performing notification action: ${e.message}")

@@ -61,9 +61,8 @@ import com.sameerasw.essentials.ui.features.display.sheets.IslandCallOptionsBott
 import com.sameerasw.essentials.ui.features.display.sheets.IslandDevicesBatteryBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandPrefToggle
 import com.sameerasw.essentials.ui.features.display.sheets.IslandPulseShadowOptionsBottomSheet
-import com.sameerasw.essentials.ui.features.display.sheets.IslandTimeBatteryOptionsBottomSheet
+import com.sameerasw.essentials.ui.features.display.sheets.IslandTimeOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandTimerOptionsBottomSheet
-import com.sameerasw.essentials.ui.features.display.sheets.IslandWeatherOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.StatusGlanceCalendarOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.rememberIslandShowsWhileLocked
 import com.sameerasw.essentials.ui.modifiers.highlight
@@ -662,6 +661,34 @@ fun IslandBehaviorSettingsUI(
                 },
                 modifier = Modifier.highlight(highlightSetting == "island_hide_on_shade"),
             )
+
+            IconToggleItem(
+                iconRes = R.drawable.rounded_fullscreen_portrait_24,
+                title = stringResource(R.string.keep_in_full_screen_title),
+                isChecked = viewModel.isIslandKeepInFullscreen.value,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    viewModel.setIslandKeepInFullscreen(checked)
+                },
+                modifier = Modifier.highlight(highlightSetting == "island_keep_in_fullscreen"),
+            )
+
+            AnimatedVisibility(
+                visible = viewModel.isIslandKeepInFullscreen.value,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
+                IconToggleItem(
+                    iconRes = R.drawable.rounded_do_not_touch_24,
+                    title = stringResource(R.string.disable_interactions_in_full_screen_title),
+                    isChecked = viewModel.isIslandDisableInteractionsInFullscreen.value,
+                    onCheckedChange = { checked ->
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        viewModel.setIslandDisableInteractionsInFullscreen(checked)
+                    },
+                    modifier = Modifier.highlight(highlightSetting == "island_disable_interactions_in_fullscreen"),
+                )
+            }
         }
 
         RoundedCardContainer(

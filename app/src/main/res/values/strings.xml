@@ -265,7 +265,7 @@
     <string name="pinned_action_missing_toast">This shortcut no longer exists. Pin it again from Essentials.</string>
     <string name="diy_action_hilight">Hilight Effect</string>
     <string name="feat_hilight_title">Hilight</string>
-    <string name="feat_hilight_desc">Light the rear LEDs for notifications</string>
+    <string name="feat_hilight_desc">Light the rear LEDs for notifications and live progress</string>
     <string name="about_desc_hilight">Lights the Hilight LEDs on the back of the Pixel 11 Pro, Pro XL and Pro Fold when notifications arrive, with a custom effect for each app you add. Hilight effects can also be used as an action in Button remap and automations. Needs Shizuku, which must be restarted after every reboot.</string>
     <string name="hilight_status_no_access">Hilight needs Shizuku or Porter. Make sure it is running and Essentials has access to it.</string>
     <string name="hilight_status_unsupported_mode">Hilight needs Shizuku or Porter. Switch Privileged access in settings to Auto, Shizuku or Porter.</string>
@@ -296,6 +296,17 @@
     <string name="hilight_pattern_flash">Flash</string>
     <string name="hilight_pattern_sweep">Sweep</string>
     <string name="hilight_pattern_rainbow">Rainbow</string>
+    <string name="hilight_progress_title">Live progress</string>
+    <string name="feat_hilight_notifications_title">Notification effects</string>
+    <string name="feat_hilight_progress_desc">Show download and live update progress on the LEDs</string>
+    <string name="about_desc_hilight_progress">Shows the progress of downloads and live updates on the Hilight LEDs, lighting one more LED each time progress passes another eighth and blinking all eight when it finishes. Needs Shizuku, which must be restarted after every reboot.</string>
+    <string name="hilight_progress_toggle_title">Show live progress</string>
+    <string name="hilight_progress_toggle_desc">Light one more LED each time a download or live update passes another eighth, and blink when it finishes</string>
+    <string name="hilight_progress_mode_monochrome">Monochrome</string>
+    <string name="hilight_progress_mode_sequential">Sequential</string>
+    <string name="hilight_progress_mode_vibgyor">VIBGYOR</string>
+    <string name="search_hilight_progress_title">Hilight live progress</string>
+    <string name="search_hilight_progress_desc">Show download and live update progress on the rear LEDs</string>
     <string name="feat_lockscreen_shortcuts_title">Lock screen shortcuts</string>
     <string name="feat_lockscreen_shortcuts_desc">Run your own actions from the lock screen</string>
     <string name="about_desc_lockscreen_shortcuts">Adds Essentials shortcut buttons to the bottom corners of the lock screen. Touch and hold a shortcut to run its action. Only available while the system\'s own lock screen shortcuts are turned off.</string>
@@ -1407,6 +1418,14 @@
     <string name="diy_select_action">Select Action</string>
     <string name="diy_in_action_label">In Action</string>
     <string name="diy_out_action_label">Out Action</string>
+    <string name="diy_more_actions">+%1$d</string>
+    <string name="diy_type_trigger">Trigger</string>
+    <string name="diy_type_state">State</string>
+    <string name="diy_type_app">App</string>
+    <string name="diy_type_action_shortcut">Action shortcut</string>
+    <string name="diy_type_accessibility_shortcut">Accessibility shortcut</string>
+    <string name="diy_type_pixel_searchbar">Search bar</string>
+    <string name="diy_no_actions">No actions yet. Add one or more actions; they run in order.</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
     <string name="action_reset">Reset</string>
@@ -1477,6 +1496,11 @@
     <string name="error_app_uninstalled">App not found or uninstalled</string>
 
     <!-- Notifications -->
+    <string name="automation_channel_name">Automations</string>
+    <string name="automation_failed_title">Automation failed</string>
+    <string name="automation_failed_text">%1$s: %2$s</string>
+    <string name="automation_failed_missing">Missing permission: %1$s</string>
+    <string name="automation_failed_apps">Could not change: %1$s</string>
     <string name="update_channel_name">App Updates</string>
     <string name="update_channel_desc">Notifications for new app updates</string>
     <string name="notification_update_available">Update Available!</string>
@@ -1710,6 +1734,16 @@
     <string name="action_support">Support</string>
     <string name="label_other_apps">Other Apps</string>
     <string name="app_overcast">Overcast</string>
+    <string name="island_providers_title">Island apps</string>
+    <string name="island_provider_pair_title">Allow %1$s on the island?</string>
+    <string name="island_provider_pair_subtitle">%1$s wants to show its content on your island.</string>
+    <string name="island_provider_cap_show">Show %1$s on the island</string>
+    <string name="island_provider_cap_views">Display its own views there</string>
+    <string name="island_provider_cap_open">Open %1$s from the island</string>
+    <string name="island_provider_detail_key">Signing key</string>
+    <string name="island_provider_allow">Allow</string>
+    <string name="island_provider_deny">Deny</string>
+    <string name="island_provider_pair_failed">Couldn\'t connect to the app</string>
     <string name="app_airsync">AirSync</string>
     <string name="app_zenzero">ZenZero</string>
     <string name="app_canvas">Canvas</string>
@@ -2444,6 +2478,8 @@
     <string name="qs_tiles_widget_description">Trigger your favorite Quick Settings tiles directly from your home screen.</string>
     <string name="qs_tiles_widget_empty_state">No favorite tiles pinned yet. No tiles pinned yet. Long press to pin some!!</string>
     <!-- External Control Permission -->
+    <string name="external_control_token_title">External control token</string>
+    <string name="external_control_token_saved">Token saved</string>
     <string name="perm_external_control_label">control Essentials features</string>
     <string name="perm_external_control_desc">read, update and control Essentials features and settings</string>
     <string name="pixel_searchbar_settings_title">Pixel Searchbar Customization</string>
@@ -2458,6 +2494,7 @@
     <string name="pixel_searchbar_tap_action_title">Configure tap action</string>
     <string name="pixel_searchbar_tap_action_desc">Set up actions to trigger in DIY automations when tapped</string>
     <string name="pixel_searchbar_style_widget">Widget</string>
+    <string name="pixel_searchbar_widget_unsupported">%1$s can\'t be shown here</string>
     <string name="pixel_searchbar_widget_picker_title">Pick a widget</string>
     <string name="pixel_searchbar_widget_picker_desc">Select a widget to display its content in the searchbar</string>
     <string name="pixel_searchbar_widget_selected">Widget selected</string>
@@ -2946,6 +2983,8 @@
     <string name="island_enable_desc">Display dynamic island</string>
     <string name="island_section_position">Position and dimensions</string>
     <string name="island_section_placement">Placement</string>
+    <string name="keep_in_full_screen_title">Keep in full screen</string>
+    <string name="disable_interactions_in_full_screen_title">Disable interactions in full screen</string>
     <string name="island_keep_on_landscape_title">Keep on landscape</string>
     <string name="island_landscape_top_spacing_title">Landscape top spacing</string>
     <string name="island_bond_edge_title">Bond with notch when inactive</string>
@@ -2972,10 +3011,22 @@
     <string name="island_action_tap_title">Single tap</string>
     <string name="island_action_tap_desc">Open app</string>
     <string name="island_tap_action_title">Tap action</string>
-    <string name="island_show_time_battery_title">Time and battery</string>
+    <string name="island_show_time_title">Time</string>
+    <string name="island_show_battery_title">Battery</string>
     <string name="island_battery_style_title">Battery style</string>
     <string name="island_battery_style_ring">Ring</string>
     <string name="island_battery_style_icon">Icon</string>
+    <string name="island_battery_alerts_title">Battery alerts</string>
+    <string name="island_battery_alerts_options_title">Battery alert options</string>
+    <string name="island_battery_alert_charging_title">Charging connected</string>
+    <string name="island_battery_alert_low_title" formatted="false">Low Battery (11-20%)</string>
+    <string name="island_battery_alert_critical_title" formatted="false">Critical Battery (0-10%)</string>
+    <string name="island_battery_alert_charging">Charging</string>
+    <string name="island_battery_alert_low">Low Battery</string>
+    <string name="island_battery_alert_critical">Critical Battery</string>
+    <string name="island_battery_alert_icon_position_title">Icon position</string>
+    <string name="island_battery_alert_icon_position_right">Right</string>
+    <string name="island_battery_alert_icon_position_left">Left</string>
     <string name="slider_value_label">Value</string>
     <string name="island_font_scale_title">Font size</string>
     <string name="island_hide_in_owner_app_title">Hide complication inside the app</string>
@@ -3063,30 +3114,6 @@
     <string name="island_camera_position_right">Right</string>
     <string name="island_show_calls_title">Calls</string>
     <string name="island_show_timers_title">Timers and stopwatches</string>
-    <string name="island_weather_options_title">Weather options</string>
-    <string name="island_weather_mode_title">Show in Island</string>
-    <string name="island_weather_mode_brief">Brief only</string>
-    <string name="island_weather_mode_always">Always</string>
-    <string name="island_weather_mode_alerts">Severe alerts</string>
-    <string name="island_weather_peek_alerts_title">Peek on severe alerts</string>
-    <string name="island_weather_effects_title">Weather effects</string>
-    <string name="island_weather_haptics_title">Simulation haptics</string>
-    <string name="weather_units_title">Units</string>
-    <string name="weather_units_system">System</string>
-    <string name="weather_high_low">H:%1$s L:%2$s</string>
-    <string name="weather_feels_like">Feels like %1$s</string>
-    <string name="weather_alert_until">Until %1$s</string>
-    <string name="perm_overcast_weather_title">Overcast weather access</string>
-    <string name="perm_overcast_weather_desc">Lets Essentials read the latest weather for your current or saved location from Overcast.</string>
-    <string name="perm_overcast_weather_missing_desc">Weather comes from the Overcast app. Install it, then allow access here.</string>
-    <string name="perm_action_install_overcast">Install Overcast</string>
-    <string name="island_weather_install_overcast">Install Overcast</string>
-    <string name="island_weather_allow_overcast">Allow access to Overcast</string>
-    <string name="island_weather_open_overcast">Open Overcast</string>
-    <string name="weather_error_overcast_missing">Install Overcast to see weather</string>
-    <string name="weather_error_overcast_permission">Allow access to Overcast weather</string>
-    <string name="weather_error_no_location">Couldn\'t get a location</string>
-    <string name="weather_error_unknown">Couldn\'t load weather</string>
     <string name="island_timer_options_title">Timer options</string>
     <string name="island_timers_show_screen_recorder_title">Show screen recorder</string>
     <string name="island_timers_filter_apps_title">Filter for apps</string>
@@ -3121,7 +3148,7 @@
     <string name="toast_granting_permissions">Granting permissions…</string>
     <string name="toast_permissions_granted">Granted all available permissions</string>
     <string name="island_battery_only_low_title">Only show when low</string>
-    <string name="island_devices_battery_desc">Pick devices to show battery for. Only one is shown at a time: the highest one in this list that is connected.</string>
+    <string name="island_devices_battery_desc">Pick devices to show connection status and battery for. Only one battery is shown at a time: the highest one in this list that is connected.</string>
     <string name="island_devices_battery_empty">No paired devices</string>
     <string name="island_devices_battery_section">Devices</string>
     <string name="island_devices_move_up">Move up</string>
@@ -3156,6 +3183,7 @@
     <string name="island_call_answer">Answer</string>
     <string name="island_call_decline">Decline</string>
     <string name="island_call_end">End</string>
+    <string name="island_call_open">Open</string>
     <string name="island_call_mute">Mute</string>
     <string name="island_call_speaker">Speaker</string>
     <string name="island_calendar_view_event">View event</string>
@@ -3214,11 +3242,17 @@
     <string name="action_expand_settings">Expand settings</string>
     <string name="action_collapse_status_bar">Collapse status bar</string>
 
-    <!-- Watchface Promotion -->
+    <!-- Watchface Promotion & Testing -->
     <string name="whats_new_watchface_title">New: Essentials Watchface</string>
     <string name="whats_new_watchface_desc">Install the Essentials watchface on your Wear OS watch straight from Google Play.</string>
     <string name="whats_new_watchface_summary">Now on Google Play for Wear OS</string>
-    <string name="watchface_promo_step3_title">Install on Watch</string>
+    <string name="watchface_promo_step1_title">1. Join Google Group</string>
+    <string name="watchface_promo_step1_desc">Join the testing group using the Gmail account associated with your watch</string>
+    <string name="watchface_promo_step1_action">Join Google Group</string>
+    <string name="watchface_promo_step2_title">2. Join Beta Program</string>
+    <string name="watchface_promo_step2_desc">Opt-in to the internal testing program on Google Play</string>
+    <string name="watchface_promo_step2_action">Join Beta Program</string>
+    <string name="watchface_promo_step3_title">3. Install on Watch</string>
     <string name="watchface_promo_step3_desc">Open the Play Store listing directly on your watch to install</string>
     <string name="watchface_promo_step3_action">Open on Watch</string>
 
@@ -3230,11 +3264,54 @@
     <string name="whats_new_overcast_card_desc">Weather by sameerasw</string>
     <string name="whats_new_hidden_debugging_summary">Detect developer options and debugging hidden by Android 17</string>
     <string name="whats_new_overcast_action_install">Install Overcast</string>
-    <string name="whats_new_overcast_action_allow_permission">Allow Access</string>
     <string name="whats_new_overcast_action_open">Open Overcast</string>
     <string name="whats_new_overcast_status_installed">Installed &amp; Connected</string>
-    <string name="whats_new_overcast_status_permission_needed">Installed (Permission needed)</string>
     <string name="whats_new_overcast_status_not_installed">Not installed</string>
     <string name="whats_new_feature_tags_title">New: Feature tags and what they mean</string>
     <string name="island_media_show_like_title">Show like track button</string>
+    <!-- Widget stack -->
+    <string name="widget_stack_label">Widget stack</string>
+    <string name="widget_stack_description">Stack several widgets in one place and switch between them</string>
+    <string name="widget_stack_empty">Tap to add widgets to this stack</string>
+    <string name="widget_stack_previous">Previous widget</string>
+    <string name="widget_stack_next">Next widget</string>
+    <string name="widget_stack_loading">Loading %1$s…</string>
+    <string name="widget_stack_unsupported">%1$s can\'t be shown in a stack</string>
+    <string name="widget_stack_unsupported_short">Can\'t be shown in a stack</string>
+    <string name="widget_stack_cant_nest">A widget stack can\'t hold another stack</string>
+    <string name="feat_widget_stack_title">Widget stack</string>
+    <string name="feat_widget_stack_desc">Stack widgets and switch between them</string>
+    <string name="about_desc_widget_stack">Put several widgets from any app in one spot on your homescreen.\n\nThe stack switches to the next widget on a timer, or you can switch with the arrows below it. Widgets that show a scrolling list, such as a calendar agenda, can\'t be shown in a stack.</string>
+    <string name="widget_stack_add_to_home">Add a stack to the homescreen</string>
+    <string name="widget_stack_add_to_home_desc">Then pick the widgets it should hold</string>
+    <string name="widget_stack_your_stacks">Stacks on your homescreen</string>
+    <string name="widget_stack_count_one">1 widget</string>
+    <string name="widget_stack_count_many">%1$d widgets</string>
+    <string name="widget_stack_count_none">No widgets yet</string>
+    <string name="widget_picker_title">Widgets</string>
+    <string name="widget_picker_search">Search</string>
+    <string name="widget_picker_size">%1$d × %2$d</string>
+    <string name="widget_picker_empty">No widgets found</string>
+    <string name="widget_stack_pin_unsupported">Your launcher can\'t add widgets from here. Add \"Widget stack\" from the homescreen\'s widget list instead.</string>
+    <string name="widget_stack_settings_title">Widget stack</string>
+    <string name="widget_stack_widgets_title">Widgets in this stack</string>
+    <string name="widget_stack_add_widget">Add widget</string>
+    <string name="widget_stack_remove_widget">Remove</string>
+    <string name="widget_stack_move_up">Move up</string>
+    <string name="widget_stack_move_down">Move down</string>
+    <string name="widget_stack_max_reached">A stack can hold up to %1$d widgets</string>
+    <string name="widget_stack_interval_title">Switch automatically</string>
+    <string name="widget_stack_interval_off">Off</string>
+    <string name="widget_stack_interval_seconds">%1$ds</string>
+    <string name="widget_stack_show_controls">Switch</string>
+    <string name="widget_stack_controls_always">Arrows and dots</string>
+    <string name="widget_stack_controls_auto_hide">Auto-hide</string>
+    <string name="widget_stack_controls_hidden">Hidden</string>
+    <string name="widget_stack_controls_edges">Widget edges</string>
+    <string name="widget_stack_controls_auto_hide_desc">Tap below the stack to show them. They hide again after a few seconds.</string>
+    <string name="widget_stack_show_controls_handle">Show arrows and dots</string>
+    <string name="widget_stack_overlay_needed">Allow Essentials to display over other apps so the stacked widgets keep updating</string>
+    <string name="widget_stack_grant">Grant</string>
+    <string name="widget_stack_done">Done</string>
+    <string name="widget_stack_unknown_widget">Widget</string>
 </resources>

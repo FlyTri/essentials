@@ -15,6 +15,7 @@ import android.content.Intent
 import com.sameerasw.essentials.domain.diy.Automation
 import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.services.automation.executors.CombinedActionExecutor
+import com.sameerasw.essentials.services.automation.modules.TimeModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,16 +47,15 @@ class TimeAutomationReceiver : BroadcastReceiver() {
                     return@launch
                 }
 
+                TimeModule.rescheduleNext(context, automation, isEntry)
+
                 when (automation.type) {
                     Automation.Type.TRIGGER -> {
-                        automation.actions.forEach { action ->
-                            CombinedActionExecutor.execute(context, action)
-                        }
+                        CombinedActionExecutor.executeAll(context, automation.actionList)
                     }
 
                     Automation.Type.STATE -> {
-                        val action = if (isEntry) automation.entryAction else automation.exitAction
-                        action?.let { CombinedActionExecutor.execute(context, it) }
+                        CombinedActionExecutor.executeAll(context, if (isEntry) automation.entryActionList else automation.exitActionList)
                     }
 
                     else -> {}

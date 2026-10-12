@@ -1475,7 +1475,6 @@
     <string name="flashlight_pocket_desc">Kapcsold ki a vakut, ha a telefon a zsebedben van</string>
     <string name="search_smart_pixels_enable_title">Okos pixelek engedélyezése</string>
     <string name="smart_pixels_intensity_title">Intenzitás</string>
-    <string name="island_weather_effects_title">Időjárás effektek</string>
     <string name="feat_notification_snoozing_title">Értesitések elhalasztása</string>
     <string name="feat_notification_snoozing_desc">Értesítések átütemezése</string>
     <string name="feat_safe_volume_title">Biztonságos hangerő figyelmeztetés letiltása</string>
@@ -1496,7 +1495,6 @@
     <string name="island_section_duration">Időtartam</string>
     <string name="island_section_behavior">Viselkedés</string>
     <string name="island_call_options_title">Hívások</string>
-    <string name="island_show_time_battery_title">Idő és akkumulátor</string>
     <string name="island_show_timers_title">Időzítők és stopperek</string>
     <string name="duo_show_media_title">Médialejátszás</string>
     <string name="status_glance_show_calendar_title">Naptári események</string>

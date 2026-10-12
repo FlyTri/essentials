@@ -183,7 +183,7 @@ fun WatchInstallHelpBottomSheet(
             var isWatchfaceSectionExpanded by remember { mutableStateOf(false) }
             CategoryExpandableSection(
                 title = stringResource(R.string.watch_watchface_title),
-                itemCount = 1,
+                itemCount = 3,
                 isExpanded = isWatchfaceSectionExpanded,
                 onToggleExpand = { isWatchfaceSectionExpanded = !isWatchfaceSectionExpanded },
             ) {

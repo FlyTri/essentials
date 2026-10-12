@@ -1486,7 +1486,6 @@
     <string name="island_enable_title">Увімкнути Острів</string>
     <string name="duo_hide_when_screen_off_title">Ховати коли екран вимкнуто</string>
     <string name="island_show_calls_title">Дзвінки </string>
-    <string name="island_show_time_battery_title">Час і батарея</string>
     <string name="duo_action_horizontal_slide_sound_mode">Режим звуку</string>
     <string name="island_devices_battery_section">Пристрої</string>
     <string name="search_smart_pixels_enable_title">Увімкнути розумні пікселі</string>

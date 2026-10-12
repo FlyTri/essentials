@@ -1628,8 +1628,6 @@
     <string name="island_section_behavior">Comportamento</string>
     <string name="island_call_options_title">chamadas</string>
     <string name="island_section_notifications">notificações </string>
-    <string name="island_show_time_battery_title">
-tempo e bateria</string>
     <string name="island_show_timers_title">Temporizadores e cronômetros</string>
     <string name="diy_volume_channel_alarm">Alarme</string>
     <string name="duo_slide_mirror_direction_title">Espelhar direções </string>
@@ -1641,9 +1639,7 @@ tempo e bateria</string>
     <string name="island_battery_style_title">Estilo da bateria</string>
     <string name="island_battery_percentage_title">Mostrar porcentagem </string>
     <string name="island_battery_percentage_conditional_title">Apenas para as condições abaixo</string>
-    <string name="island_weather_peek_alerts_title">Confira os alertas de gravidade</string>
     <string name="island_launcher_only_title">Só aparece no iniciador</string>
-    <string name="island_weather_effects_title">efeitos climáticos</string>
     <string name="island_media_peek_song_change_title">Prévia ao mudar de música</string>
     <string name="island_media_keep_when_paused_title">Manter em modo de recuperação quando pausado</string>
     <string name="island_media_show_previous_title">mostrar botão para voltar a música anterior</string>
@@ -1660,4 +1656,11 @@ tempo e bateria</string>
     <string name="setting_hidden_debugging_title">esconder Suporte para depuração</string>
     <string name="freeze_tag_color_coded_title">Etiquetas com código de cores</string>
     <string name="freeze_tag_color_coded_desc">Exibir cores de etiquetas na grade do aplicativo</string>
+    <string name="feat_hilight_title">Destaque</string>
+    <string name="feat_hilight_desc">Acende os LEDs traseiros para notificações.</string>
+    <string name="hilight_only_screen_off_title">apenas quando a tela estiver desligada </string>
+    <string name="flashlight_pulse_disable_on_dnd_title">Não ativar no modo Não Perturbe</string>
+    <string name="hilight_cooldown_desc">Aguarda esse tempo antes de acender novamente o mesmo aplicativo.</string>
+    <string name="feat_activity_launcher_title">atividade do launcher </string>
+    <string name="feat_activity_launcher_desc">Abra ou fixe qualquer tela de aplicativo</string>
 </resources>

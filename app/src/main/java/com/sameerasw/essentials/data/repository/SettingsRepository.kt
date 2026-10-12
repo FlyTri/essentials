@@ -22,6 +22,7 @@ import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.AppTag
 import com.sameerasw.essentials.domain.model.DnsPreset
 import com.sameerasw.essentials.domain.model.HilightEffect
+import com.sameerasw.essentials.domain.model.HilightProgressColorMode
 import com.sameerasw.essentials.domain.model.NotificationLightingColorMode
 import com.sameerasw.essentials.domain.model.NotificationLightingSide
 import com.sameerasw.essentials.domain.model.NotificationLightingStyle
@@ -179,6 +180,10 @@ class SettingsRepository(
         const val KEY_HILIGHT_APP_EFFECTS = "hilight_app_effects"
         const val KEY_HILIGHT_ONLY_SCREEN_OFF = "hilight_only_screen_off"
         const val KEY_HILIGHT_COOLDOWN_SECONDS = "hilight_cooldown_seconds"
+        const val KEY_HILIGHT_PROGRESS_ENABLED = "hilight_progress_enabled"
+        const val KEY_HILIGHT_PROGRESS_COLOR_MODE = "hilight_progress_color_mode"
+        const val KEY_HILIGHT_PROGRESS_COLOR = "hilight_progress_color"
+        const val KEY_HILIGHT_PROGRESS_DURATION_MS = "hilight_progress_duration_ms"
         const val KEY_HILIGHT_SKIP_DND = "hilight_skip_dnd"
         const val KEY_EDGE_LIGHTING_ONLY_SCREEN_OFF = "edge_lighting_only_screen_off"
         const val KEY_EDGE_LIGHTING_AMBIENT_DISPLAY = "edge_lighting_ambient_display"
@@ -445,6 +450,8 @@ class SettingsRepository(
         const val KEY_DUO_ISLAND_COMBINED = "duo_island_combined"
         const val KEY_DUO_TAP_FOR_BRIEF = "duo_tap_for_brief"
         const val KEY_DUO_HIDE_ON_SHADE = "duo_hide_on_shade"
+        const val KEY_DUO_KEEP_IN_FULLSCREEN = "duo_keep_in_fullscreen"
+        const val KEY_DUO_DISABLE_INTERACTIONS_IN_FULLSCREEN = "duo_disable_interactions_in_fullscreen"
         const val KEY_DUO_USE_AUTO_DETECT = "duo_use_auto_detect"
         const val KEY_DUO_CAMERA_OFFSET_X = "duo_camera_offset_x"
         const val KEY_DUO_CAMERA_OFFSET_Y = "duo_camera_offset_y"
@@ -524,6 +531,7 @@ class SettingsRepository(
         const val KEY_ISLAND_SHOW_CALENDAR = "island_show_calendar"
         const val KEY_ISLAND_SHOW_CONSCIOUS_GATE = "island_show_conscious_gate"
         const val KEY_ISLAND_SHOW_TIME_BATTERY = "island_show_time_battery"
+        const val KEY_ISLAND_SHOW_BATTERY = "island_show_battery"
         const val KEY_ISLAND_SHOW_FLASHLIGHT = "island_show_flashlight"
         const val KEY_ISLAND_BATTERY_STYLE = "island_battery_style"
         const val ISLAND_BATTERY_STYLE_RING = "ring"
@@ -538,6 +546,13 @@ class SettingsRepository(
         const val KEY_ISLAND_BATTERY_ICON_CONDITIONAL = "island_battery_icon_conditional"
         const val KEY_ISLAND_BATTERY_ONLY_LOW = "island_battery_only_low"
         const val KEY_ISLAND_DEVICES_BATTERY_ONLY_LOW = "island_devices_battery_only_low"
+        const val KEY_ISLAND_SHOW_BATTERY_ALERTS = "island_show_battery_alerts"
+        const val KEY_ISLAND_BATTERY_ALERT_CHARGING = "island_battery_alert_charging"
+        const val KEY_ISLAND_BATTERY_ALERT_LOW = "island_battery_alert_low"
+        const val KEY_ISLAND_BATTERY_ALERT_CRITICAL = "island_battery_alert_critical"
+        const val KEY_ISLAND_BATTERY_ALERT_ICON_POSITION = "island_battery_alert_icon_position"
+        const val ISLAND_BATTERY_ALERT_ICON_POSITION_RIGHT = "right"
+        const val ISLAND_BATTERY_ALERT_ICON_POSITION_LEFT = "left"
         const val ISLAND_BATTERY_LOW_LEVEL = 20
         const val ISLAND_BATTERY_CRITICAL_LEVEL = 10
         const val KEY_ISLAND_EXPANDED_SCALE = "island_expanded_scale"
@@ -545,6 +560,8 @@ class SettingsRepository(
         const val KEY_ISLAND_HIDE_IN_OWNER_APP = "island_hide_in_owner_app"
         const val KEY_ISLAND_HIDE_ON_SHADE = "island_hide_on_shade"
         const val KEY_ISLAND_KEEP_ON_LANDSCAPE = "island_keep_on_landscape"
+        const val KEY_ISLAND_KEEP_IN_FULLSCREEN = "island_keep_in_fullscreen"
+        const val KEY_ISLAND_DISABLE_INTERACTIONS_IN_FULLSCREEN = "island_disable_interactions_in_fullscreen"
         const val KEY_ISLAND_LANDSCAPE_TOP_SPACING = "island_landscape_top_spacing"
         const val KEY_ISLAND_BOND_EDGE = "island_bond_edge"
         const val KEY_ISLAND_MAX_ITEMS = "island_max_items"
@@ -567,20 +584,9 @@ class SettingsRepository(
         const val ISLAND_CALL_SHOW_PEEK = "peek"
         const val ISLAND_CALL_SHOW_COMPACT = "compact"
         const val KEY_ISLAND_SHOW_TIMERS = "island_show_timers"
-        const val KEY_ISLAND_SHOW_WEATHER = "island_show_weather"
-        const val KEY_ISLAND_WEATHER_MODE = "island_weather_mode"
-        const val KEY_ISLAND_WEATHER_PEEK_ALERTS = "island_weather_peek_alerts"
-        const val KEY_ISLAND_WEATHER_EFFECTS = "island_weather_effects"
-        const val KEY_ISLAND_WEATHER_HAPTICS = "island_weather_haptics"
-        const val ISLAND_WEATHER_MODE_BRIEF = "brief"
-        const val ISLAND_WEATHER_MODE_COMPACT = "compact"
-        const val ISLAND_WEATHER_MODE_ALERTS = "alerts"
+        const val KEY_ISLAND_PROVIDERS = "island_providers"
 
-        const val KEY_WEATHER_UNITS = "weather_units"
         private const val LEGACY_WEATHER_API_KEY_PREFIX = "weather_api_key"
-        const val WEATHER_UNITS_SYSTEM = "system"
-        const val WEATHER_UNITS_CELSIUS = "celsius"
-        const val WEATHER_UNITS_FAHRENHEIT = "fahrenheit"
         const val KEY_ISLAND_CALENDAR_EMOJIS = "island_calendar_emojis"
         const val KEY_ISLAND_TIMERS_SHOW_SCREEN_RECORDER = "island_timers_show_screen_recorder"
         const val KEY_ISLAND_TIMERS_FILTER_APPS = "island_timers_filter_apps"
@@ -597,7 +603,6 @@ class SettingsRepository(
         const val KEY_ISLAND_SOUND_MODE_KEEP_ICON = "island_sound_mode_keep_icon"
         const val KEY_ISLAND_SHOW_ALARM = "island_show_alarm"
         const val KEY_ISLAND_TIME_BATTERY_LAUNCHER_ONLY = "island_time_battery_launcher_only"
-        const val KEY_ISLAND_WEATHER_LAUNCHER_ONLY = "island_weather_launcher_only"
         const val KEY_ISLAND_CALENDAR_LAUNCHER_ONLY = "island_calendar_launcher_only"
         const val KEY_ISLAND_ALARM_LAUNCHER_ONLY = "island_alarm_launcher_only"
         const val KEY_ISLAND_ALARM_WINDOW_HOURS = "island_alarm_window_hours"
@@ -742,7 +747,12 @@ class SettingsRepository(
         const val KEY_SIM_NAMES_APPLY_ON_BOOT = "sim_names_apply_on_boot"
         const val KEY_POWER_SAVING_APPLY_ON_BOOT = "power_saving_apply_on_boot"
         const val KEY_UNSPLASH_ACCESS_KEY = "unsplash_access_key"
+        const val KEY_EXTERNAL_CONTROL_TOKEN = "external_control_token"
     }
+
+    fun getExternalControlToken(): String? = prefs.getString(KEY_EXTERNAL_CONTROL_TOKEN, null)?.takeIf { it.isNotBlank() }
+
+    fun setExternalControlToken(token: String) = putString(KEY_EXTERNAL_CONTROL_TOKEN, token.trim())
 
     fun getUnsplashAccessKey(): String? = prefs.getString(KEY_UNSPLASH_ACCESS_KEY, null)
 
@@ -1301,6 +1311,24 @@ class SettingsRepository(
     fun getHilightCooldownSeconds(): Int = getInt(KEY_HILIGHT_COOLDOWN_SECONDS, 60)
 
     fun setHilightCooldownSeconds(seconds: Int) = putInt(KEY_HILIGHT_COOLDOWN_SECONDS, seconds)
+
+    fun isHilightProgressEnabled(): Boolean = getBoolean(KEY_HILIGHT_PROGRESS_ENABLED, false)
+
+    fun setHilightProgressEnabled(enabled: Boolean) = putBoolean(KEY_HILIGHT_PROGRESS_ENABLED, enabled)
+
+    fun getHilightProgressColorMode(): HilightProgressColorMode =
+        HilightProgressColorMode.entries.find { it.name == getString(KEY_HILIGHT_PROGRESS_COLOR_MODE) }
+            ?: HilightProgressColorMode.VIBGYOR
+
+    fun setHilightProgressColorMode(mode: HilightProgressColorMode) = putString(KEY_HILIGHT_PROGRESS_COLOR_MODE, mode.name)
+
+    fun getHilightProgressColor(): Int = getInt(KEY_HILIGHT_PROGRESS_COLOR, HilightEffect.DEFAULT_COLOR)
+
+    fun setHilightProgressColor(color: Int) = putInt(KEY_HILIGHT_PROGRESS_COLOR, color)
+
+    fun getHilightProgressDurationMs(): Long = getLong(KEY_HILIGHT_PROGRESS_DURATION_MS, HilightEffect.DEFAULT_DURATION_MS)
+
+    fun setHilightProgressDurationMs(durationMs: Long) = putLong(KEY_HILIGHT_PROGRESS_DURATION_MS, durationMs)
 
     /**
      * Executes the save notification lighting selected apps operation.
@@ -2309,6 +2337,7 @@ class SettingsRepository(
     fun incrementPixelSearchbarWidgetRevision() {
         val current = getPixelSearchbarWidgetRevision()
         prefs.edit().putInt(KEY_PIXEL_SEARCHBAR_WIDGET_REVISION, current + 1).apply()
+        com.sameerasw.essentials.services.widgets.SearchbarRenderState.bump()
     }
 
     /**
@@ -3537,6 +3566,14 @@ class SettingsRepository(
     fun isDuoHideOnShadeEnabled(): Boolean = getBoolean(KEY_DUO_HIDE_ON_SHADE, false)
 
     fun setDuoHideOnShadeEnabled(enabled: Boolean) = putBoolean(KEY_DUO_HIDE_ON_SHADE, enabled)
+
+    fun isDuoKeepInFullscreenEnabled(): Boolean = getBoolean(KEY_DUO_KEEP_IN_FULLSCREEN, false)
+
+    fun setDuoKeepInFullscreenEnabled(enabled: Boolean) = putBoolean(KEY_DUO_KEEP_IN_FULLSCREEN, enabled)
+
+    fun isDuoDisableInteractionsInFullscreenEnabled(): Boolean = getBoolean(KEY_DUO_DISABLE_INTERACTIONS_IN_FULLSCREEN, false)
+
+    fun setDuoDisableInteractionsInFullscreenEnabled(enabled: Boolean) = putBoolean(KEY_DUO_DISABLE_INTERACTIONS_IN_FULLSCREEN, enabled)
     fun setDuoIslandCombined(enabled: Boolean) = putBoolean(KEY_DUO_ISLAND_COMBINED, enabled)
 
     // Only effective while both features are on
@@ -3897,6 +3934,18 @@ class SettingsRepository(
     fun isIslandShowTimeBatteryEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_TIME_BATTERY, false)
     fun setIslandShowTimeBatteryEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_TIME_BATTERY, enabled)
 
+    fun isIslandShowBatteryEnabled(): Boolean =
+        if (contains(KEY_ISLAND_SHOW_BATTERY)) getBoolean(KEY_ISLAND_SHOW_BATTERY, false) else isIslandShowTimeBatteryEnabled()
+    fun setIslandShowBatteryEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_BATTERY, enabled)
+
+    fun isIslandShowBatteryAlertsEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_BATTERY_ALERTS, true)
+    fun setIslandShowBatteryAlertsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_BATTERY_ALERTS, enabled)
+
+    fun getIslandBatteryAlertIconPosition(): String =
+        getString(KEY_ISLAND_BATTERY_ALERT_ICON_POSITION, ISLAND_BATTERY_ALERT_ICON_POSITION_RIGHT) ?: ISLAND_BATTERY_ALERT_ICON_POSITION_RIGHT
+    fun setIslandBatteryAlertIconPosition(position: String) =
+        putString(KEY_ISLAND_BATTERY_ALERT_ICON_POSITION, position)
+
     fun getIslandBatteryStyle(): String =
         getString(KEY_ISLAND_BATTERY_STYLE, ISLAND_BATTERY_STYLE_RING) ?: ISLAND_BATTERY_STYLE_RING
     fun setIslandBatteryStyle(value: String) = putString(KEY_ISLAND_BATTERY_STYLE, value)
@@ -3945,24 +3994,6 @@ class SettingsRepository(
         updated.forEach { (id, value) -> json.put(id.toString(), value) }
         putString(KEY_ISLAND_CALENDAR_EMOJIS, json.toString())
     }
-
-    fun isIslandShowWeatherEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_WEATHER, false)
-    fun setIslandShowWeatherEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_WEATHER, enabled)
-
-    fun getIslandWeatherMode(): String = getString(KEY_ISLAND_WEATHER_MODE, ISLAND_WEATHER_MODE_BRIEF) ?: ISLAND_WEATHER_MODE_BRIEF
-    fun setIslandWeatherMode(mode: String) = putString(KEY_ISLAND_WEATHER_MODE, mode)
-
-    fun isIslandWeatherPeekAlertsEnabled(): Boolean = getBoolean(KEY_ISLAND_WEATHER_PEEK_ALERTS, true)
-    fun setIslandWeatherPeekAlertsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_WEATHER_PEEK_ALERTS, enabled)
-
-    fun isIslandWeatherEffectsEnabled(): Boolean = getBoolean(KEY_ISLAND_WEATHER_EFFECTS, true)
-    fun setIslandWeatherEffectsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_WEATHER_EFFECTS, enabled)
-
-    fun isIslandWeatherHapticsEnabled(): Boolean = getBoolean(KEY_ISLAND_WEATHER_HAPTICS, true)
-    fun setIslandWeatherHapticsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_WEATHER_HAPTICS, enabled)
-
-    fun getWeatherUnits(): String = getString(KEY_WEATHER_UNITS, WEATHER_UNITS_SYSTEM) ?: WEATHER_UNITS_SYSTEM
-    fun setWeatherUnits(units: String) = putString(KEY_WEATHER_UNITS, units)
 
     fun isIslandShowTimersEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_TIMERS, true)
     fun setIslandShowTimersEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_TIMERS, enabled)
@@ -4058,6 +4089,14 @@ class SettingsRepository(
     fun isIslandKeepOnLandscapeEnabled(): Boolean = getBoolean(KEY_ISLAND_KEEP_ON_LANDSCAPE, false)
 
     fun setIslandKeepOnLandscapeEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_KEEP_ON_LANDSCAPE, enabled)
+
+    fun isIslandKeepInFullscreenEnabled(): Boolean = getBoolean(KEY_ISLAND_KEEP_IN_FULLSCREEN, false)
+
+    fun setIslandKeepInFullscreenEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_KEEP_IN_FULLSCREEN, enabled)
+
+    fun isIslandDisableInteractionsInFullscreenEnabled(): Boolean = getBoolean(KEY_ISLAND_DISABLE_INTERACTIONS_IN_FULLSCREEN, false)
+
+    fun setIslandDisableInteractionsInFullscreenEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_DISABLE_INTERACTIONS_IN_FULLSCREEN, enabled)
 
     fun isIslandAlwaysGesturesEnabled(): Boolean = getBoolean(KEY_ISLAND_ALWAYS_GESTURES, false)
 

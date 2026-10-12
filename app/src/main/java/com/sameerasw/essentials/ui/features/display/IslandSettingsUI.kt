@@ -14,6 +14,13 @@ import androidx.compose.material3.IconButton
 import sh.calvin.reorderable.ReorderableColumn
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.island.model.IslandPriorityEntries
+import com.sameerasw.essentials.island.remote.ProviderDiscovery
+import com.sameerasw.essentials.island.remote.ProviderPairing
+import com.sameerasw.essentials.island.remote.ProviderPriorities
+import com.sameerasw.essentials.island.remote.ProviderTrustStore
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import com.sameerasw.essentials.ui.core.pickers.ColorSwatchPicker
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
@@ -69,19 +76,18 @@ import com.sameerasw.essentials.ui.features.display.actions.GestureActionPickerS
 import com.sameerasw.essentials.ui.features.display.actions.HorizontalSlideModeSheet
 import com.sameerasw.essentials.ui.features.display.actions.horizontalSlideDescription
 import com.sameerasw.essentials.ui.features.display.sheets.IslandAlarmOptionsBottomSheet
+import com.sameerasw.essentials.ui.features.display.sheets.IslandBatteryOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBorderOutlineOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBriefOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandCallOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandDevicesBatteryBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandPulseShadowOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandSoundModeOptionsBottomSheet
-import com.sameerasw.essentials.ui.features.display.sheets.IslandTimeBatteryOptionsBottomSheet
+import com.sameerasw.essentials.ui.features.display.sheets.IslandTimeOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandSignalOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandTimerOptionsBottomSheet
-import com.sameerasw.essentials.ui.features.display.sheets.IslandWeatherOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.StatusGlanceCalendarOptionsBottomSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
-import com.sameerasw.essentials.weather.overcast.OvercastWeather
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.PermissionUIHelper
 import com.sameerasw.essentials.utils.PermissionUtils
@@ -99,26 +105,25 @@ fun IslandSettingsUI(
     val view = LocalView.current
     var requestingPermissionsFor by remember { mutableStateOf<Pair<Int, List<String>>?>(null) }
 
-    LaunchedEffect(Unit) {
-        if (viewModel.isIslandShowWeather.value && !OvercastWeather.isAvailable(context)) {
-            requestingPermissionsFor = Pair(R.string.lock_screen_clock_weather, listOf("OVERCAST_WEATHER"))
-        }
-    }
     val prioritySettings = remember { SettingsRepository(context) }
     var reorderMode by remember { mutableStateOf(false) }
-    var savedOrder by remember { mutableStateOf(IslandPriorityEntries.normalize(prioritySettings.getIslandPriorityOrder().orEmpty())) }
+    var providerVersion by remember { mutableIntStateOf(0) }
+    val providerEntries = remember(providerVersion) { ProviderPriorities.entries(context, prioritySettings) }
+    var savedRaw by remember { mutableStateOf(prioritySettings.getIslandPriorityOrder().orEmpty()) }
+    val savedOrder = remember(savedRaw, providerEntries) { IslandPriorityEntries.normalize(savedRaw, providerEntries) }
     var workingOrder by remember { mutableStateOf(savedOrder) }
+    val providerScope = rememberCoroutineScope()
     var showMediaAppSelectionSheet by remember { mutableStateOf(false) }
     var showCalendarOptionsSheet by remember { mutableStateOf(false) }
     var showSoundModeOptionsSheet by remember { mutableStateOf(false) }
     var showDevicesBatterySheet by remember { mutableStateOf(false) }
-    var showTimeBatteryOptionsSheet by remember { mutableStateOf(false) }
+    var showTimeOptionsSheet by remember { mutableStateOf(false) }
+    var showBatteryOptionsSheet by remember { mutableStateOf(false) }
     var showTimerOptionsSheet by remember { mutableStateOf(false) }
     var showCallOptionsSheet by remember { mutableStateOf(false) }
     var showSignalOptionsSheet by remember { mutableStateOf(false) }
     var showAlarmOptionsSheet by remember { mutableStateOf(false) }
     var showBriefOptionsSheet by remember { mutableStateOf(highlightSetting == "island_brief_show_alarm") }
-    var showWeatherOptionsSheet by remember { mutableStateOf(false) }
     var pickingGesture by remember { mutableStateOf<String?>(null) }
     var showSlideModeSheet by remember { mutableStateOf(false) }
 
@@ -275,17 +280,29 @@ fun IslandSettingsUI(
                         },
                         modifier = Modifier.highlight(highlightSetting == "island_show_notifications"),
                     )
-                    "time_battery" -> IconToggleItem(
+                    "time" -> IconToggleItem(
                         dragHandle = handle,
                         iconRes = R.drawable.rounded_schedule_24,
-                        title = stringResource(R.string.island_show_time_battery_title),
+                        title = stringResource(R.string.island_show_time_title),
                         isChecked = viewModel.isIslandShowTimeBattery.value,
                         onCheckedChange = { checked ->
                             HapticUtil.performVirtualKeyHaptic(view)
                             viewModel.setIslandShowTimeBattery(checked)
                         },
-                        onSettingsClick = { showTimeBatteryOptionsSheet = true },
+                        onSettingsClick = { showTimeOptionsSheet = true },
                         modifier = Modifier.highlight(highlightSetting == "island_show_time_battery"),
+                    )
+                    "battery" -> IconToggleItem(
+                        dragHandle = handle,
+                        iconRes = R.drawable.rounded_battery_android_0_24,
+                        title = stringResource(R.string.island_show_battery_title),
+                        isChecked = viewModel.isIslandShowBattery.value,
+                        onCheckedChange = { checked ->
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            viewModel.setIslandShowBattery(checked)
+                        },
+                        onSettingsClick = { showBatteryOptionsSheet = true },
+                        modifier = Modifier.highlight(highlightSetting == "island_show_battery"),
                     )
                     "flashlight" -> IconToggleItem(
                         dragHandle = handle,
@@ -309,27 +326,6 @@ fun IslandSettingsUI(
                         },
                         onSettingsClick = { showTimerOptionsSheet = true },
                         modifier = Modifier.highlight(highlightSetting == "island_show_timers"),
-                    )
-                    "weather" -> IconToggleItem(
-                        dragHandle = handle,
-                        iconRes = R.drawable.rounded_partly_cloudy_day_24,
-                        title = stringResource(R.string.lock_screen_clock_weather),
-                        description =
-                            if (viewModel.isIslandShowWeather.value && !viewModel.isOvercastWeatherPermissionGranted.value) {
-                                stringResource(R.string.weather_error_overcast_permission)
-                            } else {
-                                null
-                            },
-                        isChecked = viewModel.isIslandShowWeather.value,
-                        onCheckedChange = { checked ->
-                            HapticUtil.performVirtualKeyHaptic(view)
-                            viewModel.setIslandShowWeather(checked)
-                            if (checked && !OvercastWeather.isAvailable(context)) {
-                                requestingPermissionsFor = Pair(R.string.lock_screen_clock_weather, listOf("OVERCAST_WEATHER"))
-                            }
-                        },
-                        onSettingsClick = { showWeatherOptionsSheet = true },
-                        modifier = Modifier.highlight(highlightSetting == "island_show_weather"),
                     )
                     "media" -> IconToggleItem(
                         dragHandle = handle,
@@ -450,11 +446,29 @@ fun IslandSettingsUI(
                         onSettingsClick = { showDevicesBatterySheet = true },
                         modifier = Modifier.highlight(highlightSetting == "island_show_devices"),
                     )
-        
+                    else -> if (IslandPriorityEntries.isProvider(entryId)) {
+                        val packageName = IslandPriorityEntries.providerPackage(entryId)
+                        val provider = remember(packageName, providerVersion) { ProviderDiscovery.find(context, packageName) }
+                        if (provider != null) {
+                            IconToggleItem(
+                                dragHandle = handle,
+                                leadingIcon = ProviderAppIcon(provider.packageName),
+                                title = provider.label,
+                                isChecked = true,
+                                onCheckedChange = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    ProviderTrustStore(prioritySettings).disable(packageName)
+                                    providerScope.launch { ProviderPairing.revoke(context, provider) }
+                                    providerVersion++
+                                },
+                                onSettingsClick = { ProviderDiscovery.openSettings(context, provider) },
+                            )
+                        }
+                    }
                 }
             }
             renderEntry("calls", null)
-            renderEntry("time_battery", null)
+            renderEntry("time", null)
             ReorderableColumn(
                 list = if (reorderMode) workingOrder else savedOrder,
                 onSettle = { from, to -> workingOrder = workingOrder.toMutableList().apply { add(to, removeAt(from)) } },
@@ -495,11 +509,11 @@ fun IslandSettingsUI(
                 reorderMode = true
             },
             onSave = {
-                prioritySettings.setIslandPriorityOrder(workingOrder.takeIf { it != IslandPriorityEntries.defaultOrder })
-                savedOrder = workingOrder
+                prioritySettings.setIslandPriorityOrder(workingOrder.takeIf { it != IslandPriorityEntries.defaultOrder(providerEntries) })
+                savedRaw = workingOrder
                 reorderMode = false
             },
-            onReset = { workingOrder = IslandPriorityEntries.defaultOrder },
+            onReset = { workingOrder = IslandPriorityEntries.defaultOrder(providerEntries) },
         )
 
         RoundedCardContainer(
@@ -519,6 +533,8 @@ fun IslandSettingsUI(
                 modifier = Modifier.highlight(highlightSetting == "island_brief_enabled"),
             )
         }
+
+        IslandProvidersSection(onChanged = { providerVersion++ })
 
         Text(
             text = stringResource(R.string.duo_section_actions),
@@ -744,13 +760,6 @@ fun IslandSettingsUI(
         )
     }
 
-    if (showWeatherOptionsSheet) {
-        IslandWeatherOptionsBottomSheet(
-            viewModel = viewModel,
-            onDismissRequest = { showWeatherOptionsSheet = false },
-        )
-    }
-
     if (showBriefOptionsSheet) {
         IslandBriefOptionsBottomSheet(
             viewModel = viewModel,
@@ -788,10 +797,16 @@ fun IslandSettingsUI(
         )
     }
 
-    if (showTimeBatteryOptionsSheet) {
-        IslandTimeBatteryOptionsBottomSheet(
+    if (showTimeOptionsSheet) {
+        IslandTimeOptionsBottomSheet(
+            onDismissRequest = { showTimeOptionsSheet = false },
+        )
+    }
+
+    if (showBatteryOptionsSheet) {
+        IslandBatteryOptionsBottomSheet(
             viewModel = viewModel,
-            onDismissRequest = { showTimeBatteryOptionsSheet = false },
+            onDismissRequest = { showBatteryOptionsSheet = false },
         )
     }
 
