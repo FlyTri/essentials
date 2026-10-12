@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.ui
 
+import kotlin.math.roundToInt
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.expandHorizontally
@@ -35,7 +36,10 @@ fun CompactTemplate(
     spec: IslandLayoutSpec,
     onCellTap: (String) -> Unit,
     onCellLongPress: (String) -> Unit,
-    leftBias: () -> Int = { 0 },
+    // 0..1 while a side bubble claims the space left of the camera: the sides stop mirroring and hug their own cells.
+    sideBubble: () -> Float = { 0f },
+    // Right side minus left side once hugging; the surface shifts by half of it so the camera slot stays on the camera.
+    onSlack: (Int) -> Unit = {},
 ) {
     val cells = buildMap {
         state.items.values.forEach { item -> item.compact.forEach { put(it.key, item.key to it) } }
@@ -138,9 +142,11 @@ fun CompactTemplate(
         val edge = if (hasCells) spacing else 0
         val needLeft = content(left) + leftInset + edge
         val needRight = content(right) + rightInset + edge
-        val bias = if (hasCells) leftBias().coerceAtLeast(0) else 0
-        val rightSide = maxOf(needRight, needLeft + bias, if (bias == 0) needLeft else 0)
-        val leftSide = if (bias == 0) rightSide else rightSide - bias
+        val t = if (hasCells) sideBubble().coerceIn(0f, 1f) else 0f
+        val mirrored = maxOf(needLeft, needRight)
+        onSlack(needRight - needLeft)
+        val leftSide = (mirrored + (needLeft - mirrored) * t).roundToInt()
+        val rightSide = (mirrored + (needRight - mirrored) * t).roundToInt()
         val width = leftSide + rightSide + cameraSlot
         layout(width, height) {
             var x = spacing + leftInset
