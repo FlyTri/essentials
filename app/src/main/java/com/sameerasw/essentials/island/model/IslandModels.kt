@@ -50,6 +50,8 @@ class LineContent(
     val end: String,
     val endSlot: (@Composable () -> Unit)? = null,
     val showLeftIcon: Boolean = true,
+    // Icon + title only on line peek
+    val condensed: Boolean = false,
 )
 
 interface IslandExpandedScope {
@@ -123,6 +125,8 @@ class IslandItem(
     val sourcePackage: String? = null,
     // Temporary priority while the item's state is urgent; null falls back to `priority`.
     val priorityOverride: Int? = null,
+    // Identifies the content currently shown, so a new one pulses even when the item key is unchanged.
+    val contentId: String? = null,
     
     val compactVisible: Boolean = true,
     val needsCompanyAtCenter: Boolean = false,
