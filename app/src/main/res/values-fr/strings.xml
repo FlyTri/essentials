@@ -267,7 +267,7 @@
     <string name="dns_preset_cleanbrowsing_hostname">adult-filter-dns.cleanbrowsing.org</string>
     <string name="tile_charge_optimization">Recharge</string>
     <string name="limit_to_80">Limiter à 80%</string>
-    <string name="adaptive_charging">Adaptative</string>
+    <string name="adaptive_charging">Adaptatif</string>
     <string name="deactivated">Non optimisée</string>
     <string name="permission_missing">Permission manquante</string>
     <!-- Screen Locked Security -->
@@ -1703,4 +1703,6 @@ Les effets de la LED HiLight peuvent être aussi utilisés comme une action dans
     <string name="island_section_behavior">Comportements</string>
     <string name="island_section_visuals">Visuels</string>
     <string name="diy_volume_channel_alarm">Alarme</string>
+    <string name="label_charging_mode_limited">Limité</string>
+    <string name="conscious_gate_reappear_off">Désactivé</string>
 </resources>
