@@ -3012,6 +3012,7 @@
     <string name="island_action_tap_desc">Open app</string>
     <string name="island_tap_action_title">Tap action</string>
     <string name="island_show_time_title">Time</string>
+    <string name="island_time_show_seconds_title">Show seconds</string>
     <string name="island_show_battery_title">Battery</string>
     <string name="island_battery_style_title">Battery style</string>
     <string name="island_battery_style_ring">Ring</string>

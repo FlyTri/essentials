@@ -246,7 +246,7 @@ class SignalPlugin : BaseIslandPlugin() {
         val wifi = context.getSystemService(Context.WIFI_SERVICE) as? WifiManager
         var rssi: Int? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) rssi = (caps.transportInfo as? WifiInfo)?.rssi
-        if (rssi == null) {
+        if (rssi == null && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             @Suppress("DEPRECATION")
             rssi = wifi?.connectionInfo?.rssi
         }
