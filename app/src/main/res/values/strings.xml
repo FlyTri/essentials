@@ -1291,6 +1291,13 @@
     <string name="diy_trigger_wifi_disconnected">Wi-Fi Network Disconnected</string>
     <string name="diy_trigger_power_saving_on">Power Saving On</string>
     <string name="diy_trigger_power_saving_off">Power Saving Off</string>
+    <string name="diy_trigger_notification_received">Notification Received</string>
+    <string name="diy_trigger_dnd_on">Do Not Disturb On</string>
+    <string name="diy_trigger_dnd_off">Do Not Disturb Off</string>
+    <string name="diy_notification_trigger_hint">Runs when a notification from this app arrives, or one containing this text. Set at least one.</string>
+    <string name="diy_notification_trigger_app">App</string>
+    <string name="diy_notification_trigger_any_app">Any app</string>
+    <string name="diy_notification_trigger_text">Text contains (optional)</string>
     <string name="diy_trigger_accessibility_button">Accessibility Shortcut</string>
     <string name="accessibility_shortcut_service_name">Essentials Shortcut</string>
     <string name="accessibility_shortcut_service_1_name">Essentials Shortcut 1</string>
@@ -1334,6 +1341,7 @@
     <string name="diy_category_system_screen">System &amp; Screen</string>
     <string name="diy_category_battery_power">Battery &amp; Power</string>
     <string name="diy_category_time_schedule">Time &amp; Schedule</string>
+    <string name="diy_category_notifications">Notifications</string>
 
     <string name="diy_state_charging">Charging</string>
     <string name="diy_state_screen_on">Screen On</string>
@@ -1348,6 +1356,11 @@
     <string name="diy_action_flashlight_off">Turn Off Flashlight</string>
     <string name="diy_action_flashlight_toggle">Toggle Flashlight</string>
     <string name="diy_action_low_power_on">Turn On Low Power Mode</string>
+    <string name="diy_action_caffeinate_on">Turn On Caffeinate</string>
+    <string name="diy_action_caffeinate_off">Turn Off Caffeinate</string>
+    <string name="diy_action_wait">Wait</string>
+    <string name="diy_wait_duration">Duration</string>
+    <string name="diy_wait_desc">Pause before the next action runs</string>
     <string name="diy_action_low_power_off">Turn Off Low Power Mode</string>
     <string name="diy_action_set_charging_mode">Set Charging Mode</string>
     <string name="diy_action_notification_lighting">Trigger notification lighting</string>

@@ -136,6 +136,27 @@ sealed interface Action {
     }
 
     @Keep
+    data object TurnOnCaffeinate : Action {
+        override val title: Int = R.string.diy_action_caffeinate_on
+        override val icon: Int = R.drawable.rounded_coffee_24
+    }
+
+    @Keep
+    data object TurnOffCaffeinate : Action {
+        override val title: Int = R.string.diy_action_caffeinate_off
+        override val icon: Int = R.drawable.rounded_coffee_24
+    }
+
+    @Keep
+    data class Wait(
+        @SerializedName("seconds") val seconds: Int = 5,
+    ) : Action {
+        override val title: Int get() = R.string.diy_action_wait
+        override val icon: Int get() = R.drawable.rounded_timer_24
+        override val isConfigurable: Boolean get() = true
+    }
+
+    @Keep
     data object TurnOffLowPower : Action {
         override val title: Int = R.string.diy_action_low_power_off
         override val icon: Int = R.drawable.rounded_battery_android_frame_shield_24
