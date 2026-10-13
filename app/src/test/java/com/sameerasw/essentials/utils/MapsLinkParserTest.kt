@@ -26,11 +26,20 @@ class MapsLinkParserTest {
     }
 
     @Test
-    fun geoUrisAndViewportOnlyLinksStillParse() {
+    fun geoUrisParse() {
         assertEquals(51.5007, MapsLinkParser.parse("geo:51.5007,-0.1246?q=Big+Ben")!!.latitude, 1e-7)
-        val viewport = MapsLinkParser.parse("https://www.google.com/maps/@-33.8568,151.2153,17z")!!
-        assertEquals(-33.8568, viewport.latitude, 1e-7)
-        assertEquals(151.2153, viewport.longitude, 1e-7)
+    }
+
+    @Test
+    fun viewportCentreIsNotTakenAsThePlace() {
+        assertNull(MapsLinkParser.parse("https://www.google.com/maps/@-33.8568,151.2153,17z"))
+        assertNull(MapsLinkParser.parse("https://www.google.com/maps/place/Opera+House/@-33.8568,151.2153,17z"))
+    }
+
+    @Test
+    fun bareCoordinatesAreNotUsedAsTheName() {
+        val place = MapsLinkParser.parse("12.9507, 77.5848")!!
+        assertNull(place.name)
     }
 
     @Test

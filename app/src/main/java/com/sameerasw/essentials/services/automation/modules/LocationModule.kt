@@ -12,10 +12,14 @@ package com.sameerasw.essentials.services.automation.modules
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.util.Log
+import androidx.core.location.LocationManagerCompat
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
@@ -30,23 +34,44 @@ class LocationModule : AutomationModule {
 
     override val id: String = ID
     private var appContext: Context? = null
-    // Everything a geofence is built from, so a moved pin or a new radius is registered again
+    private var wanted: Set<LocationTrigger> = emptySet()
     private var registered: Set<LocationTrigger> = emptySet()
 
+    // Play services drops every geofence when location is turned off
+    private val locationToggleReceiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(
+                context: Context,
+                intent: Intent,
+            ) {
+                val locationManager = context.getSystemService(LocationManager::class.java) ?: return
+                if (!LocationManagerCompat.isLocationEnabled(locationManager)) return
+                registered = emptySet()
+                sync(context)
+            }
+        }
+
     override fun start(context: Context) {
-        appContext = context.applicationContext
+        val appContext = context.applicationContext
+        this.appContext = appContext
+        appContext.registerReceiver(locationToggleReceiver, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
     }
 
     override fun stop(context: Context) {
+        runCatching { context.applicationContext.unregisterReceiver(locationToggleReceiver) }
         LocationServices.getGeofencingClient(context).removeGeofences(pendingIntent(context))
+        wanted = emptySet()
         registered = emptySet()
         appContext = null
     }
 
     override fun updateAutomations(automations: List<Automation>) {
-        val context = appContext ?: return
-        val triggers = automations.mapNotNull(::locationTriggerFor).toSet()
-        // Skipping an unchanged set avoids re-registering on every unrelated automation edit
+        wanted = automations.mapNotNull(::locationTriggerFor).toSet()
+        appContext?.let(::sync)
+    }
+
+    private fun sync(context: Context) {
+        val triggers = wanted
         if (triggers == registered && triggers.isNotEmpty()) return
         LocationServices.getGeofencingClient(context).removeGeofences(pendingIntent(context))
         registered = emptySet()
@@ -66,7 +91,7 @@ class LocationModule : AutomationModule {
         val request =
             GeofencingRequest
                 .Builder()
-                // No initial trigger: being inside already shouldn't fire every time the service restarts
+                // Being inside already shouldn't fire every time the service restarts
                 .setInitialTrigger(0)
                 .addGeofences(triggers.map { it.toGeofence() })
                 .build()
@@ -88,7 +113,6 @@ class LocationModule : AutomationModule {
         val radiusMeters: Int,
         val transition: Int,
     ) {
-        // The request id is the automation id, so the receiver can look the automation up
         fun toGeofence(): Geofence =
             Geofence
                 .Builder()

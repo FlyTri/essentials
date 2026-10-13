@@ -289,7 +289,6 @@ object AutomationManager {
             activeModules.remove(NotificationModule.ID)?.stop(context)
         }
 
-        // Location Module
         if (requiredModuleIds.contains(LocationModule.ID)) {
             val module =
                 activeModules.getOrPut(LocationModule.ID) {

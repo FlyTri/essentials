@@ -362,7 +362,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 var showBluetoothSettings by remember { mutableStateOf(false) }
                 var showWifiSettings by remember { mutableStateOf(false) }
                 var showNotificationTriggerSettings by remember { mutableStateOf(false) }
-                var showLocationSettings by remember { mutableStateOf(false) }
+                var editingLocationTrigger by remember { mutableStateOf<Trigger?>(null) }
 
                 val isTriggerConfigured =
                     when (val trigger = selectedTrigger) {
@@ -1108,10 +1108,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                                 showWifiSettings =
                                                                                     true
                                                                             is Trigger.NotificationReceived -> showNotificationTriggerSettings = true
-                                                                            is Trigger.ArriveAtLocation, is Trigger.LeaveLocation -> {
-                                                                                selectedTrigger = trigger
-                                                                                showLocationSettings = true
-                                                                            }
+                                                                            is Trigger.ArriveAtLocation, is Trigger.LeaveLocation -> editingLocationTrigger = trigger
                                                                             else -> {}
                                                                         }
                                                                     },
@@ -1409,8 +1406,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                 )
                             }
 
-                            if (showLocationSettings) {
-                                val trigger = selectedTrigger
+                            editingLocationTrigger?.let { trigger ->
                                 val (latitude, longitude, radius, name) =
                                     when (trigger) {
                                         is Trigger.ArriveAtLocation -> LocationFields(trigger.latitude, trigger.longitude, trigger.radiusMeters, trigger.placeName)
@@ -1418,19 +1414,19 @@ class AutomationEditorActivity : ComponentActivity() {
                                         else -> LocationFields(0.0, 0.0, Trigger.DEFAULT_LOCATION_RADIUS_METERS, "")
                                     }
                                 LocationTriggerSheet(
-                                    title = stringResource(trigger?.title ?: R.string.diy_trigger_arrive_location),
+                                    title = stringResource(trigger.title),
                                     initialLatitude = latitude,
                                     initialLongitude = longitude,
                                     initialRadiusMeters = radius,
                                     initialPlaceName = name,
-                                    onDismiss = { showLocationSettings = false },
+                                    onDismiss = { editingLocationTrigger = null },
                                     onSave = { lat, lng, radiusMeters, placeName ->
                                         selectedTrigger =
                                             when (trigger) {
                                                 is Trigger.LeaveLocation -> Trigger.LeaveLocation(lat, lng, radiusMeters, placeName)
                                                 else -> Trigger.ArriveAtLocation(lat, lng, radiusMeters, placeName)
                                             }
-                                        showLocationSettings = false
+                                        editingLocationTrigger = null
                                     },
                                 )
                             }

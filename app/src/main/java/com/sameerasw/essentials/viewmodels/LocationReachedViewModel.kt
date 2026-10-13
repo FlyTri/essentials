@@ -12,11 +12,13 @@ package com.sameerasw.essentials.viewmodels
 
 import android.app.Application
 import android.content.Intent
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.LocationReachedRepository
 import com.sameerasw.essentials.domain.model.LocationAlarm
 import com.sameerasw.essentials.services.LocationReachedService
@@ -25,7 +27,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.net.URL
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -373,7 +374,7 @@ class LocationReachedViewModel(
         val type = intent.type
         val data = intent.data
 
-        android.util.Log.d(
+        Log.d(
             "LocationReachedVM",
             "handleIntent: action=$action, type=$type, data=$data",
         )
@@ -416,7 +417,7 @@ class LocationReachedViewModel(
     private fun tryParseAndSet(text: String): Boolean {
         val place = MapsLinkParser.parse(text)
         if (place == null) {
-            android.util.Log.d("LocationReachedVM", "No coordinates found in text: $text")
+            Log.d("LocationReachedVM", "No coordinates found in text: $text")
             repository.setIsProcessing(false)
             return false
         }
@@ -425,12 +426,12 @@ class LocationReachedViewModel(
     }
 
     private fun setPlace(place: MapsLinkParser.Place) {
-        android.util.Log.d("LocationReachedVM", "Parsed coordinates: ${place.latitude}, ${place.longitude}")
+        Log.d("LocationReachedVM", "Parsed coordinates: ${place.latitude}, ${place.longitude}")
         repository.setTempAlarm(
             LocationAlarm(
                 latitude = place.latitude,
                 longitude = place.longitude,
-                name = "New Destination",
+                name = place.name ?: getApplication<Application>().getString(R.string.location_reached_new_destination),
                 isEnabled = false,
             ),
         )
@@ -439,7 +440,6 @@ class LocationReachedViewModel(
         repository.setIsProcessing(false)
     }
 
-    // Current short links resolve to a place without coordinates, so this can fall back to geocoding its address
     private fun resolveAndParse(shortUrl: String) {
         repository.setIsProcessing(true)
         viewModelScope.launch {

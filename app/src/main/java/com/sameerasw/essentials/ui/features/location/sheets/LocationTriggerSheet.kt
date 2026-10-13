@@ -82,6 +82,7 @@ fun LocationTriggerSheet(
     var lastHandledLink by remember { mutableStateOf<String?>(null) }
     var wentToMaps by remember { mutableStateOf(false) }
     var isAccuracyOff by remember { mutableStateOf(false) }
+    var isApproximate by remember { mutableStateOf(false) }
     val hasPlace = latitude != 0.0 || longitude != 0.0
 
     fun applyLink(
@@ -96,25 +97,24 @@ fun LocationTriggerSheet(
             val place = withContext(Dispatchers.IO) { MapsLinkParser.resolve(context, text) }
             isResolving = false
             if (place == null) {
-                // A copied link that isn't a place is ignored quietly; an explicit paste gets told why
                 if (!fromClipboard) Toast.makeText(context, R.string.diy_location_link_invalid, Toast.LENGTH_SHORT).show()
                 return@launch
             }
             latitude = place.latitude
             longitude = place.longitude
-            // The name from shared text beats one taken from the link
+            isApproximate = place.isApproximate
             place.name?.let { name -> if (placeName.isBlank() || fromClipboard) placeName = name }
             if (fromClipboard) Toast.makeText(context, R.string.diy_location_link_added, Toast.LENGTH_SHORT).show()
         }
     }
 
-    // Coming back from Google Maps with a copied link fills the place in; the clipboard is only readable once focused.
-    // A place that's already set is only replaced after going to Maps, so an old copied link can't overwrite it
+    // The clipboard is only readable once the app is focused again
     LifecycleResumeEffect(Unit) {
         isAccuracyOff = !isNetworkLocationEnabled(context)
         val job =
             scope.launch {
                 delay(CLIPBOARD_READ_DELAY_MS)
+                // An old copied link shouldn't replace a place chosen before this visit to Maps
                 if ((latitude != 0.0 || longitude != 0.0) && !wentToMaps) return@launch
                 readClipboard(context)?.takeIf { MapsLinkParser.findUrl(it)?.let(::isMapsLink) == true }?.let {
                     applyLink(it, fromClipboard = true)
@@ -171,6 +171,13 @@ fun LocationTriggerSheet(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    if (hasPlace && isApproximate) {
+                        Text(
+                            text = stringResource(R.string.diy_location_approximate),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
                     if (isResolving) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
                 }
             }

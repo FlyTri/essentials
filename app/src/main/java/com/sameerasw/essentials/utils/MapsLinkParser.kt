@@ -21,11 +21,13 @@ object MapsLinkParser {
         val latitude: Double,
         val longitude: Double,
         val name: String?,
+        val isApproximate: Boolean = false,
     )
 
     // The !3d!4d pair is the place's own pin; the @ pair is only the map's viewport centre
     private val pinRegex = Regex("!3d(-?\\d+\\.\\d+)!4d(-?\\d+\\.\\d+)")
-    private val coordinatesRegex = Regex("(-?\\d+\\.\\d+)\\s*,\\s*(-?\\d+\\.\\d+)")
+    private val coordinatesRegex = Regex("(?<![@\\d.-])(-?\\d+\\.\\d+)\\s*,\\s*(-?\\d+\\.\\d+)")
+    private val viewportRegex = Regex("@(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)")
     private val placePathRegex = Regex("/maps/place/([^/@?]+)")
     private val urlRegex = Regex("https?://\\S+")
 
@@ -35,10 +37,18 @@ object MapsLinkParser {
 
     fun parse(text: String): Place? {
         val match = pinRegex.find(text) ?: coordinatesRegex.find(text) ?: return null
+        return placeFrom(match, text)
+    }
+
+    private fun placeFrom(
+        match: MatchResult,
+        text: String,
+        isApproximate: Boolean = false,
+    ): Place? {
         val latitude = match.groupValues[1].toDoubleOrNull() ?: return null
         val longitude = match.groupValues[2].toDoubleOrNull() ?: return null
         if (latitude !in -90.0..90.0 || longitude !in -180.0..180.0 || (latitude == 0.0 && longitude == 0.0)) return null
-        return Place(latitude, longitude, placeName(text))
+        return Place(latitude, longitude, placeName(text), isApproximate)
     }
 
     // Shared text from Maps puts the place name on the first line, before the link
@@ -47,13 +57,12 @@ object MapsLinkParser {
             text
                 .lineSequence()
                 .map { it.trim() }
-                .firstOrNull { it.isNotEmpty() && !urlRegex.containsMatchIn(it) }
+                .firstOrNull { it.isNotEmpty() && !urlRegex.containsMatchIn(it) && !coordinatesRegex.matches(it) }
         if (firstLine != null) return firstLine
         val fromPath = placePathRegex.find(text)?.groupValues?.get(1) ?: return null
         return runCatching { URLDecoder.decode(fromPath, "UTF-8") }.getOrNull()?.takeIf { it.isNotBlank() }
     }
 
-    // Resolves shared text or a link to a place, following short links and geocoding the address when the link has no coordinates
     fun resolve(
         context: Context,
         text: String,
@@ -63,9 +72,10 @@ object MapsLinkParser {
         val resolved = if (isShortLink(link)) resolveShortLink(link) else link
         parse(resolved)?.let { return it }
         // Current Maps links name the place and its address but leave out the coordinates
-        val address = placeName(resolved) ?: return null
-        val located = geocode(context, address) ?: return null
-        return located.copy(name = placeName(text) ?: address.substringBefore(','))
+        val address = placeName(resolved)
+        val located = address?.let { geocode(context, it) }
+        if (located != null) return located.copy(name = placeName(text) ?: address.substringBefore(','))
+        return viewportRegex.find(resolved)?.let { placeFrom(it, text, isApproximate = true) }
     }
 
     @Suppress("DEPRECATION")
@@ -78,17 +88,18 @@ object MapsLinkParser {
             Geocoder(context)
                 .getFromLocationName(address, 1)
                 ?.firstOrNull()
-                ?.let { Place(it.latitude, it.longitude, null) }
+                ?.let { Place(it.latitude, it.longitude, null, isApproximate = true) }
         } catch (e: Exception) {
             Log.e("MapsLinkParser", "Geocoding failed", e)
             null
         }
     }
 
-    // Short links only carry coordinates after the redirect, so this makes a network request
     fun resolveShortLink(shortUrl: String): String =
         try {
             val connection = URL(shortUrl).openConnection() as HttpURLConnection
+            connection.connectTimeout = TIMEOUT_MS
+            connection.readTimeout = TIMEOUT_MS
             connection.instanceFollowRedirects = false
             connection.connect()
             val location = connection.getHeaderField("Location")
@@ -98,4 +109,6 @@ object MapsLinkParser {
             Log.e("MapsLinkParser", "Error resolving URL", e)
             shortUrl
         }
+
+    private const val TIMEOUT_MS = 10_000
 }
