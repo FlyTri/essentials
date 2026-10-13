@@ -706,8 +706,8 @@
     <string name="unit_seconds">%d secondes</string>
     <string name="unit_minute">1 minute</string>
     <string name="unit_minutes">%d minutes</string>
-    <string name="action_restart_systemui">Redémarrer IU Système</string>
-    <string name="desc_restart_systemui">Arrête et redémarre le processus IU Système pour appliquer immédiatement certaines modifications</string>
+    <string name="action_restart_systemui">Redémarrer l\'IU du système</string>
+    <string name="desc_restart_systemui">Arrête et redémarre l\'IU du système pour appliquer immédiatement certaines modifications</string>
     <string name="msg_error_load_release_notes">Impossible de charger les notes de version</string>
     <string name="action_view_on_web">Voir sur le Web</string>
     <string name="action_done">OK</string>
