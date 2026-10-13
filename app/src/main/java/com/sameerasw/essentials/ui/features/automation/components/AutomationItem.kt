@@ -54,8 +54,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
@@ -437,10 +437,15 @@ private fun automationSummary(automation: Automation): String? {
         Automation.Type.TRIGGER ->
             when (val trigger = automation.trigger) {
                 is Trigger.Schedule -> "${time(trigger.hour, trigger.minute)} · ${days(trigger.days)}"
-                is Trigger.BluetoothConnected -> trigger.deviceName.ifBlank { trigger.deviceAddress }.ifBlank { null }
-                is Trigger.BluetoothDisconnected -> trigger.deviceName.ifBlank { trigger.deviceAddress }.ifBlank { null }
+                is Trigger.BluetoothConnected -> trigger.deviceName.ifBlank { null }
+                is Trigger.BluetoothDisconnected -> trigger.deviceName.ifBlank { null }
                 is Trigger.WifiConnected -> trigger.ssid.ifBlank { null }
                 is Trigger.WifiDisconnected -> trigger.ssid.ifBlank { null }
+                is Trigger.NotificationReceived ->
+                    listOfNotNull(
+                        trigger.appName.ifBlank { null },
+                        trigger.textContains.ifBlank { null }?.let { "\"$it\"" },
+                    ).joinToString(" · ").ifBlank { null }
                 else -> null
             }
 
@@ -563,6 +568,7 @@ private fun AutomationItemSummariesPreview() {
             Automation("2", Automation.Type.TRIGGER, trigger = Trigger.Schedule(hour = 22, minute = 0), actions = actions),
             Automation("3", Automation.Type.TRIGGER, trigger = Trigger.BluetoothConnected("00:11:22:33:44:55", "Pixel Buds Pro"), actions = actions),
             Automation("4", Automation.Type.TRIGGER, trigger = Trigger.BluetoothDisconnected("AA:BB:CC:DD:EE:FF", ""), actions = actions),
+            Automation("13", Automation.Type.TRIGGER, trigger = Trigger.NotificationReceived(packageName = "com.example.chat", appName = "Messages", textContains = "code"), actions = actions),
             Automation("5", Automation.Type.TRIGGER, trigger = Trigger.WifiConnected("Home Wi-Fi"), actions = actions),
             Automation("6", Automation.Type.TRIGGER, trigger = Trigger.WifiDisconnected("Office"), actions = actions),
             Automation(
@@ -600,7 +606,7 @@ private fun AutomationItemSummariesPreview() {
                 entryActions = listOf(Action.TurnOnLowPower),
                 exitActions = listOf(Action.TurnOffLowPower),
             ),
-            // No configurable values, so no summary line
+            // No configurable values, or no name to show, so no summary line
             Automation("12", Automation.Type.TRIGGER, trigger = Trigger.ChargerConnected, actions = actions),
         )
 
