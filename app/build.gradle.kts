@@ -276,4 +276,5 @@ dependencies {
 
     // QR Code Engine
     implementation(libs.zxing.core)
+    implementation(libs.play.services.code.scanner)
 }
