@@ -11,7 +11,7 @@ import com.sameerasw.essentials.island.plugins.BaseIslandPlugin
 class RemoteProvidersPlugin : BaseIslandPlugin() {
     override val id = "remote_providers"
 
-    override val settingKeys = setOf(SettingsRepository.KEY_ISLAND_PROVIDERS)
+    override val settingKeys = setOf(SettingsRepository.KEY_ISLAND_PROVIDERS, SettingsRepository.KEY_ISLAND_PROVIDERS_HIDDEN)
 
     private val connections = HashMap<String, ProviderConnection>()
     private var receiver: BroadcastReceiver? = null
@@ -73,6 +73,7 @@ class RemoteProvidersPlugin : BaseIslandPlugin() {
     }
 
     private fun publishAll() {
-        publish(connections.values.flatMap { it.items.value })
+        val hidden = ProviderTrustStore(settings).hiddenFromIsland()
+        publish(connections.filterKeys { it !in hidden }.values.flatMap { it.items.value })
     }
 }

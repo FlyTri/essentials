@@ -586,6 +586,7 @@ class SettingsRepository(
         const val ISLAND_CALL_SHOW_COMPACT = "compact"
         const val KEY_ISLAND_SHOW_TIMERS = "island_show_timers"
         const val KEY_ISLAND_PROVIDERS = "island_providers"
+        const val KEY_ISLAND_PROVIDERS_HIDDEN = "island_providers_hidden"
 
         private const val LEGACY_WEATHER_API_KEY_PREFIX = "weather_api_key"
         const val KEY_ISLAND_CALENDAR_EMOJIS = "island_calendar_emojis"

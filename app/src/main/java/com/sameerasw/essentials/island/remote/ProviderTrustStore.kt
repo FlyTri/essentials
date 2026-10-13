@@ -30,6 +30,19 @@ class ProviderTrustStore(private val settings: SettingsRepository) {
 
     fun disable(packageName: String) = save(trusted() - packageName)
 
+    fun hiddenFromIsland(): Set<String> =
+        settings.getString(SettingsRepository.KEY_ISLAND_PROVIDERS_HIDDEN)
+            ?.let { runCatching { gson.fromJson<List<String>>(it, object : TypeToken<List<String>>() {}.type) }.getOrNull() }
+            .orEmpty()
+            .toSet()
+
+    fun isHiddenFromIsland(packageName: String): Boolean = packageName in hiddenFromIsland()
+
+    fun setHiddenFromIsland(packageName: String, hidden: Boolean) {
+        val next = if (hidden) hiddenFromIsland() + packageName else hiddenFromIsland() - packageName
+        settings.putString(SettingsRepository.KEY_ISLAND_PROVIDERS_HIDDEN, next.takeIf { it.isNotEmpty() }?.let(gson::toJson))
+    }
+
     private fun save(map: Map<String, String>) =
         settings.putString(SettingsRepository.KEY_ISLAND_PROVIDERS, map.takeIf { it.isNotEmpty() }?.let(gson::toJson))
 

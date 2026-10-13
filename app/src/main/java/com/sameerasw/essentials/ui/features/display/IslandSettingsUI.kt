@@ -15,12 +15,9 @@ import sh.calvin.reorderable.ReorderableColumn
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.island.model.IslandPriorityEntries
 import com.sameerasw.essentials.island.remote.ProviderDiscovery
-import com.sameerasw.essentials.island.remote.ProviderPairing
 import com.sameerasw.essentials.island.remote.ProviderPriorities
 import com.sameerasw.essentials.island.remote.ProviderTrustStore
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import com.sameerasw.essentials.ui.core.pickers.ColorSwatchPicker
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
@@ -112,7 +109,6 @@ fun IslandSettingsUI(
     var savedRaw by remember { mutableStateOf(prioritySettings.getIslandPriorityOrder().orEmpty()) }
     val savedOrder = remember(savedRaw, providerEntries) { IslandPriorityEntries.normalize(savedRaw, providerEntries) }
     var workingOrder by remember { mutableStateOf(savedOrder) }
-    val providerScope = rememberCoroutineScope()
     var showMediaAppSelectionSheet by remember { mutableStateOf(false) }
     var showCalendarOptionsSheet by remember { mutableStateOf(false) }
     var showSoundModeOptionsSheet by remember { mutableStateOf(false) }
@@ -471,11 +467,10 @@ fun IslandSettingsUI(
                                 dragHandle = handle,
                                 leadingIcon = ProviderAppIcon(provider.packageName),
                                 title = provider.label,
-                                isChecked = true,
-                                onCheckedChange = {
+                                isChecked = !ProviderTrustStore(prioritySettings).isHiddenFromIsland(packageName),
+                                onCheckedChange = { checked ->
                                     HapticUtil.performVirtualKeyHaptic(view)
-                                    ProviderTrustStore(prioritySettings).disable(packageName)
-                                    providerScope.launch { ProviderPairing.revoke(context, provider) }
+                                    ProviderTrustStore(prioritySettings).setHiddenFromIsland(packageName, !checked)
                                     providerVersion++
                                 },
                                 onSettingsClick = { ProviderDiscovery.openSettings(context, provider) },
