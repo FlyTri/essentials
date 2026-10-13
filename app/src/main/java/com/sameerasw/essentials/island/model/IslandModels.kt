@@ -33,6 +33,7 @@ object IslandPriority {
     const val SOUND_MODE = 55
     const val SIGNAL = 57
     const val NETWORK = 60
+    const val HOTSPOT = 61
     const val DEVICES = 62
     const val ALARM = 90
     const val DEFAULT = 100

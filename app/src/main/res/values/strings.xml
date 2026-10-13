@@ -2039,6 +2039,22 @@
     <string name="watch_controls_long_press_hint">Long press to enable or disable buttons</string>
     <string name="watch_controls_reorder_title">Reorder watch controls</string>
     <string name="feat_watch_wireless_debugging_title">Wireless Debugging</string>
+    <string name="watch_esim_install_title">Install eSIM</string>
+    <string name="watch_esim_install_desc">Even in unsupported regions</string>
+    <string name="watch_esim_sheet_title">Install eSIM on Pixel Watch</string>
+    <string name="watch_esim_scan_qr">Scan QR code</string>
+    <string name="watch_esim_enter_code">Activation code</string>
+    <string name="watch_esim_continue">Continue in Pixel Watch</string>
+    <string name="watch_esim_error_invalid">Not a valid eSIM activation code</string>
+    <string name="watch_esim_error_confirmation">This plan needs a confirmation code, which is not supported</string>
+    <string name="watch_esim_error_companion_missing">The Pixel Watch app is not installed or cannot be opened</string>
+    <string name="watch_esim_scan_unavailable">Scanner unavailable, enter the code instead</string>
+    <string name="watch_esim_instructions_title">Instructions</string>
+    <string name="watch_esim_step_1">Connect and setup your watch with Pixel Watch app.</string>
+    <string name="watch_esim_step_2">Scan the QR code of your separate watch plan, or paste its activation code.</string>
+    <string name="watch_esim_step_3">Tap Continue in Pixel Watch and finish setup there.</string>
+    <string name="watch_esim_step_4">Use a distinct watch plan. A transfer code for your phone line may affect that line.</string>
+    <string name="watch_esim_warning">Experimental. Relies on a hidden screen in the Pixel Watch app that may change, and installation success cannot be confirmed here. Cellular may be limited by roaming restrictions or availability of IME/ voLTE.</string>
     <string name="feat_watch_wireless_debugging_desc">Enable remotely</string>
     <string name="feat_sync_sound_mode_title">Sound mode</string>
     <string name="feat_sync_sound_mode_desc">Automatically sync with watch</string>
@@ -3171,6 +3187,12 @@
     <string name="island_navigation_expand_meters">%d m</string>
     <string name="island_navigation_peek_after_expand_title">Line peek after expanding</string>
     <string name="island_navigation_peek_after_expand_desc">When off, the island goes straight back to compact</string>
+    <string name="island_show_hotspot_title">Hotspot</string>
+    <string name="island_hotspot_desc">Shows while your hotspot is on, with connected devices and data shared</string>
+    <plurals name="island_hotspot_clients">
+        <item quantity="one">%d device</item>
+        <item quantity="other">%d devices</item>
+    </plurals>
     <string name="island_devices_connected">Connected</string>
     <string name="island_devices_disconnected">Disconnected</string>
     <string name="island_devices_unknown">Bluetooth device</string>
@@ -3197,6 +3219,7 @@
     <string name="island_brief_show_alarm_title">Show upcoming alarm</string>
     <string name="island_brief_options_title">Brief options</string>
     <string name="duo_tap_for_brief_title">Tap for Brief</string>
+    <string name="island_hide_when_locked_title">Hide when locked</string>
     <string name="island_launcher_only_title">Only show on launcher</string>
     <string name="island_launcher_only_desc">Hide while an app is open</string>
     <string name="island_alarm_window_title">Show alarms within</string>

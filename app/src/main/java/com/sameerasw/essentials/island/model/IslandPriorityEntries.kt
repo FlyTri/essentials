@@ -16,6 +16,7 @@ object IslandPriorityEntries {
         Entry("calendar", setOf("calendar"), IslandPriority.CALENDAR),
         Entry("sound_mode", setOf("sound_mode"), IslandPriority.SOUND_MODE),
         Entry("network", setOf("network", "signal"), IslandPriority.SIGNAL),
+        Entry("hotspot", setOf("hotspot"), IslandPriority.HOTSPOT),
         Entry("devices", setOf("devices"), IslandPriority.DEVICES),
         Entry("alarm", setOf("alarm"), IslandPriority.ALARM),
     ).sortedBy { it.defaultPriority }

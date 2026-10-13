@@ -586,6 +586,9 @@ class SettingsRepository(
         const val ISLAND_CALL_SHOW_COMPACT = "compact"
         const val KEY_ISLAND_SHOW_TIMERS = "island_show_timers"
         const val KEY_ISLAND_PROVIDERS = "island_providers"
+        const val KEY_ISLAND_PROVIDERS_HIDDEN = "island_providers_hidden"
+        const val KEY_ISLAND_PROVIDERS_LAUNCHER_ONLY = "island_providers_launcher_only"
+        const val KEY_ISLAND_PROVIDERS_HIDE_LOCKED = "island_providers_hide_locked"
 
         private const val LEGACY_WEATHER_API_KEY_PREFIX = "weather_api_key"
         const val KEY_ISLAND_CALENDAR_EMOJIS = "island_calendar_emojis"
@@ -617,6 +620,7 @@ class SettingsRepository(
         const val ISLAND_NAVIGATION_ON_NEW_PEEK = "peek"
         const val ISLAND_NAVIGATION_ON_NEW_OFF = "off"
         const val KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE = "island_navigation_expand_distance"
+        const val KEY_ISLAND_SHOW_HOTSPOT = "island_show_hotspot"
         const val KEY_ISLAND_BRIEF_ENABLED = "island_brief_enabled"
         const val KEY_ISLAND_BRIEF_SHOW_ALARM = "island_brief_show_alarm"
         const val KEY_ISLAND_BRIEF_TWO_LINE_HEADER = "island_brief_two_line_header"
@@ -4072,6 +4076,9 @@ class SettingsRepository(
     // Meters before a turn at which the island expands; 0 = off
     fun getIslandNavigationExpandDistance(): Int = getInt(KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE, 200)
     fun setIslandNavigationExpandDistance(meters: Int) = putInt(KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE, meters)
+
+    fun isIslandShowHotspotEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_HOTSPOT, false)
+    fun setIslandShowHotspotEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_HOTSPOT, enabled)
 
     fun isIslandBriefEnabled(): Boolean = getBoolean(KEY_ISLAND_BRIEF_ENABLED, false)
     fun setIslandBriefEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_BRIEF_ENABLED, enabled)
