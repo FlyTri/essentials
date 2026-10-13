@@ -131,7 +131,7 @@ sealed interface Trigger {
         override val icon: Int = R.drawable.rounded_battery_android_frame_shield_24
     }
 
-    // A blank app matches every app and blank text matches any content. Force user to at least put any value
+    // A blank app matches every app and blank text matches any content; the editor requires at least one of them
     @Keep
     data class NotificationReceived(
         @SerializedName("packageName") val packageName: String = "",

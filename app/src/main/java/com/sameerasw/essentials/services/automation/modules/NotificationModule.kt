@@ -12,6 +12,7 @@ import com.sameerasw.essentials.services.NotificationListener
 import com.sameerasw.essentials.services.automation.executors.CombinedActionExecutor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 
 class NotificationModule : AutomationModule {
@@ -66,6 +67,7 @@ class NotificationModule : AutomationModule {
         try {
             context.unregisterReceiver(dndReceiver)
         } catch (e: Exception) { }
+        scope.coroutineContext.cancelChildren()
     }
 
     override fun updateAutomations(automations: List<Automation>) {
