@@ -266,14 +266,18 @@ class NotificationListener : NotificationListenerService() {
         return false
     }
 
-    // Do Not Disturb holds this notification back; apps and conversations allowed through DND still pass.
+    // Do Not Disturb holds this notification back or suppresses its peek; apps and conversations allowed through still pass.
     fun isBlockedByDnd(
         sbn: StatusBarNotification,
         rankingMap: RankingMap? = null,
     ): Boolean {
         val map = rankingMap ?: currentRanking ?: return false
         val ranking = Ranking()
-        return map.getRanking(sbn.key, ranking) && !ranking.matchesInterruptionFilter()
+        if (!map.getRanking(sbn.key, ranking)) return false
+        val peekSuppressed =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+                ranking.suppressedVisualEffects and NotificationManager.Policy.SUPPRESSED_EFFECT_PEEK != 0
+        return !ranking.matchesInterruptionFilter() || peekSuppressed
     }
 
     private fun populateActiveUnreadNotifications() {
