@@ -610,6 +610,13 @@ class SettingsRepository(
         const val KEY_ISLAND_SHOW_TRAVEL = "island_show_travel"
         const val KEY_ISLAND_SHOW_CAFFEINATE = "island_show_caffeinate"
         const val KEY_ISLAND_SHOW_DEVICES = "island_show_devices"
+        const val KEY_ISLAND_SHOW_NAVIGATION = "island_show_navigation"
+        const val KEY_ISLAND_NAVIGATION_ON_NEW = "island_navigation_on_new"
+        const val KEY_ISLAND_NAVIGATION_PEEK_AFTER_EXPAND = "island_navigation_peek_after_expand"
+        const val ISLAND_NAVIGATION_ON_NEW_EXPAND = "expand"
+        const val ISLAND_NAVIGATION_ON_NEW_PEEK = "peek"
+        const val ISLAND_NAVIGATION_ON_NEW_OFF = "off"
+        const val KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE = "island_navigation_expand_distance"
         const val KEY_ISLAND_BRIEF_ENABLED = "island_brief_enabled"
         const val KEY_ISLAND_BRIEF_SHOW_ALARM = "island_brief_show_alarm"
         const val KEY_ISLAND_BRIEF_TWO_LINE_HEADER = "island_brief_two_line_header"
@@ -4050,6 +4057,21 @@ class SettingsRepository(
 
     fun isIslandShowDevicesEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_DEVICES, true)
     fun setIslandShowDevicesEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_DEVICES, enabled)
+
+    fun isIslandShowNavigationEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_NAVIGATION, true)
+    fun setIslandShowNavigationEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_NAVIGATION, enabled)
+
+    // What the island does when a new instruction arrives: expand, peek or off
+    fun getIslandNavigationOnNew(): String =
+        getString(KEY_ISLAND_NAVIGATION_ON_NEW, ISLAND_NAVIGATION_ON_NEW_PEEK) ?: ISLAND_NAVIGATION_ON_NEW_PEEK
+    fun setIslandNavigationOnNew(mode: String) = putString(KEY_ISLAND_NAVIGATION_ON_NEW, mode)
+
+    fun isIslandNavigationPeekAfterExpandEnabled(): Boolean = getBoolean(KEY_ISLAND_NAVIGATION_PEEK_AFTER_EXPAND, true)
+    fun setIslandNavigationPeekAfterExpandEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NAVIGATION_PEEK_AFTER_EXPAND, enabled)
+
+    // Meters before a turn at which the island expands; 0 = off
+    fun getIslandNavigationExpandDistance(): Int = getInt(KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE, 200)
+    fun setIslandNavigationExpandDistance(meters: Int) = putInt(KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE, meters)
 
     fun isIslandBriefEnabled(): Boolean = getBoolean(KEY_ISLAND_BRIEF_ENABLED, false)
     fun setIslandBriefEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_BRIEF_ENABLED, enabled)
