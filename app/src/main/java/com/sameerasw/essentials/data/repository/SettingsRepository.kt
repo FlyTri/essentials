@@ -628,6 +628,7 @@ class SettingsRepository(
         const val KEY_ISLAND_NOTIF_KEEP_PROGRESS = "island_notif_keep_progress"
         const val KEY_ISLAND_NOTIF_QUEUE = "island_notif_queue"
         const val KEY_ISLAND_NOTIF_SKIP_SILENT = "island_notif_skip_silent"
+        const val KEY_ISLAND_NOTIF_FOLLOW_DND = "island_notif_follow_dnd"
         const val KEY_ISLAND_NOTIF_FILTER_APPS = "island_notif_filter_apps"
         const val KEY_ISLAND_NOTIF_FILTER_APPS_LIST = "island_notif_filter_apps_list"
         const val KEY_ISLAND_SHOW_NOTIFICATIONS = "island_show_notifications"
@@ -4164,6 +4165,9 @@ class SettingsRepository(
 
     fun isIslandNotifSkipSilentEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_SKIP_SILENT, true)
     fun setIslandNotifSkipSilentEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_SKIP_SILENT, enabled)
+
+    fun isIslandNotifFollowDndEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_FOLLOW_DND, true)
+    fun setIslandNotifFollowDndEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_FOLLOW_DND, enabled)
 
     fun isIslandNotifFilterAppsEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_FILTER_APPS, false)
     fun setIslandNotifFilterAppsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_FILTER_APPS, enabled)

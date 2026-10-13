@@ -266,6 +266,20 @@ class NotificationListener : NotificationListenerService() {
         return false
     }
 
+    // Do Not Disturb holds this notification back or suppresses its peek; apps and conversations allowed through still pass.
+    fun isBlockedByDnd(
+        sbn: StatusBarNotification,
+        rankingMap: RankingMap? = null,
+    ): Boolean {
+        val map = rankingMap ?: currentRanking ?: return false
+        val ranking = Ranking()
+        if (!map.getRanking(sbn.key, ranking)) return false
+        val peekSuppressed =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+                ranking.suppressedVisualEffects and NotificationManager.Policy.SUPPRESSED_EFFECT_PEEK != 0
+        return !ranking.matchesInterruptionFilter() || peekSuppressed
+    }
+
     private fun populateActiveUnreadNotifications() {
         unreadNotifications.clear()
         try {
@@ -1013,7 +1027,10 @@ class NotificationListener : NotificationListenerService() {
         }
 
         if (!isRepost && isHeadsUpNotification(sbn, rankingMap, allowSilent = true)) {
-            val alert = extractNotificationAlert(sbn)?.copy(isSilent = isSilentNotification(sbn, rankingMap))
+            val alert = extractNotificationAlert(sbn)?.copy(
+                isSilent = isSilentNotification(sbn, rankingMap),
+                blockedByDnd = isBlockedByDnd(sbn, rankingMap),
+            )
             if (alert != null) {
                 notifyAlertPosted(alert)
             }
