@@ -204,7 +204,7 @@ class SignalPlugin : BaseIslandPlugin() {
                     placement = CompactPlacement.Dynamic,
                     compact = listOf(
                         CompactCell("signal.offline") {
-                            IslandIcon(R.drawable.rounded_android_cell_dual_5_bar_alert_24, size = 18.dp, tint = MaterialTheme.colorScheme.error)
+                            IslandIcon(R.drawable.rounded_android_cell_dual_5_bar_alert_24, size = 18.dp, tint = MaterialTheme.colorScheme.primary)
                         },
                     ),
                 ),
