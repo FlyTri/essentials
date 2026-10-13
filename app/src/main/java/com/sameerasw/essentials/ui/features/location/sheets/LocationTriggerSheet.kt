@@ -15,6 +15,7 @@ import android.content.Intent
 import android.location.LocationManager
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -39,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -157,7 +160,14 @@ fun LocationTriggerSheet(
             }
 
             RoundedCardContainer {
-                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surfaceBright)
+                            .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
                     Text(
                         text = if (hasPlace) placeName.ifBlank { stringResource(R.string.diy_location_pinned) } else stringResource(R.string.diy_location_none),
                         style = MaterialTheme.typography.titleMedium,
@@ -165,52 +175,48 @@ fun LocationTriggerSheet(
                     )
                     Text(
                         text =
-                            if (hasPlace) {
-                                String.format(Locale.US, "%.5f, %.5f", latitude, longitude)
-                            } else {
-                                stringResource(R.string.diy_location_hint)
+                            when {
+                                !hasPlace -> stringResource(R.string.diy_location_hint)
+                                needsConfirming && unconfirmedAddress != null -> unconfirmedAddress.orEmpty()
+                                else -> String.format(Locale.US, "%.5f, %.5f", latitude, longitude)
                             },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    if (hasPlace && needsConfirming) {
-                        unconfirmedAddress?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
+                    if (isResolving) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+                }
+                if (hasPlace && needsConfirming) {
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                .padding(start = 16.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.rounded_warning_24),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Spacer(modifier = Modifier.size(12.dp))
                         Text(
                             text = stringResource(R.string.diy_location_approximate),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            modifier = Modifier.weight(1f),
                         )
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        TextButton(
+                            onClick = {
+                                HapticUtil.performUIHaptic(view)
+                                needsConfirming = false
+                            },
+                            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onTertiaryContainer),
                         ) {
-                            OutlinedButton(
-                                onClick = {
-                                    HapticUtil.performUIHaptic(view)
-                                    openGoogleMaps(context, latitude, longitude, hasPlace = true)
-                                },
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                Text(stringResource(R.string.diy_location_check_in_maps))
-                            }
-                            Button(
-                                onClick = {
-                                    HapticUtil.performUIHaptic(view)
-                                    needsConfirming = false
-                                },
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                Text(stringResource(R.string.diy_location_confirm_place))
-                            }
+                            Text(stringResource(R.string.diy_location_confirm_place), fontWeight = FontWeight.Bold)
                         }
                     }
-                    if (isResolving) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
                 }
             }
 
