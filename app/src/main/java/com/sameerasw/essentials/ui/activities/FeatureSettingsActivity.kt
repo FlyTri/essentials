@@ -126,6 +126,7 @@ import com.sameerasw.essentials.ui.features.system.StatusBarIconSettingsUI
 import com.sameerasw.essentials.ui.features.system.TextAnimationsSettingsUI
 import com.sameerasw.essentials.ui.features.watch.ComplicationsSettingsUI
 import com.sameerasw.essentials.ui.features.watch.WatchControlsSettingsUI
+import com.sameerasw.essentials.ui.features.watch.WatchEsimInstallSheet
 import com.sameerasw.essentials.ui.features.watch.WatchNotificationSettingsUI
 import com.sameerasw.essentials.ui.features.watch.WatchSettingsUI
 import com.sameerasw.essentials.ui.features.watch.WatchWirelessDebuggingSettingsUI
@@ -343,6 +344,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                     // Help Sheet State
                     var showHelpSheet by remember { mutableStateOf(false) }
+                    var showWatchEsimSheet by remember { mutableStateOf(false) }
                     var showInstructionsSheet by remember { mutableStateOf(false) }
                     var showWatchInstallHelpSheet by remember { mutableStateOf(false) }
                     var selectedHelpFeature by remember {
@@ -478,6 +480,10 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 permissions = permissionItems,
                             )
                         }
+                    }
+
+                    if (showWatchEsimSheet) {
+                        WatchEsimInstallSheet(onDismissRequest = { showWatchEsimSheet = false })
                     }
 
                     if (showHelpSheet && selectedHelpFeature != null) {
@@ -756,6 +762,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                         ),
                                                         listOf(
                                                             "Watch Wireless Debugging",
+                                                            "Watch eSIM Installer",
                                                         ),
                                                     )
 
@@ -963,7 +970,9 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                 isUnsupported = !child.isDeviceSupported(context),
                                                 onToggle = permissionAwareToggle,
                                                 onClick = {
-                                                    if (child.hasMoreSettings) {
+                                                    if (child.id == "Watch eSIM Installer") {
+                                                        showWatchEsimSheet = true
+                                                    } else if (child.hasMoreSettings) {
                                                         BiometricSecurityHelper.runWithAuth(
                                                             activity = this@FeatureSettingsActivity,
                                                             feature = child,

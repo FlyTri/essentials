@@ -102,6 +102,7 @@
     <queries>
         <package android:name="com.sameerasw.overcast" />
         <package android:name="eu.darken.porter" />
+        <package android:name="com.google.android.apps.wear.companion" />
         <intent>
             <action android:name="com.sameerasw.island.PROVIDER" />
         </intent>

@@ -2510,6 +2510,31 @@ object FeatureRegistry {
                 }
             },
             object : Feature(
+                id = "Watch eSIM Installer",
+                title = R.string.watch_esim_install_title,
+                iconRes = R.drawable.rounded_sim_card_24,
+                category = R.string.cat_tools,
+                description = R.string.watch_esim_install_desc,
+                parentFeatureId = "Watch",
+                hasMoreSettings = false,
+                showToggle = false,
+            ) {
+                override fun isEnabled(viewModel: MainViewModel) = false
+
+                override fun isDeviceSupported(context: Context) =
+                    context
+                        .getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+                        .getString("watch_node_name", "")
+                        .orEmpty()
+                        .contains("pixel watch", ignoreCase = true)
+
+                override fun onToggle(
+                    viewModel: MainViewModel,
+                    context: Context,
+                    enabled: Boolean,
+                ) {}
+            },
+            object : Feature(
                 id = "Sync sound mode",
                 title = R.string.feat_sync_sound_mode_title,
                 iconRes = R.drawable.rounded_volume_up_24,
