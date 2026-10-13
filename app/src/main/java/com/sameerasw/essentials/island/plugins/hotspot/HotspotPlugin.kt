@@ -140,7 +140,7 @@ class HotspotPlugin : BaseIslandPlugin() {
             publish(null)
             return
         }
-        val count = clients
+        val count = clients?.takeIf { it > 0 }
         val end = listOfNotNull(
             count?.let { context.resources.getQuantityString(R.plurals.island_hotspot_clients, it, it) },
             bytes?.let { Formatter.formatShortFileSize(context, it) },
