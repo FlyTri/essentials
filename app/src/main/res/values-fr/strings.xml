@@ -1629,7 +1629,7 @@ Réinitialiser permet d\'effacer les valeurs personnalisées et le système gér
     <string name="island_enable_title">Activer Island</string>
     <string name="island_show_calls_title">Appels</string>
     <string name="island_show_timers_title">Minuteurs et chronomètres</string>
-    <string name="duo_action_horizontal_slide_sound_mode">Mode son</string>
+    <string name="duo_action_horizontal_slide_sound_mode">Mode de sonnerie</string>
     <string name="island_devices_battery_section">Appareils</string>
     <string name="island_show_network_title">Activité réseau</string>
     <string name="feat_status_glance_title">Aperçu du statut</string>
@@ -1698,4 +1698,9 @@ Note que en activant ça peut casser les widgets At a Glance du launcher (Comme 
     <string name="about_desc_hilight">Allume la LED HiLight à l\'arrière des Pixels 11 Pro (XL/Fold) quand une notification arrive, avec un effet différent pour chaque application que tu ajoutes.
 Les effets de la LED HiLight peuvent être aussi utilisés comme une action dans les paramètres du remapage des boutons et des automatisations.
 À besoin de Shizuku, ou de permission root pour fonctionner.</string>
+    <string name="watch_esim_install_title">Installer une eSIM</string>
+    <string name="watch_esim_install_desc">Même dans des régions non supportés</string>
+    <string name="island_section_behavior">Comportements</string>
+    <string name="island_section_visuals">Visuels</string>
+    <string name="diy_volume_channel_alarm">Alarme</string>
 </resources>
