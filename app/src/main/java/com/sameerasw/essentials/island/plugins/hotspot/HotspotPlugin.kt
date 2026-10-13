@@ -9,6 +9,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.text.format.Formatter
+import android.util.Log
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
@@ -70,22 +71,31 @@ class HotspotPlugin : BaseIslandPlugin() {
         clients = null
     }
 
-    override fun refresh() = render()
+    override fun refresh() {
+        syncPolling()
+        render()
+    }
 
     private fun setEnabled(on: Boolean) {
-        val c = ctx ?: return
-        if (on == enabled) return
+        if (ctx == null || on == enabled) return
         enabled = on
-        pollJob?.cancel()
-        pollJob = null
-        bytes = null
-        clients = null
-        baseline = null
-        if (on) {
-            windowStart = System.currentTimeMillis() - WINDOW_MS
-            pollJob = c.scope.launch { poll() }
-        }
+        syncPolling()
         render()
+    }
+
+    private fun syncPolling() {
+        val c = ctx ?: return
+        if (!enabled || !settings.isIslandShowHotspotEnabled()) {
+            pollJob?.cancel()
+            pollJob = null
+            bytes = null
+            clients = null
+            baseline = null
+            return
+        }
+        if (pollJob?.isActive == true) return
+        windowStart = System.currentTimeMillis() - WINDOW_MS
+        pollJob = c.scope.launch { poll() }
     }
 
     private suspend fun poll() {
@@ -130,7 +140,8 @@ class HotspotPlugin : BaseIslandPlugin() {
                     total
                 }
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.d(TAG, "Tethered bytes query failed", e)
             null
         }
     }
@@ -167,6 +178,7 @@ class HotspotPlugin : BaseIslandPlugin() {
 
     companion object {
         const val KEY = "hotspot"
+        private const val TAG = "HotspotPlugin"
         private const val ACTION_AP_STATE = "android.net.wifi.WIFI_AP_STATE_CHANGED"
         private const val EXTRA_AP_STATE = "wifi_state"
         private const val AP_STATE_ENABLED = 13
