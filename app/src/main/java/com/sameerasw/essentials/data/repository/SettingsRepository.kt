@@ -4052,7 +4052,7 @@ class SettingsRepository(
     fun isIslandShowDevicesEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_DEVICES, true)
     fun setIslandShowDevicesEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_DEVICES, enabled)
 
-    fun isIslandShowHotspotEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_HOTSPOT, true)
+    fun isIslandShowHotspotEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_HOTSPOT, false)
     fun setIslandShowHotspotEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_HOTSPOT, enabled)
 
     fun isIslandBriefEnabled(): Boolean = getBoolean(KEY_ISLAND_BRIEF_ENABLED, false)

@@ -10,8 +10,27 @@ import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.text.format.Formatter
 import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.island.model.CompactCell
@@ -21,7 +40,6 @@ import com.sameerasw.essentials.island.model.IslandPriority
 import com.sameerasw.essentials.island.model.LineContent
 import com.sameerasw.essentials.island.plugins.BaseIslandPlugin
 import com.sameerasw.essentials.island.ui.components.IslandIcon
-import com.sameerasw.essentials.island.ui.components.RollingText
 import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.ShellUtils
 import kotlinx.coroutines.Dispatchers
@@ -161,11 +179,8 @@ class HotspotPlugin : BaseIslandPlugin() {
                 key = KEY,
                 priority = IslandPriority.HOTSPOT,
                 placement = CompactPlacement.Dynamic,
-                compact = listOfNotNull(
-                    count?.let { CompactCell("hotspot.clients") { RollingText(it.toString()) } },
-                    CompactCell("hotspot.icon") {
-                        IslandIcon(R.drawable.rounded_wifi_tethering_24, size = 18.dp, tint = MaterialTheme.colorScheme.primary)
-                    },
+                compact = listOf(
+                    CompactCell("hotspot.icon") { HotspotIcon(count) },
                 ),
                 line = LineContent(
                     icon = { IslandIcon(R.drawable.rounded_wifi_tethering_24, tint = MaterialTheme.colorScheme.primary) },
@@ -184,6 +199,47 @@ class HotspotPlugin : BaseIslandPlugin() {
         private const val AP_STATE_ENABLED = 13
         private const val POLL_MS = 10_000L
         private const val WINDOW_MS = 24 * 60 * 60 * 1000L
+    }
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+private fun HotspotIcon(count: Int?) {
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen },
+    ) {
+        IslandIcon(
+            R.drawable.rounded_wifi_tethering_24,
+            size = 20.dp,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.align(Alignment.TopStart),
+        )
+        if (count != null) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .size(11.dp)
+                    .drawBehind { drawCircle(Color.Black, blendMode = BlendMode.Clear) },
+            )
+            Text(
+                text = if (count > 9) "9+" else count.toString(),
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = if (count > 9) 6.sp else 8.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                softWrap = false,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .width(11.dp),
+                style = LocalTextStyle.current.copy(
+                    platformStyle = PlatformTextStyle(includeFontPadding = false),
+                    lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.Both),
+                ),
+            )
+        }
     }
 }
 

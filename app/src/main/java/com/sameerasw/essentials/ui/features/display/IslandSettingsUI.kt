@@ -434,13 +434,15 @@ fun IslandSettingsUI(
                         dragHandle = handle,
                         iconRes = R.drawable.rounded_wifi_tethering_24,
                         title = stringResource(R.string.island_show_hotspot_title),
-                        description = stringResource(R.string.island_hotspot_desc),
                         isChecked = viewModel.isIslandShowHotspot.value,
                         onCheckedChange = { checked ->
                             HapticUtil.performVirtualKeyHaptic(view)
                             viewModel.setIslandShowHotspot(checked)
-                            if (checked && !PermissionUtils.hasUsageStatsPermission(context)) {
-                                requestingPermissionsFor = Pair(R.string.island_title, listOf("USAGE_STATS"))
+                            if (checked) {
+                                val missing = mutableListOf<String>()
+                                if (!PermissionUtils.hasUsageStatsPermission(context)) missing.add("USAGE_STATS")
+                                if (!ShellUtils.isAvailable(context) || !ShellUtils.hasPermission(context)) missing.add("SHIZUKU")
+                                if (missing.isNotEmpty()) requestingPermissionsFor = Pair(R.string.island_title, missing)
                             }
                         },
                         modifier = Modifier.highlight(highlightSetting == "island_show_hotspot"),

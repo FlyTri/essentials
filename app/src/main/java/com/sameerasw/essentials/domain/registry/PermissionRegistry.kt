@@ -98,10 +98,12 @@ fun initPermissionRegistry() {
     PermissionRegistry.register("SHIZUKU", R.string.feat_standby_apps_title)
     PermissionRegistry.register("SHIZUKU", R.string.island_dynamic_hide_status_bar_title)
     PermissionRegistry.register("SHIZUKU", R.string.island_hide_live_updates_title)
+    PermissionRegistry.register("SHIZUKU", R.string.island_show_hotspot_title)
     PermissionRegistry.register("USAGE_STATS", R.string.feat_freeze_title)
     PermissionRegistry.register("USAGE_STATS", R.string.feat_app_lock_title)
     PermissionRegistry.register("USAGE_STATS", R.string.feat_dynamic_night_light_title)
     PermissionRegistry.register("USAGE_STATS", R.string.feat_conscious_gate_title)
+    PermissionRegistry.register("USAGE_STATS", R.string.island_show_hotspot_title)
     PermissionRegistry.register("NOTIFICATION_LISTENER", R.string.feat_freeze_title)
 
     // Root permission

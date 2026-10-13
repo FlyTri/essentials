@@ -241,7 +241,7 @@ class MainViewModel : ViewModel() {
     val islandAlarmWindowHours = mutableIntStateOf(12)
     val isIslandShowTravel = mutableStateOf(true)
     val isIslandShowCaffeinate = mutableStateOf(true)
-    val isIslandShowHotspot = mutableStateOf(true)
+    val isIslandShowHotspot = mutableStateOf(false)
     val isIslandShowDevices = mutableStateOf(true)
     val isIslandBriefEnabled = mutableStateOf(false)
     val isIslandBriefShowAlarm = mutableStateOf(true)
