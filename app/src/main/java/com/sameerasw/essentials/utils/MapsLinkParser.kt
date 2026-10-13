@@ -22,6 +22,7 @@ object MapsLinkParser {
         val longitude: Double,
         val name: String?,
         val isApproximate: Boolean = false,
+        val address: String? = null,
     )
 
     // The !3d!4d pair is the place's own pin; the @ pair is only the map's viewport centre
@@ -88,7 +89,7 @@ object MapsLinkParser {
             Geocoder(context)
                 .getFromLocationName(address, 1)
                 ?.firstOrNull()
-                ?.let { Place(it.latitude, it.longitude, null, isApproximate = true) }
+                ?.let { Place(it.latitude, it.longitude, null, isApproximate = true, address = it.getAddressLine(0)) }
         } catch (e: Exception) {
             Log.e("MapsLinkParser", "Geocoding failed", e)
             null

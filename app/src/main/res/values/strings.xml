@@ -1362,7 +1362,9 @@
     <string name="diy_location_link_added">Place added from the copied link</string>
     <string name="diy_location_accuracy_off">Turn on Google Location Accuracy in Settings › Location › Location services. Location triggers can\'t run without it.</string>
     <string name="location_reached_new_destination">New Destination</string>
-    <string name="diy_location_approximate">Found by searching the name, so it may not be the exact place. Open it in Google Maps to check.</string>
+    <string name="diy_location_approximate">The link doesn\'t include this place\'s pin, so it may not be the one you meant. Check it in Google Maps before saving.</string>
+    <string name="diy_location_check_in_maps">Check in Maps</string>
+    <string name="diy_location_confirm_place">Right place</string>
     <string name="diy_location_link_invalid">Copy a Google Maps link to a place first</string>
 
     <string name="diy_state_charging">Charging</string>

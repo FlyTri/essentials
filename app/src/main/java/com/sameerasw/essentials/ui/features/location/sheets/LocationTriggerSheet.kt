@@ -82,7 +82,8 @@ fun LocationTriggerSheet(
     var lastHandledLink by remember { mutableStateOf<String?>(null) }
     var wentToMaps by remember { mutableStateOf(false) }
     var isAccuracyOff by remember { mutableStateOf(false) }
-    var isApproximate by remember { mutableStateOf(false) }
+    var unconfirmedAddress by remember { mutableStateOf<String?>(null) }
+    var needsConfirming by remember { mutableStateOf(false) }
     val hasPlace = latitude != 0.0 || longitude != 0.0
 
     fun applyLink(
@@ -102,8 +103,9 @@ fun LocationTriggerSheet(
             }
             latitude = place.latitude
             longitude = place.longitude
-            isApproximate = place.isApproximate
-            place.name?.let { name -> if (placeName.isBlank() || fromClipboard) placeName = name }
+            needsConfirming = place.isApproximate
+            unconfirmedAddress = place.address
+            place.name?.let { name -> if (placeName.isBlank() || fromClipboard || place.isApproximate) placeName = name }
             if (fromClipboard) Toast.makeText(context, R.string.diy_location_link_added, Toast.LENGTH_SHORT).show()
         }
     }
@@ -171,12 +173,42 @@ fun LocationTriggerSheet(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    if (hasPlace && isApproximate) {
+                    if (hasPlace && needsConfirming) {
+                        unconfirmedAddress?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
                         Text(
                             text = stringResource(R.string.diy_location_approximate),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error,
                         )
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            OutlinedButton(
+                                onClick = {
+                                    HapticUtil.performUIHaptic(view)
+                                    openGoogleMaps(context, latitude, longitude, hasPlace = true)
+                                },
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Text(stringResource(R.string.diy_location_check_in_maps))
+                            }
+                            Button(
+                                onClick = {
+                                    HapticUtil.performUIHaptic(view)
+                                    needsConfirming = false
+                                },
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Text(stringResource(R.string.diy_location_confirm_place))
+                            }
+                        }
                     }
                     if (isResolving) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
                 }
@@ -262,7 +294,7 @@ fun LocationTriggerSheet(
                         onSave(latitude, longitude, radiusMeters, placeName.trim())
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = hasPlace && !isResolving,
+                    enabled = hasPlace && !isResolving && !needsConfirming,
                 ) {
                     Icon(painterResource(R.drawable.rounded_check_24), contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.size(8.dp))
