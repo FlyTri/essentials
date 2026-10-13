@@ -492,7 +492,7 @@ class DuoOverlayHandler(
                         }
                     }
                 }
-                if (level == -1 && wifiManager != null) {
+                if (level == -1 && wifiManager != null && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                     @Suppress("DEPRECATION")
                     val info = wifiManager?.connectionInfo
                     if (info != null && info.rssi > -127) {

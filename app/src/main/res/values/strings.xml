@@ -1291,6 +1291,13 @@
     <string name="diy_trigger_wifi_disconnected">Wi-Fi Network Disconnected</string>
     <string name="diy_trigger_power_saving_on">Power Saving On</string>
     <string name="diy_trigger_power_saving_off">Power Saving Off</string>
+    <string name="diy_trigger_notification_received">Notification Received</string>
+    <string name="diy_trigger_dnd_on">Do Not Disturb On</string>
+    <string name="diy_trigger_dnd_off">Do Not Disturb Off</string>
+    <string name="diy_notification_trigger_hint">Runs when a notification from this app arrives, or one containing this text. Set at least one.</string>
+    <string name="diy_notification_trigger_app">App</string>
+    <string name="diy_notification_trigger_any_app">Any app</string>
+    <string name="diy_notification_trigger_text">Text contains (optional)</string>
     <string name="diy_trigger_accessibility_button">Accessibility Shortcut</string>
     <string name="accessibility_shortcut_service_name">Essentials Shortcut</string>
     <string name="accessibility_shortcut_service_1_name">Essentials Shortcut 1</string>
@@ -1313,6 +1320,9 @@
     <string name="diy_calendar_include_declined">Include declined events</string>
     <string name="diy_calendar_include_tentative">Include tentative events</string>
     <string name="diy_calendar_include_free">Include events shown as free</string>
+    <string name="diy_summary_every_day">Every day</string>
+    <string name="diy_summary_all_calendars">All calendars</string>
+    <string name="diy_summary_calendars_count">Calendars: %1$d</string>
     <string name="diy_calendar_filters">Filters</string>
     <string name="diy_calendar_calendars">Calendars</string>
     <string name="diy_calendar_permission">Calendar access is needed to pick calendars</string>
@@ -1334,6 +1344,7 @@
     <string name="diy_category_system_screen">System &amp; Screen</string>
     <string name="diy_category_battery_power">Battery &amp; Power</string>
     <string name="diy_category_time_schedule">Time &amp; Schedule</string>
+    <string name="diy_category_notifications">Notifications</string>
 
     <string name="diy_state_charging">Charging</string>
     <string name="diy_state_screen_on">Screen On</string>
@@ -1348,6 +1359,11 @@
     <string name="diy_action_flashlight_off">Turn Off Flashlight</string>
     <string name="diy_action_flashlight_toggle">Toggle Flashlight</string>
     <string name="diy_action_low_power_on">Turn On Low Power Mode</string>
+    <string name="diy_action_caffeinate_on">Turn On Caffeinate</string>
+    <string name="diy_action_caffeinate_off">Turn Off Caffeinate</string>
+    <string name="diy_action_wait">Wait</string>
+    <string name="diy_wait_duration">Duration</string>
+    <string name="diy_wait_desc">Pause before the next action runs</string>
     <string name="diy_action_low_power_off">Turn Off Low Power Mode</string>
     <string name="diy_action_set_charging_mode">Set Charging Mode</string>
     <string name="diy_action_notification_lighting">Trigger notification lighting</string>
@@ -3012,6 +3028,7 @@
     <string name="island_action_tap_desc">Open app</string>
     <string name="island_tap_action_title">Tap action</string>
     <string name="island_show_time_title">Time</string>
+    <string name="island_time_show_seconds_title">Show seconds</string>
     <string name="island_show_battery_title">Battery</string>
     <string name="island_battery_style_title">Battery style</string>
     <string name="island_battery_style_ring">Ring</string>
@@ -3140,6 +3157,12 @@
     <string name="duo_combine_with_island">Combine with Island</string>
     <string name="island_combine_with_duo">Combine with Duo</string>
     <string name="island_show_devices_title">Devices</string>
+    <string name="island_show_hotspot_title">Hotspot</string>
+    <string name="island_hotspot_desc">Shows while your hotspot is on, with connected devices and data shared</string>
+    <plurals name="island_hotspot_clients">
+        <item quantity="one">%d device</item>
+        <item quantity="other">%d devices</item>
+    </plurals>
     <string name="island_devices_connected">Connected</string>
     <string name="island_devices_disconnected">Disconnected</string>
     <string name="island_devices_unknown">Bluetooth device</string>
@@ -3207,7 +3230,24 @@
     <string name="island_notif_skip_silent_title">Skip silent notifications</string>
     <string name="island_notif_filter_apps_title">Filter apps</string>
     <string name="island_notif_compact_heads_up_title">Compact heads up</string>
-    <string name="island_notif_compact_heads_up_desc">Show new notifications as a line peek</string>
+    <string name="island_notif_compact_heads_up_desc">Peek new notifications as a line instead of expanding the island</string>
+    <string name="island_notif_compact_heads_up_needs_line_peek">Needs Line peek. Tap to turn it on in Behavior</string>
+    <string name="island_notif_condensed_info_title">Peek style</string>
+    <string name="island_notif_condensed_info_desc">App icon and title only. Tap to expand for the content and actions</string>
+    <string name="island_notif_peek_style_compact">Compact</string>
+    <string name="island_notif_peek_style_full">Full</string>
+    <string name="island_notif_show_title">Show notifications</string>
+    <string name="island_notif_section_sources">Which notifications</string>
+    <string name="island_notif_section_heads_up">Heads up</string>
+    <string name="island_notif_section_in_island">In the island</string>
+    <string name="island_notif_section_lock_screen">Lock screen</string>
+    <string name="island_notif_filter_apps_desc">Only show notifications from the apps you pick</string>
+    <string name="island_notif_skip_silent_desc">Ignore notifications that arrive without sound</string>
+    <string name="island_notif_follow_dnd_title">Follow Do Not Disturb</string>
+    <string name="island_notif_follow_dnd_desc">Hide notifications that Do Not Disturb silences</string>
+    <string name="island_notif_keep_progress_desc">Show downloads and other ongoing progress</string>
+    <string name="island_notif_queue_desc">Keep several notifications instead of replacing the current one</string>
+    <string name="island_notif_tap_to_open_desc">Tap an expanded notification to open its app</string>
     <string name="island_media_peek_song_change_title">Peek song change</string>
     <string name="island_media_keep_when_paused_title">Keep in catchup when paused</string>
     <string name="island_media_show_previous_title">Show previous track button</string>

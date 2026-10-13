@@ -7,6 +7,7 @@ import android.view.SurfaceView
 import android.view.ViewOutlineProvider
 import android.view.View
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -22,10 +23,12 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -77,7 +80,12 @@ fun RemoteExpanded(
     val cornerPx = with(density) { scope.spec.expandedCorner.toPx() }
     val current = remember { intArrayOf(0, 0) }
     val corner = remember { floatArrayOf(0f) }
-    Box(size) {
+    val interactive by rememberUpdatedState(revealed && !dragging)
+    Box(
+        size.pointerInput(session) {
+            detectTapGestures { if (interactive) session.tap(it.x, it.y) }
+        },
+    ) {
     snapshot?.let {
         Image(
             bitmap = it,

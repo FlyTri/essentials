@@ -241,6 +241,7 @@ class MainViewModel : ViewModel() {
     val islandAlarmWindowHours = mutableIntStateOf(12)
     val isIslandShowTravel = mutableStateOf(true)
     val isIslandShowCaffeinate = mutableStateOf(true)
+    val isIslandShowHotspot = mutableStateOf(false)
     val isIslandShowDevices = mutableStateOf(true)
     val isIslandBriefEnabled = mutableStateOf(false)
     val isIslandBriefShowAlarm = mutableStateOf(true)
@@ -260,9 +261,11 @@ class MainViewModel : ViewModel() {
     val isIslandMediaShowPrevious = mutableStateOf(false)
     val isIslandMediaShowLike = mutableStateOf(true)
     val isIslandNotifCompactHeadsUp = mutableStateOf(true)
+    val isIslandNotifCondensedInfo = mutableStateOf(false)
     val isIslandNotifKeepProgress = mutableStateOf(true)
     val isIslandNotifQueue = mutableStateOf(true)
     val isIslandNotifSkipSilent = mutableStateOf(true)
+    val isIslandNotifFollowDnd = mutableStateOf(true)
     val isIslandNotifFilterApps = mutableStateOf(false)
     val isIslandShowNotifications = mutableStateOf(true)
     val isIslandNotifTapToOpen = mutableStateOf(false)
@@ -914,11 +917,17 @@ class MainViewModel : ViewModel() {
                     SettingsRepository.KEY_ISLAND_NOTIF_COMPACT_HEADS_UP ->
                         isIslandNotifCompactHeadsUp.value = settingsRepository.isIslandNotifCompactHeadsUpEnabled()
 
+                    SettingsRepository.KEY_ISLAND_NOTIF_CONDENSED_INFO ->
+                        isIslandNotifCondensedInfo.value = settingsRepository.isIslandNotifCondensedInfoEnabled()
+
                     SettingsRepository.KEY_ISLAND_NOTIF_QUEUE ->
                         isIslandNotifQueue.value = settingsRepository.isIslandNotifQueueEnabled()
 
                     SettingsRepository.KEY_ISLAND_NOTIF_SKIP_SILENT ->
                         isIslandNotifSkipSilent.value = settingsRepository.isIslandNotifSkipSilentEnabled()
+
+                    SettingsRepository.KEY_ISLAND_NOTIF_FOLLOW_DND ->
+                        isIslandNotifFollowDnd.value = settingsRepository.isIslandNotifFollowDndEnabled()
 
                     SettingsRepository.KEY_ISLAND_NOTIF_FILTER_APPS ->
                         isIslandNotifFilterApps.value = settingsRepository.isIslandNotifFilterAppsEnabled()
@@ -2398,6 +2407,7 @@ class MainViewModel : ViewModel() {
         isDuoKeepInFullscreen.value = settingsRepository.isDuoKeepInFullscreenEnabled()
         isDuoDisableInteractionsInFullscreen.value = settingsRepository.isDuoDisableInteractionsInFullscreenEnabled()
         isIslandShowCaffeinate.value = settingsRepository.isIslandShowCaffeinateEnabled()
+        isIslandShowHotspot.value = settingsRepository.isIslandShowHotspotEnabled()
         isIslandShowDevices.value = settingsRepository.isIslandShowDevicesEnabled()
         isIslandBriefEnabled.value = settingsRepository.isIslandBriefEnabled()
         isIslandBriefShowAlarm.value = settingsRepository.isIslandBriefShowAlarmEnabled()
@@ -2425,9 +2435,11 @@ class MainViewModel : ViewModel() {
         isIslandMediaShowPrevious.value = settingsRepository.isIslandMediaShowPreviousEnabled()
         isIslandMediaShowLike.value = settingsRepository.isIslandMediaShowLikeEnabled()
         isIslandNotifCompactHeadsUp.value = settingsRepository.isIslandNotifCompactHeadsUpEnabled()
+        isIslandNotifCondensedInfo.value = settingsRepository.isIslandNotifCondensedInfoEnabled()
         isIslandNotifKeepProgress.value = settingsRepository.isIslandNotifKeepProgressEnabled()
         isIslandNotifQueue.value = settingsRepository.isIslandNotifQueueEnabled()
         isIslandNotifSkipSilent.value = settingsRepository.isIslandNotifSkipSilentEnabled()
+        isIslandNotifFollowDnd.value = settingsRepository.isIslandNotifFollowDndEnabled()
         isIslandNotifFilterApps.value = settingsRepository.isIslandNotifFilterAppsEnabled()
         isIslandShowNotifications.value = settingsRepository.isIslandShowNotificationsEnabled()
         isIslandNotifTapToOpen.value = settingsRepository.isIslandNotifTapToOpenEnabled()
@@ -5482,6 +5494,11 @@ class MainViewModel : ViewModel() {
         settingsRepository.setIslandShowDevicesEnabled(enabled)
     }
 
+    fun setIslandShowHotspot(enabled: Boolean) {
+        isIslandShowHotspot.value = enabled
+        settingsRepository.setIslandShowHotspotEnabled(enabled)
+    }
+
     fun setIslandShowCaffeinate(enabled: Boolean) {
         isIslandShowCaffeinate.value = enabled
         settingsRepository.setIslandShowCaffeinateEnabled(enabled)
@@ -5730,6 +5747,11 @@ class MainViewModel : ViewModel() {
         settingsRepository.setIslandNotifSkipSilentEnabled(enabled)
     }
 
+    fun setIslandNotifFollowDnd(enabled: Boolean) {
+        isIslandNotifFollowDnd.value = enabled
+        settingsRepository.setIslandNotifFollowDndEnabled(enabled)
+    }
+
     fun setIslandNotifFilterApps(enabled: Boolean) {
         isIslandNotifFilterApps.value = enabled
         settingsRepository.setIslandNotifFilterAppsEnabled(enabled)
@@ -5762,6 +5784,11 @@ class MainViewModel : ViewModel() {
     fun setIslandNotifCompactHeadsUp(enabled: Boolean) {
         isIslandNotifCompactHeadsUp.value = enabled
         settingsRepository.setIslandNotifCompactHeadsUpEnabled(enabled)
+    }
+
+    fun setIslandNotifCondensedInfo(enabled: Boolean) {
+        isIslandNotifCondensedInfo.value = enabled
+        settingsRepository.setIslandNotifCondensedInfoEnabled(enabled)
     }
 
     fun setIslandCatchUpEnabled(enabled: Boolean) {

@@ -18,6 +18,7 @@ import com.sameerasw.essentials.services.automation.executors.CombinedActionExec
 import com.sameerasw.essentials.services.automation.modules.AutomationModule
 import com.sameerasw.essentials.services.automation.modules.BluetoothModule
 import com.sameerasw.essentials.services.automation.modules.DisplayModule
+import com.sameerasw.essentials.services.automation.modules.NotificationModule
 import com.sameerasw.essentials.services.automation.modules.PowerModule
 import com.sameerasw.essentials.services.automation.modules.TimeModule
 import com.sameerasw.essentials.services.automation.modules.CalendarModule
@@ -112,6 +113,7 @@ object AutomationManager {
         val bluetoothAutomations = mutableListOf<Automation>()
         val wifiAutomations = mutableListOf<Automation>()
         val calendarAutomations = mutableListOf<Automation>()
+        val notificationAutomations = mutableListOf<Automation>()
 
         enabledAutomations.forEach { automation ->
             when (automation.type) {
@@ -140,6 +142,11 @@ object AutomationManager {
                         is Trigger.WifiConnected, is Trigger.WifiDisconnected -> {
                             requiredModuleIds.add(WifiModule.ID)
                             wifiAutomations.add(automation)
+                        }
+
+                        is Trigger.NotificationReceived, is Trigger.DndOn, is Trigger.DndOff -> {
+                            requiredModuleIds.add(NotificationModule.ID)
+                            notificationAutomations.add(automation)
                         }
 
                         else -> {}
@@ -262,6 +269,17 @@ object AutomationManager {
             module.updateAutomations(calendarAutomations)
         } else {
             activeModules.remove(CalendarModule.ID)?.stop(context)
+        }
+
+        // Notification Module
+        if (requiredModuleIds.contains(NotificationModule.ID)) {
+            val module =
+                activeModules.getOrPut(NotificationModule.ID) {
+                    NotificationModule().also { it.start(context) }
+                }
+            module.updateAutomations(notificationAutomations)
+        } else {
+            activeModules.remove(NotificationModule.ID)?.stop(context)
         }
     }
 

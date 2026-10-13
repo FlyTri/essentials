@@ -11,6 +11,7 @@ package com.sameerasw.essentials.domain.registry
 
 import com.sameerasw.essentials.ui.features.display.ISLAND_BEHAVIOR_FEATURE_ID
 import com.sameerasw.essentials.ui.features.display.ISLAND_DURATION_FEATURE_ID
+import com.sameerasw.essentials.ui.features.display.ISLAND_NOTIFICATIONS_FEATURE_ID
 import com.sameerasw.essentials.ui.features.display.ISLAND_PLACEMENT_FEATURE_ID
 import com.sameerasw.essentials.ui.features.display.ISLAND_VISUALS_FEATURE_ID
 import android.content.Context
@@ -775,6 +776,11 @@ object FeatureRegistry {
                             "island_show_timers",
                         ),
                         SearchSetting(
+                            R.string.island_show_hotspot_title,
+                            R.string.island_hotspot_desc,
+                            "island_show_hotspot",
+                        ),
+                        SearchSetting(
                             R.string.feat_caffeinate_title,
                             R.string.caffeinate_notification_desc,
                             "island_show_caffeinate",
@@ -818,26 +824,6 @@ object FeatureRegistry {
                             R.string.island_show_calls_title,
                             R.string.island_call_incoming,
                             "island_show_calls",
-                        ),
-                        SearchSetting(
-                            R.string.island_notif_queue_title,
-                            R.string.island_notif_queue_title,
-                            "island_notif_queue",
-                        ),
-                        SearchSetting(
-                            R.string.island_notif_compact_heads_up_title,
-                            R.string.island_notif_compact_heads_up_desc,
-                            "island_notif_compact_heads_up",
-                        ),
-                        SearchSetting(
-                            R.string.island_notif_skip_silent_title,
-                            R.string.island_notification_options_title,
-                            "island_notif_skip_silent",
-                        ),
-                        SearchSetting(
-                            R.string.island_notif_filter_apps_title,
-                            R.string.island_notification_options_title,
-                            "island_notif_filter_apps",
                         ),
                         SearchSetting(
                             R.string.island_media_peek_song_change_title,
@@ -969,6 +955,72 @@ object FeatureRegistry {
                     ),
             ) {
                 override fun isEnabled(viewModel: MainViewModel) = true
+
+                override fun onToggle(
+                    viewModel: MainViewModel,
+                    context: Context,
+                    enabled: Boolean,
+                ) {}
+            },
+            object : Feature(
+                id = ISLAND_NOTIFICATIONS_FEATURE_ID,
+                title = R.string.island_section_notifications,
+                iconRes = R.drawable.rounded_notifications_unread_24,
+                category = R.string.cat_interface,
+                description = R.string.island_notification_options_title,
+                showToggle = false,
+                parentFeatureId = "Island",
+                isVisibleInMain = false,
+                searchableSettings =
+                    listOf(
+                        SearchSetting(
+                            R.string.island_notif_filter_apps_title,
+                            R.string.island_notif_filter_apps_desc,
+                            "island_notif_filter_apps",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_skip_silent_title,
+                            R.string.island_notif_skip_silent_desc,
+                            "island_notif_skip_silent",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_follow_dnd_title,
+                            R.string.island_notif_follow_dnd_desc,
+                            "island_notif_follow_dnd",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_keep_progress_title,
+                            R.string.island_notif_keep_progress_desc,
+                            "island_notif_keep_progress",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_compact_heads_up_title,
+                            R.string.island_notif_compact_heads_up_desc,
+                            "island_notif_compact_heads_up",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_condensed_info_title,
+                            R.string.island_notif_condensed_info_desc,
+                            "island_notif_condensed_info",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_queue_title,
+                            R.string.island_notif_queue_desc,
+                            "island_notif_queue",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_tap_to_open_title,
+                            R.string.island_notif_tap_to_open_desc,
+                            "island_notif_tap_to_open",
+                        ),
+                        SearchSetting(
+                            R.string.island_catch_up_title,
+                            R.string.island_catch_up_desc,
+                            "island_catch_up",
+                        ),
+                    ),
+            ) {
+                override fun isEnabled(viewModel: MainViewModel) = viewModel.isIslandEnabled.value
 
                 override fun onToggle(
                     viewModel: MainViewModel,

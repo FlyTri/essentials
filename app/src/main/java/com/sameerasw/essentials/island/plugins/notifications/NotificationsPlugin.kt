@@ -37,9 +37,12 @@ class NotificationsPlugin : BaseIslandPlugin() {
     override val settingKeys = setOf(
         SettingsRepository.KEY_ISLAND_CATCH_UP_ENABLED,
         SettingsRepository.KEY_ISLAND_NOTIF_COMPACT_HEADS_UP,
+        SettingsRepository.KEY_ISLAND_NOTIF_CONDENSED_INFO,
+        SettingsRepository.KEY_ISLAND_LINE_STAGE_ENABLED,
         SettingsRepository.KEY_ISLAND_SHOW_GLOW,
         SettingsRepository.KEY_ISLAND_NOTIF_QUEUE,
         SettingsRepository.KEY_ISLAND_NOTIF_SKIP_SILENT,
+        SettingsRepository.KEY_ISLAND_NOTIF_FOLLOW_DND,
         SettingsRepository.KEY_ISLAND_NOTIF_FILTER_APPS,
         SettingsRepository.KEY_ISLAND_NOTIF_FILTER_APPS_LIST,
         SettingsRepository.KEY_ISLAND_NOTIF_TAP_TO_OPEN,
@@ -160,6 +163,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private fun passesFilters(alert: ActiveNotificationAlert): Boolean {
         if (alert.isSilent && settings.isIslandNotifSkipSilentEnabled()) return false
+        if (alert.blockedByDnd && settings.isIslandNotifFollowDndEnabled()) return false
         if (!settings.isIslandNotifFilterAppsEnabled()) return true
         return settings.loadIslandNotifFilterApps().any { it.isEnabled && it.packageName == alert.packageName }
     }
@@ -333,6 +337,9 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private fun queueEnabled() = settings.isIslandNotifQueueEnabled()
 
+    private fun condensedLine() = settings.isIslandNotifCondensedInfoEnabled() &&
+        settings.isIslandLineStageEnabled() && settings.isIslandNotifCompactHeadsUpEnabled()
+
     private fun itemFor(alert: ActiveNotificationAlert): IslandItem {
         if (concealed()) return concealedItemFor(alert)
         val (sender, message) = senderAndMessage(context, alert)
@@ -359,6 +366,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
                 icon = { IslandBitmap(icon, 24.dp, fallbackRes = R.drawable.rounded_notifications_unread_24) },
                 start = sender,
                 end = message,
+                condensed = condensedLine(),
             ),
             expanded = ExpandedContent { scope ->
                 NotificationExpanded(
@@ -383,6 +391,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
                 popCurrent(reExpand = false)
             },
             sourcePackage = alert.packageName,
+            contentId = alert.key,
         )
     }
 
@@ -414,6 +423,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
                 icon = { IslandBitmap(icon, 24.dp, fallbackRes = R.drawable.rounded_notifications_unread_24) },
                 start = appNameFor(context, alert),
                 end = "",
+                condensed = condensedLine(),
             ),
             accent = alert.appColor?.let { Color(soften(it)) },
             dismissible = true,
@@ -424,6 +434,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
             onOpen = open,
             interactions = InteractionOverrides(onTap = { open(); true }),
             sourcePackage = alert.packageName,
+            contentId = alert.key,
         )
     }
 
@@ -448,6 +459,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         interactions = interactions,
         queue = queue,
         sourcePackage = sourcePackage,
+        contentId = contentId,
         stack = stack,
         compactVisible = sideBubble == null,
         sideBubble = sideBubble,

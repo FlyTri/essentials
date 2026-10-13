@@ -130,4 +130,41 @@ sealed interface Trigger {
         override val title: Int = R.string.diy_trigger_power_saving_off
         override val icon: Int = R.drawable.rounded_battery_android_frame_shield_24
     }
+
+    // A blank app matches every app and blank text matches any content; the editor requires at least one of them
+    @Keep
+    data class NotificationReceived(
+        @SerializedName("packageName") val packageName: String = "",
+        @SerializedName("appName") val appName: String = "",
+        @SerializedName("textContains") val textContains: String = "",
+    ) : Trigger {
+        override val title: Int get() = R.string.diy_trigger_notification_received
+        override val icon: Int get() = R.drawable.rounded_notifications_unread_24
+        override val isConfigurable: Boolean get() = true
+        override val permissions: List<String> get() = listOf("NOTIFICATION_LISTENER")
+
+        fun matches(
+            alertPackage: String,
+            alertTitle: String,
+            alertText: String,
+        ): Boolean =
+            (packageName.isBlank() || packageName == alertPackage) &&
+                (
+                    textContains.isBlank() ||
+                        alertTitle.contains(textContains, ignoreCase = true) ||
+                        alertText.contains(textContains, ignoreCase = true)
+                )
+    }
+
+    @Keep
+    data object DndOn : Trigger {
+        override val title: Int = R.string.diy_trigger_dnd_on
+        override val icon: Int = R.drawable.rounded_do_not_disturb_on_24
+    }
+
+    @Keep
+    data object DndOff : Trigger {
+        override val title: Int = R.string.diy_trigger_dnd_off
+        override val icon: Int = R.drawable.rounded_do_not_disturb_on_24
+    }
 }
