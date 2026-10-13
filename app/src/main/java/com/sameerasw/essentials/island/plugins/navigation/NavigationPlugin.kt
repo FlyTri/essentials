@@ -36,12 +36,19 @@ class NavigationPlugin : BaseIslandPlugin() {
 
     private var data: NavigationNotificationData? = null
 
-    // Instruction the island already expanded for, so each turn expands once
-    private var expandedFor: String? = null
+    private val expandedFor = HashSet<String>()
+
+    private val surfaced = LinkedHashSet<String>()
+    private var lastSurfacedAt = 0L
+
+    private val endRoute = Runnable {
+        expandedFor.clear()
+        surfaced.clear()
+        lastSurfacedAt = 0L
+    }
 
     private val endExpand = Runnable {
         val c = ctx ?: return@Runnable
-        // The user closed it or switched to something else
         if (c.focusedKey() != ITEM_KEY || c.currentStage() != IslandStage.Expanded) return@Runnable
         c.request(PluginRequest.Collapse(ITEM_KEY))
         if (settings.isIslandNavigationPeekAfterExpandEnabled() && settings.isIslandLineStageEnabled()) {
@@ -67,8 +74,9 @@ class NavigationPlugin : BaseIslandPlugin() {
         NotificationListener.removeNavigationNotificationListener(listener)
         ctx?.mainHandler?.removeCallbacks(endExpand)
         ctx?.mainHandler?.removeCallbacks(peekAfterCollapse)
+        ctx?.mainHandler?.removeCallbacks(endRoute)
         data = null
-        expandedFor = null
+        endRoute.run()
     }
 
     override fun refresh() {
@@ -83,32 +91,57 @@ class NavigationPlugin : BaseIslandPlugin() {
         data = next
         render()
         if (next == null) {
-            expandedFor = null
             c.mainHandler.removeCallbacks(endExpand)
             c.mainHandler.removeCallbacks(peekAfterCollapse)
+            c.mainHandler.removeCallbacks(endRoute)
+            c.mainHandler.postDelayed(endRoute, ROUTE_GRACE_MS)
             return
         }
+        c.mainHandler.removeCallbacks(endRoute)
         if (!enabled()) return
         val instruction = next.instruction.orEmpty()
         val threshold = settings.getIslandNavigationExpandDistance()
         val meters = NavigationParser.meters(next.distance)
         // Distance jumped back up: a new maneuver with the same text ("Turn right" twice in a row)
-        if (meters != null && meters > threshold * REARM_FACTOR) expandedFor = null
-        val approaching = threshold > 0 && meters != null && meters <= threshold && instruction != expandedFor
+        if (meters != null && meters > threshold * REARM_FACTOR) {
+            expandedFor.remove(instruction)
+            surfaced.remove(instruction)
+        }
+        val approaching =
+            threshold > 0 && meters != null && meters <= threshold && instruction !in expandedFor
+        val expandSoon = threshold > 0 && meters != null && meters <= threshold * REARM_FACTOR
+        val now = System.currentTimeMillis()
+        val announce =
+            turned && instruction !in surfaced && !expandSoon && now - lastSurfacedAt >= COOLDOWN_MS
+
         when {
-            approaching && expand(c) -> expandedFor = instruction
-            !turned -> {}
-            settings.getIslandNavigationOnNew() == SettingsRepository.ISLAND_NAVIGATION_ON_NEW_EXPAND -> expand(c)
-            settings.getIslandNavigationOnNew() == SettingsRepository.ISLAND_NAVIGATION_ON_NEW_PEEK && settings.isIslandLineStageEnabled() ->
+            approaching && expand(c) -> {
+                expandedFor += instruction
+                markSurfaced(instruction, now)
+            }
+
+            !announce -> {}
+            settings.getIslandNavigationOnNew() == SettingsRepository.ISLAND_NAVIGATION_ON_NEW_EXPAND -> {
+                if (expand(c)) markSurfaced(instruction, now)
+            }
+
+            settings.getIslandNavigationOnNew() == SettingsRepository.ISLAND_NAVIGATION_ON_NEW_PEEK && settings.isIslandLineStageEnabled() -> {
                 c.request(PluginRequest.Peek(ITEM_KEY, settings.getIslandPeekDurationMs()))
+                markSurfaced(instruction, now)
+            }
         }
     }
 
-    // Expands for a while, then collapses to a line peek or compact
+    private fun markSurfaced(instruction: String, now: Long) {
+        surfaced += instruction
+        if (surfaced.size > MAX_SURFACED) surfaced.remove(surfaced.first())
+        lastSurfacedAt = now
+    }
+
     private fun expand(c: IslandPluginContext): Boolean {
-        // Don't take over something the user is looking at; retried on the next distance update
         val focused = c.focusedKey()
         if (focused != null && focused != ITEM_KEY) return false
+        if (focused == ITEM_KEY && c.currentStage() == IslandStage.Expanded) return true
         c.mainHandler.removeCallbacks(peekAfterCollapse)
         c.request(PluginRequest.Expand(ITEM_KEY))
         c.mainHandler.removeCallbacks(endExpand)
@@ -143,7 +176,14 @@ class NavigationPlugin : BaseIslandPlugin() {
                         data = d,
                         accent = MaterialTheme.colorScheme.primary,
                         onOpen = { open(d) },
-                        onExit = d.exitIntent?.let { intent -> { sendPendingIntent(context, intent) } },
+                        onExit = d.exitIntent?.let { intent ->
+                            {
+                                sendPendingIntent(
+                                    context,
+                                    intent
+                                )
+                            }
+                        },
                         scope = scope,
                     )
                 },
@@ -160,10 +200,12 @@ class NavigationPlugin : BaseIslandPlugin() {
     companion object {
         const val ITEM_KEY = "navigation"
 
-        // ponytail: fixed timings; make them settings if people ask
         private const val EXPANDED_MS = 6_000L
         private const val COLLAPSE_ANIM_MS = 600L
         private const val REARM_FACTOR = 1.5
+        private const val COOLDOWN_MS = 30_000L
+        private const val ROUTE_GRACE_MS = 60_000L
+        private const val MAX_SURFACED = 50
     }
 }
 
@@ -172,6 +214,10 @@ internal fun Maneuver(d: NavigationNotificationData, size: Int) {
     if (d.maneuver != null) {
         IslandBitmap(d.maneuver, size.dp, fallbackRes = R.drawable.round_navigation_24)
     } else {
-        IslandIcon(R.drawable.round_navigation_24, size = size.dp, tint = MaterialTheme.colorScheme.primary)
+        IslandIcon(
+            R.drawable.round_navigation_24,
+            size = size.dp,
+            tint = MaterialTheme.colorScheme.primary
+        )
     }
 }

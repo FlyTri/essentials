@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.plugins.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,17 +13,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.NavigationNotificationData
 import com.sameerasw.essentials.island.model.IslandExpandedScope
+import com.sameerasw.essentials.island.ui.IslandLayoutSpec
 import com.sameerasw.essentials.island.ui.IslandTextStyles
 import com.sameerasw.essentials.island.ui.components.CameraRow
 import com.sameerasw.essentials.island.ui.components.ConnectedButtonRow
 import com.sameerasw.essentials.island.ui.components.ConnectedItem
 import com.sameerasw.essentials.island.ui.components.ConnectedTextLabel
-import com.sameerasw.essentials.island.ui.components.MarqueeText
+import com.sameerasw.essentials.ui.theme.EssentialsTheme
 
 @Composable
 fun NavigationExpanded(
@@ -39,22 +42,18 @@ fun NavigationExpanded(
             Spacer(Modifier.height(spec.expandedTopPadding))
             scope.CameraRow(
                 horizontalPadding = spec.cameraGap + spec.expandedCorner * 0.35f,
-                start = {
-                    Maneuver(data, spec.cellSize.value.toInt())
-                    MarqueeText(
-                        text = data.distance ?: data.instruction.orEmpty(),
-                        style = IslandTextStyles.title.copy(color = accent),
-                        modifier = Modifier.weight(1f),
-                    )
+                start = { Maneuver(data, spec.cellSize.value.toInt()) },
+                end = {
+                    data.distance?.let {
+                        Text(it, style = IslandTextStyles.title.copy(color = accent), maxLines = 1)
+                    }
                 },
-                end = {},
             )
-            val instruction = data.instruction.takeIf { data.distance != null }
-            if (!instruction.isNullOrBlank()) {
-                Spacer(Modifier.height(4.dp))
+            if (!data.instruction.isNullOrBlank()) {
+                Spacer(Modifier.height(8.dp))
                 Text(
-                    text = instruction,
-                    style = IslandTextStyles.body.copy(color = Color.White, fontSize = 17.sp, lineHeight = 22.sp),
+                    text = data.instruction,
+                    style = IslandTextStyles.title.copy(color = Color.White, fontSize = 20.sp, lineHeight = 25.sp),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = sidePadding),
