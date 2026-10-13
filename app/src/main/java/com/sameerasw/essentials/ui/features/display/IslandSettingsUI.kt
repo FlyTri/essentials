@@ -76,6 +76,7 @@ import com.sameerasw.essentials.ui.features.display.sheets.IslandAlarmOptionsBot
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBatteryOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBorderOutlineOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBriefOptionsBottomSheet
+import com.sameerasw.essentials.ui.features.display.sheets.IslandAppOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandCallOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandDevicesBatteryBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandPulseShadowOptionsBottomSheet
@@ -105,6 +106,7 @@ fun IslandSettingsUI(
     val prioritySettings = remember { SettingsRepository(context) }
     var reorderMode by remember { mutableStateOf(false) }
     var providerVersion by remember { mutableIntStateOf(0) }
+    var providerOptionsFor by remember { mutableStateOf<Pair<String, String>?>(null) }
     val providerEntries = remember(providerVersion) { ProviderPriorities.entries(context, prioritySettings) }
     var savedRaw by remember { mutableStateOf(prioritySettings.getIslandPriorityOrder().orEmpty()) }
     val savedOrder = remember(savedRaw, providerEntries) { IslandPriorityEntries.normalize(savedRaw, providerEntries) }
@@ -473,7 +475,7 @@ fun IslandSettingsUI(
                                     ProviderTrustStore(prioritySettings).setHiddenFromIsland(packageName, !checked)
                                     providerVersion++
                                 },
-                                onSettingsClick = { ProviderDiscovery.openSettings(context, provider) },
+                                onSettingsClick = { providerOptionsFor = provider.packageName to provider.label },
                             )
                         }
                     }
@@ -796,6 +798,10 @@ fun IslandSettingsUI(
 
     if (showSignalOptionsSheet) {
         IslandSignalOptionsBottomSheet(onDismissRequest = { showSignalOptionsSheet = false })
+    }
+
+    providerOptionsFor?.let { (pkg, label) ->
+        IslandAppOptionsBottomSheet(packageName = pkg, label = label, onDismissRequest = { providerOptionsFor = null })
     }
 
     if (showCallOptionsSheet) {
