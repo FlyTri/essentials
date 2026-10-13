@@ -2521,6 +2521,13 @@ object FeatureRegistry {
             ) {
                 override fun isEnabled(viewModel: MainViewModel) = false
 
+                override fun isDeviceSupported(context: Context) =
+                    context
+                        .getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+                        .getString("watch_node_name", "")
+                        .orEmpty()
+                        .contains("pixel watch", ignoreCase = true)
+
                 override fun onToggle(
                     viewModel: MainViewModel,
                     context: Context,
