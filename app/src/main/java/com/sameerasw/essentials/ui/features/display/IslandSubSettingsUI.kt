@@ -978,40 +978,18 @@ fun IslandNotificationSettingsUI(
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically(),
             ) {
-                val condensed = viewModel.isIslandNotifCondensedInfo.value
                 val compactLabel = stringResource(R.string.island_notif_peek_style_compact)
                 val fullLabel = stringResource(R.string.island_notif_peek_style_full)
-                Column(
+                SegmentedPicker(
+                    items = listOf(true, false),
+                    selectedItem = viewModel.isIslandNotifCondensedInfo.value,
+                    onItemSelected = { viewModel.setIslandNotifCondensedInfo(it) },
+                    labelProvider = { if (it) compactLabel else fullLabel },
+                    title = R.string.island_notif_condensed_info_title,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceBright, MaterialTheme.shapes.extraSmall)
-                        .padding(top = 12.dp)
                         .highlight(highlightSetting == "island_notif_condensed_info"),
-                ) {
-                    Text(
-                        text = stringResource(R.string.island_notif_condensed_info_title),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
-                    Text(
-                        text = stringResource(
-                            if (condensed) R.string.island_notif_condensed_info_desc
-                            else R.string.island_notif_peek_style_full_desc,
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
-                    SegmentedPicker(
-                        items = listOf(true, false),
-                        selectedItem = condensed,
-                        onItemSelected = { viewModel.setIslandNotifCondensedInfo(it) },
-                        labelProvider = { if (it) compactLabel else fullLabel },
-                        title = R.string.island_notif_condensed_info_title,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+                )
             }
         }
 
@@ -1116,7 +1094,6 @@ fun IslandNotificationSettingsUI(
     }
 }
 
-// Header sits closer to its own card than to the previous section, so each group reads as one unit.
 @Composable
 private fun IslandSettingsSection(titleRes: Int, content: @Composable ColumnScope.() -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

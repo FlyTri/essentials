@@ -125,8 +125,7 @@ class IslandItem(
     val sourcePackage: String? = null,
     // Temporary priority while the item's state is urgent; null falls back to `priority`.
     val priorityOverride: Int? = null,
-    // Identifies which piece of content the item is currently showing. The item key stays put while a plugin cycles
-    // through its own content, so this is what tells the island a genuinely new thing arrived and it should pulse.
+    // Identifies the content currently shown, so a new one pulses even when the item key is unchanged.
     val contentId: String? = null,
     
     val compactVisible: Boolean = true,

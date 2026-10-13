@@ -3211,10 +3211,8 @@
     <string name="island_notif_compact_heads_up_desc">Peek new notifications as a line instead of expanding the island</string>
     <string name="island_notif_compact_heads_up_needs_line_peek">Needs Line peek. Tap to turn it on in Behavior</string>
     <string name="island_notif_condensed_info_title">Peek style</string>
-    <string name="island_notif_condensed_info_desc">App icon and title only. Tap to expand for the content and actions</string>
     <string name="island_notif_peek_style_compact">Compact</string>
     <string name="island_notif_peek_style_full">Full</string>
-    <string name="island_notif_peek_style_full_desc">Title on the left, message on the right</string>
     <string name="island_notif_show_title">Show notifications</string>
     <string name="island_notif_section_sources">Which notifications</string>
     <string name="island_notif_section_heads_up">Heads up</string>
