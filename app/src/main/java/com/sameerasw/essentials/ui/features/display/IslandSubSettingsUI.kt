@@ -1159,7 +1159,6 @@ fun IslandNotificationSettingsUI(
     }
 }
 
-// Header sits closer to its own card than to the previous section, so each group reads as one unit.
 @Composable
 private fun IslandSettingsSection(titleRes: Int, content: @Composable ColumnScope.() -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -146,9 +146,6 @@ private fun CondensedLine(line: LineContent, spec: IslandLayoutSpec, startInset:
             edgePad = edgePad,
             queueInset = maxOf(startInset, endInset),
         )
-        // Both halves get the same width so the camera slot stays dead centre and the pill reads balanced; the slack
-        // collects beside the camera while icon and title hug the outer ends, the rule CompactTemplate already uses.
-        // condensedTitleWidth floors at cellSize, so the icon half is never squeezed.
         // The leading queue sits with the icon; if that side outgrows the title, both sides take its width.
         val side = maxOf(titleWidth, spec.cellSize + leadingWidth) + edgePad
         Row(

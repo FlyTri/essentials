@@ -4,6 +4,7 @@ import android.provider.Settings
 import com.sameerasw.essentials.island.plugins.alarm.AlarmPlugin
 import com.sameerasw.essentials.island.plugins.batteryalerts.BatteryAlertsPlugin
 import com.sameerasw.essentials.island.plugins.timer.TimerPlugin
+import com.sameerasw.essentials.island.remote.ProviderTrustStore
 import com.sameerasw.essentials.island.plugins.call.CallPlugin
 import android.accessibilityservice.AccessibilityService
 import android.app.KeyguardManager
@@ -42,6 +43,7 @@ import com.sameerasw.essentials.island.model.IslandStage
 import com.sameerasw.essentials.island.plugins.calendar.CalendarPlugin
 import com.sameerasw.essentials.island.plugins.consciousgate.ConsciousGatePlugin
 import com.sameerasw.essentials.island.plugins.flashlight.FlashlightPlugin
+import com.sameerasw.essentials.island.plugins.hotspot.HotspotPlugin
 import com.sameerasw.essentials.island.plugins.network.NetworkPlugin
 import com.sameerasw.essentials.island.plugins.signal.SignalPlugin
 import com.sameerasw.essentials.island.plugins.devices.DevicesPlugin
@@ -147,6 +149,7 @@ class IslandCoordinator(
         TravelPlugin(),
         NetworkPlugin(),
         SignalPlugin(),
+        HotspotPlugin(),
         DevicesPlugin(),
         BriefPlugin(),
         BatteryAlertsPlugin(),
@@ -331,7 +334,7 @@ class IslandCoordinator(
 
     private fun applyLauncherOnly() {
         val sources = LAUNCHER_ONLY_KEYS.filterValues { settings.getBoolean(it, false) }.keys
-        controller.setLauncherState(onLauncher, sources)
+        controller.setLauncherState(onLauncher, sources, ProviderTrustStore(settings).launcherOnly())
     }
 
     private fun applyOwnerAppHiding() {
@@ -744,7 +747,7 @@ class IslandCoordinator(
             SettingsRepository.KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR, SettingsRepository.KEY_ISLAND_COMPACT_HIDE_STATUS_BAR -> syncStatusBar()
             SettingsRepository.KEY_ISLAND_HIDE_WHEN_SCREEN_OFF, SettingsRepository.KEY_ISLAND_SHOW_WHEN -> applySuppression()
             SettingsRepository.KEY_ISLAND_HIDE_IN_OWNER_APP -> applyOwnerAppHiding()
-            in LAUNCHER_ONLY_KEYS.values -> applyLauncherOnly()
+            in LAUNCHER_ONLY_KEYS.values, SettingsRepository.KEY_ISLAND_PROVIDERS_LAUNCHER_ONLY -> applyLauncherOnly()
             SettingsRepository.KEY_ISLAND_HIDE_ON_SHADE -> applySuppression()
             SettingsRepository.KEY_ISLAND_PREVIEW_RING -> if (running) applyPreviewRing()
             SettingsRepository.KEY_ISLAND_PREVIEW_STAGE -> applyPreviewStage()

@@ -56,6 +56,8 @@ import com.sameerasw.essentials.ui.core.sheets.HilightEffectSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.ScreenOffSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.OpenActivityPicker
 import com.sameerasw.essentials.ui.core.sheets.SingleAppSelectionSheet
+import com.sameerasw.essentials.ui.core.sheets.WaitSettingsSheet
+import com.sameerasw.essentials.ui.core.sheets.formatWait
 import com.sameerasw.essentials.ui.core.sheets.ChargingModeSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.NotificationLightingActionSheet
 import com.sameerasw.essentials.ui.core.sheets.OverlayControlSettingsSheet
@@ -104,6 +106,7 @@ fun ActionSequenceEditor(
     var showCustomSettingsSettings by remember { mutableStateOf(false) }
     var showSetVolumeSettings by remember { mutableStateOf(false) }
     var showHilightSettings by remember { mutableStateOf(false) }
+    var showWaitSettings by remember { mutableStateOf(false) }
     var configAction by remember { mutableStateOf<Action?>(null) }
     var configIndex by remember { mutableStateOf<Int?>(null) }
     var showAddActionSheet by remember { mutableStateOf(false) }
@@ -214,6 +217,7 @@ fun ActionSequenceEditor(
             is Action.SetVolume -> showSetVolumeSettings = true
             is Action.Hilight -> showHilightSettings = true
             is Action.CustomSettings -> showCustomSettingsSettings = true
+            is Action.Wait -> showWaitSettings = true
             else -> {}
         }
     }
@@ -591,6 +595,18 @@ fun ActionSequenceEditor(
         )
     }
 
+    if (showWaitSettings && configAction is Action.Wait) {
+        WaitSettingsSheet(
+            initialAction = configAction as Action.Wait,
+            onDismiss = { showWaitSettings = false },
+            onSave = { newAction ->
+                showWaitSettings = false
+                onActionSelected(newAction)
+                configAction = null
+            },
+        )
+    }
+
     if (showPermissionSheet) {
         val permissionItems =
             com.sameerasw.essentials.utils.PermissionUIHelper.getPermissionItems(
@@ -623,7 +639,7 @@ private fun RemapSequenceItem(
     onRemove: () -> Unit,
 ) {
     val view = LocalView.current
-    val title = stringResource(action.title)
+    val title = stringResource(action.title).let { if (action is Action.Wait) "$it · ${formatWait(action.seconds)}" else it }
     Row(
         modifier =
             Modifier

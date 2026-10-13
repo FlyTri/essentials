@@ -32,6 +32,7 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
 
     override val settingKeys = setOf(
         SettingsRepository.KEY_ISLAND_SHOW_TIME_BATTERY,
+        SettingsRepository.KEY_ISLAND_TIME_SHOW_SECONDS,
         SettingsRepository.KEY_ISLAND_SHOW_BATTERY,
         SettingsRepository.KEY_ISLAND_BATTERY_STYLE,
         SettingsRepository.KEY_ISLAND_BATTERY_PERCENTAGE,
@@ -57,6 +58,13 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
     private var registered = false
     private var chargePeekUntil = 0L
     private val endChargePeek = Runnable { render() }
+    private val secondsTick = object : Runnable {
+        override fun run() {
+            readTime()
+            render()
+            scheduleSecondsTick()
+        }
+    }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(c: Context?, intent: Intent?) {
@@ -71,6 +79,14 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
                     }
                 }
                 PowerManager.ACTION_POWER_SAVE_MODE_CHANGED -> readBattery(null)
+                Intent.ACTION_SCREEN_OFF -> {
+                    ctx?.mainHandler?.removeCallbacks(secondsTick)
+                    return
+                }
+                Intent.ACTION_SCREEN_ON -> {
+                    readTime()
+                    scheduleSecondsTick()
+                }
                 else -> readTime()
             }
             render()
@@ -84,15 +100,19 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
                 addAction(Intent.ACTION_BATTERY_CHANGED)
                 addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
                 addAction(Intent.ACTION_TIME_TICK)
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_SCREEN_OFF)
                 addAction(Intent.ACTION_TIME_CHANGED)
                 addAction(Intent.ACTION_TIMEZONE_CHANGED)
             },
         )
         registered = true
+        scheduleSecondsTick()
     }
 
     override fun onStop() {
         ctx?.mainHandler?.removeCallbacks(endChargePeek)
+        ctx?.mainHandler?.removeCallbacks(secondsTick)
         if (registered) {
             try {
                 context.unregisterReceiver(receiver)
@@ -107,10 +127,21 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
         readTime()
         readBattery(null)
         render()
+        scheduleSecondsTick()
     }
 
+    private fun scheduleSecondsTick() {
+        val handler = ctx?.mainHandler ?: return
+        handler.removeCallbacks(secondsTick)
+        if (!registered || !settings.isIslandShowTimeBatteryEnabled() || !showSeconds()) return
+        handler.postDelayed(secondsTick, 1000L - System.currentTimeMillis() % 1000L)
+    }
+
+    private fun showSeconds() = settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_SHOW_SECONDS, false)
+
     private fun readTime() {
-        val pattern = if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm"
+        val base = if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm"
+        val pattern = if (showSeconds()) "$base:ss" else base
         time = SimpleDateFormat(pattern, Locale.getDefault()).format(Date())
     }
 

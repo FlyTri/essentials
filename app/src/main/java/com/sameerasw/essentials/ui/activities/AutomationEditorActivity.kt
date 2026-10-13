@@ -98,6 +98,7 @@ import com.sameerasw.essentials.ui.core.cards.AppToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.BluetoothDeviceSelectionSheet
+import com.sameerasw.essentials.ui.core.sheets.NotificationTriggerSheet
 import com.sameerasw.essentials.ui.core.sheets.WifiNetworkSelectionSheet
 import com.sameerasw.essentials.ui.features.system.ActionSequenceEditor
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
@@ -359,6 +360,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 var showBatteryLevelSettings by remember { mutableStateOf(false) }
                 var showBluetoothSettings by remember { mutableStateOf(false) }
                 var showWifiSettings by remember { mutableStateOf(false) }
+                var showNotificationTriggerSettings by remember { mutableStateOf(false) }
 
                 val isTriggerConfigured =
                     when (val trigger = selectedTrigger) {
@@ -366,6 +368,7 @@ class AutomationEditorActivity : ComponentActivity() {
                         is Trigger.BluetoothDisconnected -> trigger.deviceAddress.isNotBlank()
                         is Trigger.WifiConnected -> trigger.ssid.isNotBlank()
                         is Trigger.WifiDisconnected -> trigger.ssid.isNotBlank()
+                        is Trigger.NotificationReceived -> trigger.packageName.isNotBlank() || trigger.textContains.isNotBlank()
                         else -> true
                     }
 
@@ -501,7 +504,14 @@ class AutomationEditorActivity : ComponentActivity() {
                             Automation.Type.PIXEL_SEARCHBAR -> selectedActions
                             else -> selectedInActions + selectedOutActions
                         }
-                    val allMissingPermissions = actionsToCheck.flatMap { getMissingPermissionsHelper(it) }.distinct()
+                    val triggerMissingPermissions =
+                        if (automationType == Automation.Type.TRIGGER) {
+                            selectedTrigger?.permissions.orEmpty().filter { AppPermission.fromKey(it)?.isGranted(context) == false }
+                        } else {
+                            emptyList()
+                        }
+                    val allMissingPermissions =
+                        (actionsToCheck.flatMap { getMissingPermissionsHelper(it) } + triggerMissingPermissions).distinct()
                     if (allMissingPermissions.isNotEmpty()) {
                         permissionKeysToShow = allMissingPermissions
                         permissionFeatureTitle = R.string.tab_diy
@@ -1023,6 +1033,13 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                                 (selectedTrigger as? Trigger.WifiDisconnected)?.ssid ?: "",
                                                                         ),
                                                                     ),
+                                                                R.string.diy_category_notifications to
+                                                                    listOf(
+                                                                        (selectedTrigger as? Trigger.NotificationReceived)
+                                                                            ?: Trigger.NotificationReceived(),
+                                                                        Trigger.DndOn,
+                                                                        Trigger.DndOff,
+                                                                    ),
                                                                 R.string.diy_category_time_schedule to
                                                                     listOf(
                                                                         Trigger.Schedule(
@@ -1081,6 +1098,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                             is Trigger.WifiConnected, is Trigger.WifiDisconnected ->
                                                                                 showWifiSettings =
                                                                                     true
+                                                                            is Trigger.NotificationReceived -> showNotificationTriggerSettings = true
                                                                             else -> {}
                                                                         }
                                                                     },
@@ -1342,6 +1360,17 @@ class AutomationEditorActivity : ComponentActivity() {
                                                 else -> selectedTrigger
                                             }
                                         showBluetoothSettings = false
+                                    },
+                                )
+                            }
+
+                            if (showNotificationTriggerSettings) {
+                                NotificationTriggerSheet(
+                                    initialTrigger = selectedTrigger as? Trigger.NotificationReceived,
+                                    onDismiss = { showNotificationTriggerSettings = false },
+                                    onSave = {
+                                        selectedTrigger = it
+                                        showNotificationTriggerSettings = false
                                     },
                                 )
                             }
