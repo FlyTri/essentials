@@ -342,6 +342,13 @@ sealed interface Action {
     }
 
     @Keep
+    data object SplitScreen : Action {
+        override val title: Int = R.string.diy_action_split_screen
+        override val icon: Int = R.drawable.rounded_splitscreen_24
+        override val permissions: List<String> = listOf("shizuku", "root")
+    }
+
+    @Keep
     data object EssentialSearch : Action {
         override val title: Int = R.string.essential_search_label
         override val icon: Int = R.drawable.rounded_search_24

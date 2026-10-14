@@ -89,6 +89,7 @@ import com.sameerasw.essentials.utils.RootUtils
 import com.sameerasw.essentials.utils.PrivilegedMode
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.ShizukuUtils
+import com.sameerasw.essentials.utils.SplitScreenUtil
 import com.sameerasw.essentials.utils.SurfaceFlingerControl
 import com.sameerasw.essentials.utils.TestNotificationUtil
 import com.sameerasw.essentials.utils.UpdateNotificationHelper
@@ -417,6 +418,7 @@ class MainViewModel : ViewModel() {
     val isMobileDataAlwaysOnEnabled = mutableStateOf(false)
     val isWirelessDisplayCertificationEnabled = mutableStateOf(false)
     val isTransparentNavigationBarEnabled = mutableStateOf(false)
+    val isSplitScreenGestureEnabled = mutableStateOf(false)
     val isPreferGpuComposingEnabled = mutableStateOf(false)
     val standbyAppsList = mutableStateOf<List<AppStandbyInfo>>(emptyList())
     val isStandbyAppsLoading = mutableStateOf(false)
@@ -1854,6 +1856,8 @@ class MainViewModel : ViewModel() {
             )
         isTransparentNavigationBarEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_TRANSPARENT_NAVIGATION_BAR, false)
+        isSplitScreenGestureEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_SPLIT_SCREEN_GESTURE, false)
         isPreferGpuComposingEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_PREFER_GPU_COMPOSING, false)
         isPixelSearchbarEnabled.value =
@@ -4062,6 +4066,28 @@ class MainViewModel : ViewModel() {
                         isEnabled,
                     )
                 }
+            }
+        }
+    }
+
+    fun setSplitScreenGestureEnabled(
+        enabled: Boolean,
+        context: Context,
+    ) {
+        isSplitScreenGestureEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_SPLIT_SCREEN_GESTURE, enabled)
+        viewModelScope.launch(Dispatchers.IO) {
+            SplitScreenUtil.setGestureEnabled(context, enabled)
+        }
+    }
+
+    // The gesture binding lives in system settings, where the user can also remove it.
+    fun refreshSplitScreenGestureState(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val isEnabled = SplitScreenUtil.isGestureEnabled(context) ?: return@launch
+            withContext(Dispatchers.Main) {
+                isSplitScreenGestureEnabled.value = isEnabled
+                settingsRepository.putBoolean(SettingsRepository.KEY_SPLIT_SCREEN_GESTURE, isEnabled)
             }
         }
     }
