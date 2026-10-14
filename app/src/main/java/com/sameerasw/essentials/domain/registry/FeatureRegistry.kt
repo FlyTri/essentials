@@ -274,7 +274,7 @@ object FeatureRegistry {
                 title = R.string.cat_navigation,
                 iconRes = R.drawable.rounded_bottom_navigation_24,
                 category = R.string.cat_interaction,
-                description = R.string.feat_other_customizations_desc,
+                description = R.string.feat_navigation_desc,
                 showToggle = false,
                 parentFeatureId = "Input",
                 animationRes = R.raw.navigation_animation,

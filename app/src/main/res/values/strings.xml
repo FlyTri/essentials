@@ -2454,6 +2454,7 @@
     <string name="feat_transparent_navigation_bar_title">Transparent navigation bar</string>
     <string name="feat_transparent_navigation_bar_desc">Make system navigation bar background transparent</string>
     <string name="cat_navigation">Navigation</string>
+    <string name="feat_navigation_desc">Gesture bar, navigation gestures and navigation bar tweaks</string>
     <string name="feat_standby_apps_title">Standby apps</string>
     <string name="feat_standby_apps_desc">Optimize app background activities</string>
     <string name="about_desc_networks">Configure network download speed limits, keep mobile data continuously active even when connected to Wi-Fi, and enable wireless display certification settings.</string>
