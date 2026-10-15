@@ -13,7 +13,6 @@ import android.content.ComponentName
 import android.content.Context
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.services.SplitScreenShortcutService
-import com.sameerasw.essentials.utils.ui.HapticUtil
 
 object SplitScreenUtil {
     private const val GESTURE_TARGETS = "accessibility_gesture_targets"
