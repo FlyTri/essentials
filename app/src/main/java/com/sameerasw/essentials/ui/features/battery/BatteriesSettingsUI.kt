@@ -31,6 +31,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -179,6 +183,37 @@ fun BatteriesSettingsUI(
                     }
                 },
             )
+
+            if (isBluetoothEnabled && isPermissionGranted) {
+                var separateChannels by remember {
+                    mutableStateOf(
+                        com.sameerasw.essentials.data.repository
+                            .SettingsRepository(context)
+                            .isBatterySeparateChannelsEnabled(),
+                    )
+                }
+                IconToggleItem(
+                    iconRes = R.drawable.rounded_earbuds_2_24,
+                    title = stringResource(R.string.battery_separate_channels_title),
+                    isChecked = separateChannels,
+                    onCheckedChange = { enabled ->
+                        separateChannels = enabled
+                        com.sameerasw.essentials.data.repository
+                            .SettingsRepository(context)
+                            .setBatterySeparateChannelsEnabled(enabled)
+                        if (enabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)) {
+                            if (com.sameerasw.essentials.utils.ShizukuUtils.isShizukuAvailable()) {
+                                com.sameerasw.essentials.utils.ShizukuUtils.requestPermission()
+                            } else {
+                                android.widget.Toast
+                                    .makeText(context, R.string.shizuku_not_running_desc, android.widget.Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
+                        viewModel.setBluetoothDevicesEnabled(true, context)
+                    },
+                )
+            }
 
             // Widget Background Toggle
             IconToggleItem(

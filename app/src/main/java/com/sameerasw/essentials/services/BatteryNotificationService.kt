@@ -224,10 +224,23 @@ class BatteryNotificationService : Service() {
                             Array<BluetoothBatteryUtils.BluetoothDeviceBattery>::class.java,
                         ).toList()
                 devices.forEach { device ->
-                    val iconRes = BluetoothDeviceIcons.resolve(this, device.address, device.name)
-                    val statusIcon =
-                        if (device.level <= 15) R.drawable.rounded_battery_android_frame_alert_24 else null
-                    items.add(BatteryItemData(device.level, iconRes, device.name, statusIcon))
+                    if (device.hasParts) {
+                        listOf(
+                            Triple(device.left, R.drawable.rounded_earbud_left_24, " L"),
+                            Triple(device.right, R.drawable.rounded_earbud_right_24, " R"),
+                            Triple(device.case, R.drawable.rounded_earbud_case_24, " Case"),
+                        ).forEach { (level, icon, suffix) ->
+                            if (level != null) {
+                                val status = if (level <= 15) R.drawable.rounded_battery_android_frame_alert_24 else null
+                                items.add(BatteryItemData(level, icon, device.name + suffix, status))
+                            }
+                        }
+                    } else {
+                        val iconRes = BluetoothDeviceIcons.resolve(this, device.address, device.name)
+                        val statusIcon =
+                            if (device.level <= 15) R.drawable.rounded_battery_android_frame_alert_24 else null
+                        items.add(BatteryItemData(device.level, iconRes, device.name, statusIcon))
+                    }
                 }
             } catch (_: Exception) {
             }
