@@ -66,14 +66,14 @@ class FlashlightPlugin : BaseIslandPlugin() {
 
     private val callback = object : CameraManager.TorchCallback() {
         override fun onTorchModeChanged(id: String, enabled: Boolean) {
-            if (id != cameraId) return
+            if (ctx == null || id != cameraId) return
             torchOn = enabled
             refresh()
         }
 
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         override fun onTorchStrengthLevelChanged(id: String, level: Int) {
-            if (id != cameraId) return
+            if (ctx == null || id != cameraId) return
             percent = toPercent(level)
             render()
         }
