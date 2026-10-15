@@ -1047,7 +1047,8 @@ class NotificationListener : NotificationListenerService() {
                 blockedByDnd = isBlockedByDnd(sbn, rankingMap),
                 otpCode = OtpExtractor.extract(otpSourceText(sbn)),
             )
-            if (alert != null) {
+            val callHidden = CallNotificationParser.isCall(sbn) && !SettingsRepository(applicationContext).isIslandShowCallsEnabled()
+            if (alert != null && !callHidden) {
                 notifyAlertPosted(alert)
             }
         }

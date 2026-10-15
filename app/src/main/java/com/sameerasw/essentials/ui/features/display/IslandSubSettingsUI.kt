@@ -56,6 +56,7 @@ import com.sameerasw.essentials.ui.features.display.actions.HorizontalSlideModeS
 import com.sameerasw.essentials.ui.features.display.actions.horizontalSlideDescription
 import com.sameerasw.essentials.ui.features.display.sheets.IslandAlarmOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBorderOutlineOptionsBottomSheet
+import com.sameerasw.essentials.ui.features.display.sheets.IslandNotificationQueueOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBriefOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandCallOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandDevicesBatteryBottomSheet
@@ -732,6 +733,43 @@ fun IslandBehaviorSettingsUI(
 
             IconToggleItem(
                 iconRes = R.drawable.rounded_visibility_off_24,
+                title = stringResource(R.string.island_compact_hide_status_bar_title),
+                isChecked = viewModel.isIslandCompactHideStatusBar.value && hasShellPermission,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    if (checked && !hasShellPermission) {
+                        requestingPermissionsFor =
+                            Pair(
+                                R.string.island_compact_hide_status_bar_title,
+                                listOf(if (ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"),
+                            )
+                    } else {
+                        viewModel.setIslandCompactHideStatusBar(checked)
+                    }
+                },
+                modifier = Modifier.highlight(highlightSetting == "island_compact_hide_status_bar"),
+            )
+        }
+
+        RoundedCardContainer(
+            spacing = 2.dp,
+            cornerRadius = 24.dp,
+        ) {
+            IslandHideIconsToggle(
+                viewModel = viewModel,
+                hasShellPermission = hasShellPermission,
+                onNeedPermission = {
+                    requestingPermissionsFor =
+                        Pair(
+                            R.string.island_hide_icons_title,
+                            listOf(if (ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"),
+                        )
+                },
+                highlighted = highlightSetting == "island_hide_icons",
+            )
+
+            IconToggleItem(
+                iconRes = R.drawable.rounded_visibility_off_24,
                 title = stringResource(R.string.island_dynamic_hide_status_bar_title),
                 isChecked = viewModel.isIslandDynamicHideStatusBar.value && hasShellPermission,
                 onCheckedChange = { checked ->
@@ -749,24 +787,6 @@ fun IslandBehaviorSettingsUI(
                 modifier = Modifier.highlight(highlightSetting == "island_dynamic_hide_status_bar"),
             )
 
-            IconToggleItem(
-                iconRes = R.drawable.rounded_visibility_off_24,
-                title = stringResource(R.string.island_compact_hide_status_bar_title),
-                isChecked = viewModel.isIslandCompactHideStatusBar.value && hasShellPermission,
-                onCheckedChange = { checked ->
-                    HapticUtil.performVirtualKeyHaptic(view)
-                    if (checked && !hasShellPermission) {
-                        requestingPermissionsFor =
-                            Pair(
-                                R.string.island_compact_hide_status_bar_title,
-                                listOf(if (ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"),
-                            )
-                    } else {
-                        viewModel.setIslandCompactHideStatusBar(checked)
-                    }
-                },
-                modifier = Modifier.highlight(highlightSetting == "island_compact_hide_status_bar"),
-            )
         }
 
         RoundedCardContainer(
@@ -871,6 +891,12 @@ fun IslandNotificationSettingsUI(
         mutableStateOf(SettingsRepository(context).getIslandOtpTimeoutMs())
     }
     var otpReadable by remember { mutableStateOf(PermissionGrantUtil.hasSensitiveNotifications(context)) }
+    var showQueueSheet by remember {
+        mutableStateOf(
+            viewModel.isIslandNotifQueue.value &&
+                highlightSetting in setOf("island_notif_queue_style", "island_notif_queue_inline"),
+        )
+    }
     var concealed by remember {
         mutableStateOf(
             SettingsRepository(context).getBoolean(SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED, false)
@@ -998,18 +1024,56 @@ fun IslandNotificationSettingsUI(
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically(),
             ) {
-                val compactLabel = stringResource(R.string.island_notif_peek_style_compact)
+                val peekStyle = viewModel.islandNotifPeekStyle.value
                 val fullLabel = stringResource(R.string.island_notif_peek_style_full)
-                SegmentedPicker(
-                    items = listOf(true, false),
-                    selectedItem = viewModel.isIslandNotifCondensedInfo.value,
-                    onItemSelected = { viewModel.setIslandNotifCondensedInfo(it) },
-                    labelProvider = { if (it) compactLabel else fullLabel },
-                    title = R.string.island_notif_condensed_info_title,
+                val compactLabel = stringResource(R.string.island_notif_peek_style_compact)
+                val minimalLabel = stringResource(R.string.island_notif_peek_style_minimal)
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .highlight(highlightSetting == "island_notif_condensed_info"),
-                )
+                        .background(MaterialTheme.colorScheme.surfaceBright, MaterialTheme.shapes.extraSmall)
+                        .padding(top = 12.dp)
+                        .highlight(highlightSetting == "island_notif_peek_style"),
+                ) {
+                    Text(
+                        text = stringResource(R.string.island_notif_condensed_info_title),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                    Text(
+                        text = stringResource(
+                            when (peekStyle) {
+                                SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_COMPACT -> R.string.island_notif_condensed_info_desc
+                                SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_MINIMAL ->
+                                    if (viewModel.isIslandCatchUpEnabled.value) R.string.island_notif_peek_style_minimal_catch_up_desc
+                                    else R.string.island_notif_peek_style_minimal_desc
+                                else -> R.string.island_notif_peek_style_full_desc
+                            },
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                    SegmentedPicker(
+                        items = listOf(
+                            SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_FULL,
+                            SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_COMPACT,
+                            SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_MINIMAL,
+                        ),
+                        selectedItem = peekStyle,
+                        onItemSelected = { viewModel.setIslandNotifPeekStyle(it) },
+                        labelProvider = {
+                            when (it) {
+                                SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_COMPACT -> compactLabel
+                                SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_MINIMAL -> minimalLabel
+                                else -> fullLabel
+                            }
+                        },
+                        title = R.string.island_notif_condensed_info_title,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
 
@@ -1023,6 +1087,7 @@ fun IslandNotificationSettingsUI(
                     HapticUtil.performVirtualKeyHaptic(view)
                     viewModel.setIslandNotifQueue(checked)
                 },
+                onSettingsClick = { showQueueSheet = true },
                 modifier = Modifier.highlight(highlightSetting == "island_notif_queue"),
             )
 
@@ -1168,6 +1233,13 @@ fun IslandNotificationSettingsUI(
                 }
             }
         }
+    }
+
+    if (showQueueSheet) {
+        IslandNotificationQueueOptionsBottomSheet(
+            viewModel = viewModel,
+            onDismissRequest = { showQueueSheet = false },
+        )
     }
 
     if (showFilterAppsSheet) {

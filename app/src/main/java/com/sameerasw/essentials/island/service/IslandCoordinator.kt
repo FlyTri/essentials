@@ -25,6 +25,9 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -38,6 +41,7 @@ import com.sameerasw.essentials.island.gestures.CompactGestures
 import com.sameerasw.essentials.island.state.IslandUiState
 import com.sameerasw.essentials.island.model.IslandPlugin
 import com.sameerasw.essentials.island.model.IslandPriorityEntries
+import com.sameerasw.essentials.utils.StatusBarManager
 import com.sameerasw.essentials.island.model.IslandPluginContext
 import com.sameerasw.essentials.island.model.IslandStage
 import com.sameerasw.essentials.island.plugins.calendar.CalendarPlugin
@@ -67,6 +71,12 @@ import com.sameerasw.essentials.island.ui.IslandFontFamily
 import com.sameerasw.essentials.island.ui.IslandLayoutSpec
 import com.sameerasw.essentials.island.ui.IslandMotion
 import com.sameerasw.essentials.island.ui.IslandRoot
+import com.sameerasw.essentials.island.ui.QueueStyle
+import com.sameerasw.essentials.island.ui.IslandStackBubble
+import com.sameerasw.essentials.island.ui.IslandStackOverlap
+import com.sameerasw.essentials.island.model.SideBubble
+import com.sameerasw.essentials.island.model.SideBubblePriority
+import com.sameerasw.essentials.island.model.StackIcon
 import com.sameerasw.essentials.utils.ShellUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -156,6 +166,7 @@ class IslandCoordinator(
 
     private var isScreenOff = false
     private var isLandscape = false
+    private var colorRevision by mutableIntStateOf(0)
     private var isFullscreenApp = false
     private var isShadeExpanded = false
     private var running = false
@@ -372,6 +383,7 @@ class IslandCoordinator(
     }
 
     fun onConfigurationChanged() {
+        colorRevision++
         val landscape = service.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         if (landscape != isLandscape) {
             isLandscape = landscape
@@ -421,7 +433,11 @@ class IslandCoordinator(
         val attached = windowHost.attach(geo) {
             val state by controller.state.collectAsState()
             val layoutSpec by spec.collectAsState()
-            val colors = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicDarkColorScheme(service) else darkColorScheme()
+            val revision = colorRevision
+            val colors =
+                remember(revision) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicDarkColorScheme(service) else darkColorScheme()
+                }
             MaterialTheme(colorScheme = colors, typography = IslandTypography) {
                 val base = LocalDensity.current
                 CompositionLocalProvider(
@@ -473,8 +489,50 @@ class IslandCoordinator(
                 .distinctUntilChanged()
                 .collect { (stage, key) -> plugins.forEach { it.onFocusChanged(stage, key) } }
         }
+        newScope.launch { IslandPreviewRequests.queue.collect { showQueuePreview() } }
         if (settings.isIslandSuppressSystemHeadsUpEnabled()) settings.applyHeadsUpSuppression(true)
         applyPreviewStage()
+    }
+
+    private val endQueuePreview = Runnable {
+        controller.holdFocus = settings.getIslandPreviewStage() != SettingsRepository.ISLAND_PREVIEW_STAGE_AUTO
+        controller.setItems(QUEUE_PREVIEW_SOURCE, emptyList())
+    }
+
+    private fun showQueuePreview() {
+        mainHandler.post {
+            if (!running) return@post
+            mainHandler.removeCallbacks(endQueuePreview)
+            val minimal = settings.isIslandLineStageEnabled() && settings.isIslandNotifCompactHeadsUpEnabled() &&
+                settings.getIslandNotifPeekStyle() == SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_MINIMAL
+            val layout = when {
+                !minimal -> QueuePreviewLayout.Peek
+                settings.isIslandNotifQueueInlineEnabled() -> QueuePreviewLayout.MinimalInline
+                else -> QueuePreviewLayout.MinimalStack
+            }
+            controller.holdFocus = layout == QueuePreviewLayout.Peek
+            controller.setItems(
+                QUEUE_PREVIEW_SOURCE,
+                listOf(
+                    queuePreviewItem(
+                        service.getString(R.string.island_preview_sample_title),
+                        service.getString(R.string.island_preview_sample_text),
+                        layout,
+                        overlap = settings.getIslandNotifQueueStyle() == SettingsRepository.ISLAND_NOTIF_QUEUE_STYLE_OVERLAP,
+                    ),
+                ),
+            )
+            val state = controller.state.value
+            if (layout == QueuePreviewLayout.Peek) {
+                if (state.focusedKey != QUEUE_PREVIEW_KEY || state.stage != IslandStage.Line) {
+                    controller.collapseImmediately()
+                    controller.peek(QUEUE_PREVIEW_KEY, 0L, force = true)
+                }
+            } else if (state.focusedKey == QUEUE_PREVIEW_KEY) {
+                controller.collapseImmediately()
+            }
+            mainHandler.postDelayed(endQueuePreview, QUEUE_PREVIEW_HOLD_MS)
+        }
     }
 
     private fun applyPreviewRing() {
@@ -523,6 +581,38 @@ class IslandCoordinator(
         compactVisible = false,
     )
 
+    private enum class QueuePreviewLayout { Peek, MinimalInline, MinimalStack }
+
+    private fun queuePreviewItem(title: String, text: String, layout: QueuePreviewLayout, overlap: Boolean): IslandItem {
+        fun icon(key: String, current: Boolean = false) = StackIcon(key, current = current) { size ->
+            IslandIcon(R.drawable.rounded_notifications_unread_24, size = size * 0.7f)
+        }
+        val waiting = listOf(icon("$QUEUE_PREVIEW_KEY.1"), icon("$QUEUE_PREVIEW_KEY.2"))
+        val iconCell = CompactCell("preview.queue.icon") { IslandIcon(R.drawable.rounded_notifications_unread_24, size = 18.dp) }
+        val queueCell = CompactCell("preview.queue.stack") {
+            if (overlap) IslandStackOverlap(waiting, 22.dp) else IslandStackBubble(waiting, 26.dp)
+        }
+        return IslandItem(
+            key = QUEUE_PREVIEW_KEY,
+            priority = IslandPriority.NOTIFICATION,
+            placement = CompactPlacement.Dynamic,
+            compact = if (layout == QueuePreviewLayout.MinimalInline) listOf(queueCell, iconCell) else listOf(iconCell),
+            line = LineContent(
+                icon = { IslandIcon(R.drawable.rounded_notifications_unread_24, size = 24.dp) },
+                start = title,
+                end = text,
+            ),
+            compactVisible = layout != QueuePreviewLayout.Peek,
+            sideBubble = if (layout == QueuePreviewLayout.MinimalStack) {
+                SideBubble(priority = SideBubblePriority.NOTIFICATION, onOpen = {}, icons = waiting)
+            } else {
+                null
+            },
+            stack = listOf(icon(QUEUE_PREVIEW_KEY, current = true)) + waiting,
+            queued = waiting,
+        )
+    }
+
     private var revealing = false
     private var hiding = false
     private var pendingStop: Runnable? = null
@@ -551,6 +641,8 @@ class IslandCoordinator(
         running = false
         controller.holdFocus = false
         controller.setItems(PREVIEW_SOURCE, emptyList())
+        mainHandler.removeCallbacks(endQueuePreview)
+        controller.setItems(QUEUE_PREVIEW_SOURCE, emptyList())
         plugins.forEach {
             it.stop()
             controller.setItems(it.id, emptyList())
@@ -611,6 +703,11 @@ class IslandCoordinator(
             pulseYShift = settings.getIslandPulseShadowYShift().coerceIn(0f, 1f),
             pulseSpread = settings.getIslandPulseShadowSpread().coerceIn(1f, 4f),
             pulseDurationMs = settings.getIslandPulseShadowDurationMs().coerceIn(300f, 4000f).toInt(),
+            queueStyle = when (settings.getIslandNotifQueueStyle()) {
+                SettingsRepository.ISLAND_NOTIF_QUEUE_STYLE_OVERLAP -> QueueStyle.Overlap
+                else -> QueueStyle.Stack
+            },
+            queueInline = settings.isIslandNotifQueueInlineEnabled(),
         )
         windowHost.maxWidthPx = (maxOf(lineWidth, expandedWidth * scale) * density).toInt()
         windowHost.updateGeometry(geo)
@@ -636,14 +733,30 @@ class IslandCoordinator(
     private fun syncStatusBar() {
         val dynamic = settings.getBoolean(SettingsRepository.KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR, false)
         val compact = settings.getBoolean(SettingsRepository.KEY_ISLAND_COMPACT_HIDE_STATUS_BAR, false)
-        if ((!dynamic && !compact) || !ShellUtils.hasPermission(service)) {
+        val selective = settings.getBoolean(SettingsRepository.KEY_ISLAND_HIDE_ICONS_ENABLED, false)
+        if ((!dynamic && !compact && !selective) || !ShellUtils.hasPermission(service)) {
             IslandStatusBarHider.restore(service)
             return
         }
         val state = controller.state.value
         val peekOrExpanded = dynamic && (state.stage == IslandStage.Line || state.stage == IslandStage.Expanded)
         val crowdedCompact = compact && state.stage == IslandStage.Compact && complicationCount(state) >= 2
-        IslandStatusBarHider.apply(service, peekOrExpanded || crowdedCompact)
+        val flags = mutableSetOf<String>()
+        if (peekOrExpanded || crowdedCompact) {
+            flags += StatusBarManager.FLAG_SYSTEM_ICONS
+            flags += StatusBarManager.FLAG_NOTIFICATION_ICONS
+            flags += StatusBarManager.FLAG_CLOCK
+        }
+        if (selective && state.stage != IslandStage.Hidden) {
+            settings.getIslandHideIcons().forEach {
+                when (it) {
+                    SettingsRepository.ISLAND_HIDE_ICON_SYSTEM -> flags += StatusBarManager.FLAG_SYSTEM_ICONS
+                    SettingsRepository.ISLAND_HIDE_ICON_NOTIFICATIONS -> flags += StatusBarManager.FLAG_NOTIFICATION_ICONS
+                    SettingsRepository.ISLAND_HIDE_ICON_CLOCK -> flags += StatusBarManager.FLAG_CLOCK
+                }
+            }
+        }
+        IslandStatusBarHider.applyFlags(service, flags)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -656,7 +769,8 @@ class IslandCoordinator(
             SettingsRepository.KEY_ISLAND_HIDE_LANDSCAPE -> updateState()
             SettingsRepository.KEY_ISLAND_ALWAYS_GESTURES -> syncGestureHitbox()
             SettingsRepository.KEY_ISLAND_PRIORITY_ORDER, SettingsRepository.KEY_ISLAND_PROVIDERS -> if (running) reloadPriorities()
-            SettingsRepository.KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR, SettingsRepository.KEY_ISLAND_COMPACT_HIDE_STATUS_BAR -> syncStatusBar()
+            SettingsRepository.KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR, SettingsRepository.KEY_ISLAND_COMPACT_HIDE_STATUS_BAR,
+            SettingsRepository.KEY_ISLAND_HIDE_ICONS_ENABLED, SettingsRepository.KEY_ISLAND_HIDE_ICONS -> syncStatusBar()
             SettingsRepository.KEY_ISLAND_HIDE_WHEN_SCREEN_OFF, SettingsRepository.KEY_ISLAND_SHOW_WHEN -> applySuppression()
             SettingsRepository.KEY_ISLAND_HIDE_IN_OWNER_APP -> applyOwnerAppHiding()
             in LAUNCHER_ONLY_KEYS.values, SettingsRepository.KEY_ISLAND_PROVIDERS_LAUNCHER_ONLY -> applyLauncherOnly()
@@ -676,12 +790,17 @@ class IslandCoordinator(
         const val SETTLE_MS = 300L
         const val PREVIEW_SOURCE = "preview"
         const val PREVIEW_KEY = "preview.sample"
+        const val QUEUE_PREVIEW_SOURCE = "preview.queue"
+        const val QUEUE_PREVIEW_KEY = "preview.queue.sample"
+        const val QUEUE_PREVIEW_HOLD_MS = 5000L
         val LAUNCHER_ONLY_KEYS = mapOf(
             "time_battery" to SettingsRepository.KEY_ISLAND_TIME_BATTERY_LAUNCHER_ONLY,
             "calendar" to SettingsRepository.KEY_ISLAND_CALENDAR_LAUNCHER_ONLY,
             "alarm" to SettingsRepository.KEY_ISLAND_ALARM_LAUNCHER_ONLY,
         )
         val CONFIG_KEYS = setOf(
+            SettingsRepository.KEY_ISLAND_NOTIF_QUEUE_STYLE,
+            SettingsRepository.KEY_ISLAND_NOTIF_QUEUE_INLINE,
             SettingsRepository.KEY_ISLAND_USE_AUTO_DETECT,
             SettingsRepository.KEY_ISLAND_CAMERA_OFFSET_X,
             SettingsRepository.KEY_ISLAND_CAMERA_OFFSET_Y,

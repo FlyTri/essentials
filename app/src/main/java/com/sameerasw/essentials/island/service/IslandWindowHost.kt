@@ -188,7 +188,7 @@ class IslandWindowHost(
         val reach = maxWidthPx + 32 * density
         val width = if (geo.anchor == CameraAnchor.Center) reach.roundToInt().coerceAtMost(geo.screenWidth) else (reach * 2).roundToInt()
         lp.width = width
-        lp.height = (geo.screenHeight * 0.6f).roundToInt()
+        lp.height = if (geo.screenWidth > geo.screenHeight) geo.screenHeight else (geo.screenHeight * 0.6f).roundToInt()
         lp.x = (geo.centerX - width / 2f).roundToInt()
         lp.y = 0
     }

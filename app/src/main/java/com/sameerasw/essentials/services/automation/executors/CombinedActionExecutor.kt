@@ -32,12 +32,14 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.controller.CaffeinateController
 import com.sameerasw.essentials.domain.controller.HilightController
 import com.sameerasw.essentials.domain.controller.HotspotController
+import com.sameerasw.essentials.domain.controller.ZenModeController
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.domain.model.DashConfig
 import com.sameerasw.essentials.domain.model.NotificationLightingStyle
@@ -52,10 +54,13 @@ import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.ShizukuUtils
+import com.sameerasw.essentials.utils.SplitScreenUtil
 import com.sameerasw.essentials.utils.overlay.fromPrefs
 import com.sameerasw.essentials.utils.overlay.writeTo
 import com.sameerasw.essentials.utils.performHapticFeedback
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
 
@@ -145,7 +150,7 @@ object CombinedActionExecutor {
                 return@forEachIndexed
             }
             try {
-                execute(context, action)
+                execute(context, action, fromAutomation = true)
             } catch (e: Exception) {
                 Log.e("CombinedActionExecutor", "Action ${action::class.simpleName} failed", e)
                 AutomationFailureNotifier.notifyFailure(context, action, e.message ?: e::class.java.simpleName)
@@ -158,6 +163,7 @@ object CombinedActionExecutor {
     suspend fun execute(
         context: Context,
         action: Action,
+        fromAutomation: Boolean = false,
     ) {
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
             when (action) {
@@ -480,6 +486,17 @@ object CombinedActionExecutor {
                         .cycleNextMode()
                 }
 
+                is Action.SetMode -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                        try {
+                            setMode(context, action)
+                        } catch (e: Exception) {
+                            if (fromAutomation) throw e
+                            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
                 is Action.ToggleDoNotDisturb -> {
                     val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                     if (nm.isNotificationPolicyAccessGranted) {
@@ -573,6 +590,8 @@ object CombinedActionExecutor {
                         .trigger(context)
                 }
 
+                is Action.SplitScreen -> SplitScreenUtil.toggle(context)
+
                 is Action.EssentialSearch -> {
                     try {
                         val intent = Intent(context, PixelSearchResultsActivity::class.java).apply {
@@ -616,6 +635,8 @@ object CombinedActionExecutor {
                     resolve(action.island, settings.isIslandEnabled())?.let(settings::setIslandEnabled)
                     resolve(action.statusGlance, settings.isStatusGlanceEnabled())?.let(settings::setStatusGlanceEnabled)
                 }
+                is Action.TurnOffBackGesture -> withContext(Dispatchers.IO) { SettingsRepository(context).backGesture.turnOff() }
+                is Action.TurnOnBackGesture -> withContext(Dispatchers.IO) { SettingsRepository(context).backGesture.turnOn() }
                 is Action.TurnOnDuo -> SettingsRepository(context).setDuoEnabled(true)
                 is Action.TurnOffDuo -> SettingsRepository(context).setDuoEnabled(false)
                 is Action.ToggleDuo -> SettingsRepository(context).let { it.setDuoEnabled(!it.isDuoEnabled()) }
@@ -1045,6 +1066,28 @@ object CombinedActionExecutor {
             e.printStackTrace()
             false
         }
+
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    private suspend fun setMode(
+        context: Context,
+        action: Action.SetMode,
+    ) {
+        val featureName = context.getString(R.string.diy_action_set_mode)
+        if (!ShizukuUtils.isShizukuAvailable()) error(context.getString(R.string.shizuku_not_running_feature_desc, featureName))
+        if (!ShizukuUtils.hasPermission()) error(context.getString(R.string.shizuku_permission_missing_feature_desc, featureName))
+        val result =
+            try {
+                withContext(Dispatchers.IO) { ZenModeController.setActive(action.modeId, action.modeName, action.active) }
+            } catch (e: Exception) {
+                Log.e("CombinedActionExecutor", "Set Mode failed", e)
+                error(context.getString(R.string.diy_set_mode_failed, action.modeName, "${e::class.java.simpleName}: ${e.message}"))
+            }
+        when (result) {
+            ZenModeController.Result.DONE -> {}
+            ZenModeController.Result.NOT_FOUND -> error(context.getString(R.string.diy_set_mode_not_found, action.modeName))
+            ZenModeController.Result.NO_CONDITION -> error(context.getString(R.string.diy_set_mode_no_condition, action.modeName))
+        }
+    }
 
     private fun setHotspotEnabled(
         context: Context,

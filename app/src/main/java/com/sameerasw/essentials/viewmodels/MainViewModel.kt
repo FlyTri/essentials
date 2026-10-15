@@ -57,6 +57,7 @@ import com.sameerasw.essentials.domain.controller.CaffeinateController
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.domain.model.AppIcon
 import com.sameerasw.essentials.domain.model.AppSelection
+import com.sameerasw.essentials.domain.model.BackGestureAppConfig
 import com.sameerasw.essentials.domain.model.AppStandbyInfo
 import com.sameerasw.essentials.domain.model.DnsPreset
 import com.sameerasw.essentials.domain.model.HilightEffect
@@ -89,6 +90,7 @@ import com.sameerasw.essentials.utils.RootUtils
 import com.sameerasw.essentials.utils.PrivilegedMode
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.ShizukuUtils
+import com.sameerasw.essentials.utils.SplitScreenUtil
 import com.sameerasw.essentials.utils.SurfaceFlingerControl
 import com.sameerasw.essentials.utils.TestNotificationUtil
 import com.sameerasw.essentials.utils.UpdateNotificationHelper
@@ -147,6 +149,11 @@ class MainViewModel : ViewModel() {
     val isLockscreenShortcutsEnabled = mutableStateOf(false)
     val lockscreenShortcutActions = mutableStateMapOf<LockscreenShortcutSide, List<Action>>()
     val lockscreenSystemShortcutsState = mutableStateOf(SystemShortcutsState.UNKNOWN)
+    val isVolumeStepsEnabled = mutableStateOf(false)
+    val volumeStepsPerPress = mutableIntStateOf(2)
+    val isAppVolumeEnabled = mutableStateOf(false)
+    val isAppVolumeOverlayEnabled = mutableStateOf(false)
+    val appVolumeLevels = mutableStateOf<Map<String, Float>>(emptyMap())
     val remapHapticType = mutableStateOf(HapticFeedbackType.DOUBLE)
     val isDynamicNightLightEnabled = mutableStateOf(false)
     val isSmartPixelsEnabled = mutableStateOf(false)
@@ -261,9 +268,11 @@ class MainViewModel : ViewModel() {
     val isIslandMediaShowPrevious = mutableStateOf(false)
     val isIslandMediaShowLike = mutableStateOf(true)
     val isIslandNotifCompactHeadsUp = mutableStateOf(true)
-    val isIslandNotifCondensedInfo = mutableStateOf(false)
+    val islandNotifPeekStyle = mutableStateOf(SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_FULL)
     val isIslandNotifKeepProgress = mutableStateOf(true)
     val isIslandNotifQueue = mutableStateOf(true)
+    val islandNotifQueueStyle = mutableStateOf(SettingsRepository.ISLAND_NOTIF_QUEUE_STYLE_STACK)
+    val isIslandNotifQueueInline = mutableStateOf(false)
     val isIslandNotifSkipSilent = mutableStateOf(true)
     val isIslandNotifFollowDnd = mutableStateOf(true)
     val isIslandNotifFilterApps = mutableStateOf(false)
@@ -388,6 +397,7 @@ class MainViewModel : ViewModel() {
     val currentWallpaperBitmap = mutableStateOf<Bitmap?>(null)
     val isPocketModeEnabled = mutableStateOf(false)
     val isFaceUnlockBrightnessEnabled = mutableStateOf(false)
+    val isScreenshotShareCleanupEnabled = mutableStateOf(false)
     val faceUnlockMaxBrightness = mutableIntStateOf(100)
     val faceUnlockAmbientThreshold = mutableFloatStateOf(10f)
     val isFaceUnlockTriggerUnlock = mutableStateOf(true)
@@ -408,6 +418,9 @@ class MainViewModel : ViewModel() {
     val isCircleToSearchGestureEnabled = mutableStateOf(false)
     val circleToSearchGestureHeight = mutableFloatStateOf(48f)
     val circleToSearchGestureWidth = mutableFloatStateOf(240f)
+    val backGestureLeftScale = mutableFloatStateOf(1f)
+    val backGestureRightScale = mutableFloatStateOf(1f)
+    val backGestureAppConfigs = mutableStateOf<List<BackGestureAppConfig>>(emptyList())
     val isCircleToSearchPreviewEnabled = mutableStateOf(false)
     val isDisableRotationSuggestionEnabled = mutableStateOf(false)
     val isAllowOverlaysInSettingsEnabled = mutableStateOf(false)
@@ -415,6 +428,7 @@ class MainViewModel : ViewModel() {
     val isMobileDataAlwaysOnEnabled = mutableStateOf(false)
     val isWirelessDisplayCertificationEnabled = mutableStateOf(false)
     val isTransparentNavigationBarEnabled = mutableStateOf(false)
+    val isSplitScreenGestureEnabled = mutableStateOf(false)
     val isPreferGpuComposingEnabled = mutableStateOf(false)
     val standbyAppsList = mutableStateOf<List<AppStandbyInfo>>(emptyList())
     val isStandbyAppsLoading = mutableStateOf(false)
@@ -540,6 +554,7 @@ class MainViewModel : ViewModel() {
     val isLocationReachedFullScreenAlarmEnabled = mutableStateOf(true)
 
     val isEnableUnsupportedFeatures = mutableStateOf(false)
+    val isForceFlashlightControls = mutableStateOf(false)
     val isShowLegacyFeatures = mutableStateOf(true)
     val isSecureSensitiveTilesEnabled = mutableStateOf(true)
     val isBlurEnabled = mutableStateOf(true)
@@ -917,11 +932,17 @@ class MainViewModel : ViewModel() {
                     SettingsRepository.KEY_ISLAND_NOTIF_COMPACT_HEADS_UP ->
                         isIslandNotifCompactHeadsUp.value = settingsRepository.isIslandNotifCompactHeadsUpEnabled()
 
-                    SettingsRepository.KEY_ISLAND_NOTIF_CONDENSED_INFO ->
-                        isIslandNotifCondensedInfo.value = settingsRepository.isIslandNotifCondensedInfoEnabled()
+                    SettingsRepository.KEY_ISLAND_NOTIF_PEEK_STYLE ->
+                        islandNotifPeekStyle.value = settingsRepository.getIslandNotifPeekStyle()
 
                     SettingsRepository.KEY_ISLAND_NOTIF_QUEUE ->
                         isIslandNotifQueue.value = settingsRepository.isIslandNotifQueueEnabled()
+
+                    SettingsRepository.KEY_ISLAND_NOTIF_QUEUE_STYLE ->
+                        islandNotifQueueStyle.value = settingsRepository.getIslandNotifQueueStyle()
+
+                    SettingsRepository.KEY_ISLAND_NOTIF_QUEUE_INLINE ->
+                        isIslandNotifQueueInline.value = settingsRepository.isIslandNotifQueueInlineEnabled()
 
                     SettingsRepository.KEY_ISLAND_NOTIF_SKIP_SILENT ->
                         isIslandNotifSkipSilent.value = settingsRepository.isIslandNotifSkipSilentEnabled()
@@ -1362,6 +1383,9 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_FACE_UNLOCK_BRIGHTNESS_ENABLED ->
                         isFaceUnlockBrightnessEnabled.value = settingsRepository.isFaceUnlockBrightnessEnabled()
+
+                    SettingsRepository.KEY_SCREENSHOT_SHARE_CLEANUP_ENABLED ->
+                        isScreenshotShareCleanupEnabled.value = settingsRepository.isScreenshotShareCleanupEnabled()
 
                     SettingsRepository.KEY_FACE_UNLOCK_MAX_BRIGHTNESS ->
                         faceUnlockMaxBrightness.intValue = settingsRepository.getFaceUnlockMaxBrightness()
@@ -1846,6 +1870,8 @@ class MainViewModel : ViewModel() {
             )
         isTransparentNavigationBarEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_TRANSPARENT_NAVIGATION_BAR, false)
+        isSplitScreenGestureEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_SPLIT_SCREEN_GESTURE, false)
         isPreferGpuComposingEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_PREFER_GPU_COMPOSING, false)
         isPixelSearchbarEnabled.value =
@@ -2296,6 +2322,11 @@ class MainViewModel : ViewModel() {
         hilightAppEffects.clear()
         hilightAppEffects.putAll(settingsRepository.getHilightAppEffects())
         isLockscreenShortcutsEnabled.value = settingsRepository.isLockscreenShortcutsEnabled()
+        isVolumeStepsEnabled.value = settingsRepository.isVolumeStepsEnabled()
+        volumeStepsPerPress.intValue = settingsRepository.getVolumeStepsPerPress()
+        isAppVolumeEnabled.value = settingsRepository.isAppVolumeEnabled()
+        isAppVolumeOverlayEnabled.value = settingsRepository.isAppVolumeOverlayEnabled()
+        appVolumeLevels.value = settingsRepository.getAppVolumeLevels()
         LockscreenShortcutSide.entries.forEach { side ->
             lockscreenShortcutActions[side] = settingsRepository.getRemapActions(side.prefKey)
         }
@@ -2435,9 +2466,11 @@ class MainViewModel : ViewModel() {
         isIslandMediaShowPrevious.value = settingsRepository.isIslandMediaShowPreviousEnabled()
         isIslandMediaShowLike.value = settingsRepository.isIslandMediaShowLikeEnabled()
         isIslandNotifCompactHeadsUp.value = settingsRepository.isIslandNotifCompactHeadsUpEnabled()
-        isIslandNotifCondensedInfo.value = settingsRepository.isIslandNotifCondensedInfoEnabled()
+        islandNotifPeekStyle.value = settingsRepository.getIslandNotifPeekStyle()
         isIslandNotifKeepProgress.value = settingsRepository.isIslandNotifKeepProgressEnabled()
         isIslandNotifQueue.value = settingsRepository.isIslandNotifQueueEnabled()
+        islandNotifQueueStyle.value = settingsRepository.getIslandNotifQueueStyle()
+        isIslandNotifQueueInline.value = settingsRepository.isIslandNotifQueueInlineEnabled()
         isIslandNotifSkipSilent.value = settingsRepository.isIslandNotifSkipSilentEnabled()
         isIslandNotifFollowDnd.value = settingsRepository.isIslandNotifFollowDndEnabled()
         isIslandNotifFilterApps.value = settingsRepository.isIslandNotifFilterAppsEnabled()
@@ -2556,6 +2589,7 @@ class MainViewModel : ViewModel() {
         isLocationReachedFullScreenAlarmEnabled.value =
             settingsRepository.getLocationReachedFullScreenAlarmEnabled()
         isEnableUnsupportedFeatures.value = settingsRepository.isEnableUnsupportedFeatures()
+        isForceFlashlightControls.value = settingsRepository.isForceFlashlightControls()
         isShowLegacyFeatures.value = settingsRepository.isShowLegacyFeatures()
         isSecureSensitiveTilesEnabled.value = settingsRepository.isSecureSensitiveTilesEnabled()
 
@@ -2791,6 +2825,7 @@ class MainViewModel : ViewModel() {
         isPocketModeEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_POCKET_MODE_ENABLED)
         isFaceUnlockBrightnessEnabled.value = settingsRepository.isFaceUnlockBrightnessEnabled()
+        isScreenshotShareCleanupEnabled.value = settingsRepository.isScreenshotShareCleanupEnabled()
         faceUnlockMaxBrightness.intValue = settingsRepository.getFaceUnlockMaxBrightness()
         faceUnlockAmbientThreshold.floatValue = settingsRepository.getFaceUnlockAmbientThreshold()
         isFaceUnlockTriggerUnlock.value = settingsRepository.isFaceUnlockTriggerUnlockEnabled()
@@ -2873,6 +2908,11 @@ class MainViewModel : ViewModel() {
         if (searchQuery.value.isNotBlank()) {
             onSearchQueryChanged(searchQuery.value, context)
         }
+    }
+
+    fun setForceFlashlightControls(enabled: Boolean) {
+        isForceFlashlightControls.value = enabled
+        settingsRepository.setForceFlashlightControls(enabled)
     }
 
     fun setShowLegacyFeatures(
@@ -3734,6 +3774,48 @@ class MainViewModel : ViewModel() {
         settingsRepository.putFloat(SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_HEIGHT, height)
     }
 
+    fun refreshBackGestureState() {
+        backGestureLeftScale.floatValue = settingsRepository.backGesture.defaultScale(left = true)
+        backGestureRightScale.floatValue = settingsRepository.backGesture.defaultScale(left = false)
+        backGestureAppConfigs.value = settingsRepository.loadBackGestureAppConfigs()
+    }
+
+    fun applyBackGestureScale(left: Boolean) {
+        val scale = if (left) backGestureLeftScale.floatValue else backGestureRightScale.floatValue
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsRepository.backGesture.setDefaultScale(left, scale)
+        }
+    }
+
+    fun updateBackGestureAppConfig(
+        config: BackGestureAppConfig,
+        context: Context,
+    ) {
+        val current = backGestureAppConfigs.value
+        val configs =
+            if (current.any { it.packageName == config.packageName }) {
+                current.map { if (it.packageName == config.packageName) config else it }
+            } else {
+                current + config
+            }
+        backGestureAppConfigs.value = configs
+        settingsRepository.saveBackGestureAppConfigs(configs)
+        updateAppDetectionService(context)
+    }
+
+    fun removeBackGestureAppConfig(
+        packageName: String,
+        context: Context,
+    ) {
+        val configs = backGestureAppConfigs.value.filterNot { it.packageName == packageName }
+        backGestureAppConfigs.value = configs
+        settingsRepository.saveBackGestureAppConfigs(configs)
+        updateAppDetectionService(context)
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsRepository.backGesture.onAppRemoved(packageName)
+        }
+    }
+
     /**
      * Executes the set circle to search gesture width operation.
      *
@@ -4052,6 +4134,28 @@ class MainViewModel : ViewModel() {
                         isEnabled,
                     )
                 }
+            }
+        }
+    }
+
+    fun setSplitScreenGestureEnabled(
+        enabled: Boolean,
+        context: Context,
+    ) {
+        isSplitScreenGestureEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_SPLIT_SCREEN_GESTURE, enabled)
+        viewModelScope.launch(Dispatchers.IO) {
+            SplitScreenUtil.setGestureEnabled(context, enabled)
+        }
+    }
+
+    // The gesture binding lives in system settings, where the user can also remove it.
+    fun refreshSplitScreenGestureState(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val isEnabled = SplitScreenUtil.isGestureEnabled(context) ?: return@launch
+            withContext(Dispatchers.Main) {
+                isSplitScreenGestureEnabled.value = isEnabled
+                settingsRepository.putBoolean(SettingsRepository.KEY_SPLIT_SCREEN_GESTURE, isEnabled)
             }
         }
     }
@@ -5067,6 +5171,39 @@ class MainViewModel : ViewModel() {
         settingsRepository.setRemapActions(slot.prefKey, actions)
     }
 
+    fun setVolumeStepsEnabled(enabled: Boolean) {
+        isVolumeStepsEnabled.value = enabled
+        settingsRepository.setVolumeStepsEnabled(enabled)
+    }
+
+    fun setVolumeStepsPerPress(steps: Int) {
+        volumeStepsPerPress.intValue = steps
+        settingsRepository.setVolumeStepsPerPress(steps)
+    }
+
+    fun setAppVolumeEnabled(enabled: Boolean) {
+        isAppVolumeEnabled.value = enabled
+        settingsRepository.setAppVolumeEnabled(enabled)
+    }
+
+    fun setAppVolumeOverlayEnabled(enabled: Boolean) {
+        isAppVolumeOverlayEnabled.value = enabled
+        settingsRepository.setAppVolumeOverlayEnabled(enabled)
+    }
+
+    fun setAppVolumeLevel(
+        packageName: String,
+        level: Float,
+    ) {
+        appVolumeLevels.value = appVolumeLevels.value + (packageName to level)
+        settingsRepository.setAppVolumeLevels(appVolumeLevels.value)
+    }
+
+    fun removeAppVolumeLevel(packageName: String) {
+        appVolumeLevels.value = appVolumeLevels.value - packageName
+        settingsRepository.setAppVolumeLevels(appVolumeLevels.value)
+    }
+
     fun setLockscreenShortcutsEnabled(enabled: Boolean) {
         isLockscreenShortcutsEnabled.value = enabled
         settingsRepository.setLockscreenShortcutsEnabled(enabled)
@@ -5737,6 +5874,16 @@ class MainViewModel : ViewModel() {
         settingsRepository.setIslandShowNotificationsEnabled(enabled)
     }
 
+    fun setIslandNotifQueueInline(enabled: Boolean) {
+        isIslandNotifQueueInline.value = enabled
+        settingsRepository.setIslandNotifQueueInlineEnabled(enabled)
+    }
+
+    fun setIslandNotifQueueStyle(style: String) {
+        islandNotifQueueStyle.value = style
+        settingsRepository.setIslandNotifQueueStyle(style)
+    }
+
     fun setIslandNotifQueue(enabled: Boolean) {
         isIslandNotifQueue.value = enabled
         settingsRepository.setIslandNotifQueueEnabled(enabled)
@@ -5786,9 +5933,9 @@ class MainViewModel : ViewModel() {
         settingsRepository.setIslandNotifCompactHeadsUpEnabled(enabled)
     }
 
-    fun setIslandNotifCondensedInfo(enabled: Boolean) {
-        isIslandNotifCondensedInfo.value = enabled
-        settingsRepository.setIslandNotifCondensedInfoEnabled(enabled)
+    fun setIslandNotifPeekStyle(style: String) {
+        islandNotifPeekStyle.value = style
+        settingsRepository.setIslandNotifPeekStyle(style)
     }
 
     fun setIslandCatchUpEnabled(enabled: Boolean) {
@@ -9456,6 +9603,11 @@ class MainViewModel : ViewModel() {
     fun setFaceUnlockBrightnessEnabled(enabled: Boolean) {
         settingsRepository.setFaceUnlockBrightnessEnabled(enabled)
         isFaceUnlockBrightnessEnabled.value = enabled
+    }
+
+    fun setScreenshotShareCleanupEnabled(enabled: Boolean) {
+        settingsRepository.setScreenshotShareCleanupEnabled(enabled)
+        isScreenshotShareCleanupEnabled.value = enabled
     }
 
     fun setFaceUnlockAmbientThreshold(value: Float) {
