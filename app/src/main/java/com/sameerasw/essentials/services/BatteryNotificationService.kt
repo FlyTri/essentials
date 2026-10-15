@@ -206,6 +206,7 @@ class BatteryNotificationService : Service() {
                     R.drawable.rounded_laptop_mac_24,
                     "Mac",
                     statusIcon,
+                    BluetoothDeviceOrder.MAC,
                 ),
             )
         }
@@ -224,7 +225,7 @@ class BatteryNotificationService : Service() {
                             bluetoothJson,
                             Array<BluetoothBatteryUtils.BluetoothDeviceBattery>::class.java,
                         ).toList()
-                BluetoothDeviceOrder.apply(this, devices) { it.address }.forEach { device ->
+                devices.forEach { device ->
                     if (device.hasParts) {
                         listOf(
                             Triple(device.left, R.drawable.rounded_earbud_left_24, " L"),
@@ -233,21 +234,21 @@ class BatteryNotificationService : Service() {
                         ).forEach { (level, icon, suffix) ->
                             if (level != null) {
                                 val status = if (level <= 15) R.drawable.rounded_battery_android_frame_alert_24 else null
-                                items.add(BatteryItemData(level, icon, device.name + suffix, status))
+                                items.add(BatteryItemData(level, icon, device.name + suffix, status, device.address))
                             }
                         }
                     } else {
                         val iconRes = BluetoothDeviceIcons.resolve(this, device.address, device.name)
                         val statusIcon =
                             if (device.level <= 15) R.drawable.rounded_battery_android_frame_alert_24 else null
-                        items.add(BatteryItemData(device.level, iconRes, device.name, statusIcon))
+                        items.add(BatteryItemData(device.level, iconRes, device.name, statusIcon, device.address))
                     }
                 }
             } catch (_: Exception) {
             }
         }
 
-        return items.take(maxDevices)
+        return BluetoothDeviceOrder.apply(this, items) { it.key }.take(maxDevices)
     }
 
     private fun createCompositeBitmap(items: List<BatteryItemData>): Bitmap {
@@ -313,5 +314,6 @@ class BatteryNotificationService : Service() {
         val iconRes: Int,
         val name: String,
         val statusIconRes: Int? = null,
+        val key: String = "",
     )
 }

@@ -228,7 +228,7 @@ fun BatteriesSettingsUI(
             )
         }
 
-        if (viewModel.isBluetoothDevicesEnabled.value && viewModel.isBluetoothPermissionGranted.value) {
+        run {
             Text(
                 text = stringResource(R.string.bt_device_icons_title),
                 style = MaterialTheme.typography.titleMedium,

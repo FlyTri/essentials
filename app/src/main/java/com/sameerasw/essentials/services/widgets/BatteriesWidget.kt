@@ -87,6 +87,7 @@ class BatteriesWidget : GlanceAppWidget() {
     }
 
     private class Item(
+        val key: String,
         val level: Int,
         val iconRes: Int,
         val statusIconRes: Int? = null,
@@ -103,14 +104,14 @@ class BatteriesWidget : GlanceAppWidget() {
         val phoneLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
         val phoneCharging =
             batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING
-        items += Item(phoneLevel, R.drawable.rounded_mobile_24, statusIcon(phoneLevel, phoneCharging))
+        items += Item(BluetoothDeviceOrder.PHONE, phoneLevel, R.drawable.rounded_mobile_24, statusIcon(phoneLevel, phoneCharging))
 
         val macEnabled = prefs[booleanPreferencesKey(SettingsRepository.KEY_AIRSYNC_CONNECTION_ENABLED)] ?: false
         val macConnected = prefs[booleanPreferencesKey(SettingsRepository.KEY_AIRSYNC_MAC_CONNECTED)] ?: false
         val macLevel = prefs[intPreferencesKey(SettingsRepository.KEY_MAC_BATTERY_LEVEL)] ?: -1
         val macCharging = prefs[booleanPreferencesKey(SettingsRepository.KEY_MAC_BATTERY_IS_CHARGING)] ?: false
         if (macEnabled && macConnected && macLevel != -1) {
-            items += Item(macLevel, R.drawable.rounded_laptop_mac_24, statusIcon(macLevel, macCharging))
+            items += Item(BluetoothDeviceOrder.MAC, macLevel, R.drawable.rounded_laptop_mac_24, statusIcon(macLevel, macCharging))
         }
 
         val bluetoothEnabled = prefs[booleanPreferencesKey(SettingsRepository.KEY_SHOW_BLUETOOTH_DEVICES)] ?: false
@@ -122,18 +123,18 @@ class BatteriesWidget : GlanceAppWidget() {
                 } catch (_: Exception) {
                     emptyList()
                 }
-            BluetoothDeviceOrder.apply(context, devices) { it.address }.forEach { device ->
+            devices.forEach { device ->
                 if (device.hasParts) {
-                    device.left?.let { items += Item(it, R.drawable.rounded_earbud_left_24, statusIcon(it, false)) }
-                    device.right?.let { items += Item(it, R.drawable.rounded_earbud_right_24, statusIcon(it, false)) }
-                    device.case?.let { items += Item(it, R.drawable.rounded_earbud_case_24, statusIcon(it, false)) }
+                    device.left?.let { items += Item(device.address, it, R.drawable.rounded_earbud_left_24, statusIcon(it, false)) }
+                    device.right?.let { items += Item(device.address, it, R.drawable.rounded_earbud_right_24, statusIcon(it, false)) }
+                    device.case?.let { items += Item(device.address, it, R.drawable.rounded_earbud_case_24, statusIcon(it, false)) }
                 } else {
                     val icon = BluetoothDeviceIcons.resolve(context, device.address, device.name)
-                    items += Item(device.level, icon, statusIcon(device.level, false))
+                    items += Item(device.address, device.level, icon, statusIcon(device.level, false))
                 }
             }
         }
-        return items
+        return BluetoothDeviceOrder.apply(context, items) { it.key }
     }
 
     private fun statusIcon(

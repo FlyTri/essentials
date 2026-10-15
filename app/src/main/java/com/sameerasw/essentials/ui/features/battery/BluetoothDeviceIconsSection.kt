@@ -52,7 +52,7 @@ import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import com.sameerasw.essentials.utils.BluetoothDeviceIcon
 import com.sameerasw.essentials.utils.BluetoothDeviceIcons
 
-private data class PairedDevice(val name: String, val address: String)
+private data class PairedDevice(val name: String, val address: String, val iconRes: Int? = null)
 
 @SuppressLint("MissingPermission")
 private fun pairedDevices(context: Context): List<PairedDevice> =
@@ -71,11 +71,16 @@ private fun pairedDevices(context: Context): List<PairedDevice> =
 fun BluetoothDeviceIconsSection() {
     val context = LocalContext.current
     val view = LocalView.current
-    val devices = remember { pairedDevices(context) }
+    val devices =
+        remember {
+            listOf(
+                PairedDevice("Phone", BluetoothDeviceOrder.PHONE, R.drawable.rounded_mobile_24),
+                PairedDevice("Mac", BluetoothDeviceOrder.MAC, R.drawable.rounded_laptop_mac_24),
+            ) + pairedDevices(context)
+        }
     var version by remember { mutableIntStateOf(0) }
     var editing by remember { mutableStateOf<PairedDevice?>(null) }
     var order by remember { mutableStateOf(BluetoothDeviceOrder.load(context, devices.map { it.address })) }
-    if (devices.isEmpty()) return
     val byAddress = remember(devices) { devices.associateBy { it.address } }
     val separatorAt = order.indexOf(BluetoothDeviceOrder.SEPARATOR)
 
@@ -128,15 +133,15 @@ fun BluetoothDeviceIconsSection() {
                     }
                 } else {
                     val device = byAddress[entry] ?: return@ReorderableItem
-                    val iconRes = remember(version, device.address) { BluetoothDeviceIcons.resolve(context, device.address, device.name) }
-                    val custom = remember(version, device.address) { BluetoothDeviceIcons.getOverrideId(context, device.address) != null }
+                    val iconRes = device.iconRes ?: remember(version, device.address) { BluetoothDeviceIcons.resolve(context, device.address, device.name) }
+                    val custom = device.iconRes == null && remember(version, device.address) { BluetoothDeviceIcons.getOverrideId(context, device.address) != null }
                     Row(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
                                 .alpha(if (hidden) 0.4f else 1f)
                                 .background(MaterialTheme.colorScheme.surfaceBright, shape)
-                                .clickable { editing = device }
+                                .clickable(enabled = device.iconRes == null) { editing = device }
                                 .padding(start = 16.dp, top = 4.dp, bottom = 4.dp, end = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -146,11 +151,13 @@ fun BluetoothDeviceIconsSection() {
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f).padding(start = 16.dp),
                         )
-                        Text(
-                            text = if (custom) stringResource(R.string.bt_icon_custom) else stringResource(R.string.bt_icon_auto),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                        if (device.iconRes == null) {
+                            Text(
+                                text = if (custom) stringResource(R.string.bt_icon_custom) else stringResource(R.string.bt_icon_auto),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                         handle()
                     }
                 }
