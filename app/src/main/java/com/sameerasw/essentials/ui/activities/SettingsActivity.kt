@@ -1410,6 +1410,7 @@ fun SettingsContent(
             )
 
             RoundedCardContainer {
+                com.sameerasw.essentials.ui.features.system.AutoBackupSetting()
 
                 Column(
                     modifier =

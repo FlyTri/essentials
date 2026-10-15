@@ -586,6 +586,12 @@
     <string name="tile_color_picker">Color Picker</string>
     <string name="setting_force_flashlight_controls_title">Force enable flashlight controls</string>
     <string name="setting_force_flashlight_controls_desc">This may break camera app or cause anomalies</string>
+    <string name="auto_backup_title">Auto backup configs</string>
+    <string name="auto_backup_folder">Backup folder</string>
+    <string name="auto_backup_never">Never</string>
+    <string name="auto_backup_updating">Updating</string>
+    <string name="auto_backup_daily">Daily</string>
+    <string name="auto_backup_weekly">Weekly</string>
     <string name="tile_default_launcher">Default launcher</string>
     <string name="tile_default_launcher_cycle_title">Launchers to cycle between</string>
     <string name="subtitle_default_launcher">Choose home app</string>
