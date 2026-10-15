@@ -68,6 +68,8 @@ import com.sameerasw.essentials.ui.features.battery.BatteriesSettingsUI
 import com.sameerasw.essentials.ui.features.consciousgate.CONSCIOUS_GATE_FEATURE_ID
 import com.sameerasw.essentials.ui.features.security.AppLockSettingsUI
 import com.sameerasw.essentials.ui.features.system.AlwaysOnDisplaySettingsUI
+import com.sameerasw.essentials.ui.features.system.BACK_GESTURE_FEATURE_ID
+import com.sameerasw.essentials.ui.features.system.BackGestureSettingsUI
 import com.sameerasw.essentials.ui.features.system.ActivityLauncherSearchBar
 import com.sameerasw.essentials.ui.features.system.ActivityLauncherSettingsUI
 import com.sameerasw.essentials.ui.features.system.ButtonRemapSettingsUI
@@ -112,6 +114,7 @@ import com.sameerasw.essentials.ui.features.system.OtherCustomizationsSettingsUI
 import com.sameerasw.essentials.ui.features.system.FaceUnlockBrightnessSettingsUI
 import com.sameerasw.essentials.ui.features.system.PocketModeSettingsUI
 import com.sameerasw.essentials.ui.features.system.VolumeStepsSettingsUI
+import com.sameerasw.essentials.ui.features.system.AppVolumeSettingsUI
 import com.sameerasw.essentials.ui.features.system.PowerAndBatterySettingsUI
 import com.sameerasw.essentials.ui.features.system.QuickSettingsTilesSettingsUI
 import com.sameerasw.essentials.ui.features.system.RefreshRateSettingsUI
@@ -380,6 +383,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 "Face unlock brightness" -> !isAccessibilityEnabled
                                 "Lock screen shortcuts" -> !isAccessibilityEnabled
                                 "Volume steps" -> !isAccessibilityEnabled
+                                "App volume" -> !isAccessibilityEnabled || !isShizukuPermissionGranted
                                 "Pocket mode" -> !isAccessibilityEnabled
                                 "Dynamic night light" ->
                                     (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) ||
@@ -663,7 +667,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         viewModel.isEnableUnsupportedFeatures.value,
                                         viewModel.isShowLegacyFeatures.value,
                                     ).filter { it.parentFeatureId == featureId }
-                            if (children.isNotEmpty() && featureId != "Networks" && featureId != "Island") {
+                            if (children.isNotEmpty() && featureId != "Networks" && featureId != "Island" && featureId != "Navigation") {
                                 if (featureId == "Hilight") HilightStatus(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
 
                         val sectionChildLists =
@@ -781,6 +785,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                         listOf(
                                                             "Lockdown mode",
                                                             "Face unlock brightness",
+                                                            "Screenshot share cleanup",
                                                         ),
                                                     )
 
@@ -837,6 +842,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                             "Face unlock brightness" -> !isAccessibilityEnabled
                                                             "Lock screen shortcuts" -> !isAccessibilityEnabled
                                                             "Volume steps" -> !isAccessibilityEnabled
+                                                            "App volume" -> !isAccessibilityEnabled || !isShizukuPermissionGranted
                                                             "Dynamic night light" ->
                                                                 (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) ||
                                                                     !isWriteSecureSettingsEnabled
@@ -1099,6 +1105,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                                     "Volume steps" -> {
                                         VolumeStepsSettingsUI(
+                                            viewModel = viewModel,
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            highlightSetting = highlightSetting,
+                                        )
+                                    }
+
+                                    "App volume" -> {
+                                        AppVolumeSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
                                             highlightSetting = highlightSetting,
@@ -1411,6 +1425,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                                     "Navigation" -> {
                                         NavigationSettingsUI(
+                                            viewModel = viewModel,
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            highlightSetting = highlightSetting,
+                                        )
+                                    }
+
+                                    BACK_GESTURE_FEATURE_ID -> {
+                                        BackGestureSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
                                             highlightSetting = highlightSetting,

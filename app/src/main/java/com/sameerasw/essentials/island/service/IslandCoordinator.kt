@@ -25,6 +25,9 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -163,6 +166,7 @@ class IslandCoordinator(
 
     private var isScreenOff = false
     private var isLandscape = false
+    private var colorRevision by mutableIntStateOf(0)
     private var isFullscreenApp = false
     private var isShadeExpanded = false
     private var running = false
@@ -379,6 +383,7 @@ class IslandCoordinator(
     }
 
     fun onConfigurationChanged() {
+        colorRevision++
         val landscape = service.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         if (landscape != isLandscape) {
             isLandscape = landscape
@@ -428,7 +433,11 @@ class IslandCoordinator(
         val attached = windowHost.attach(geo) {
             val state by controller.state.collectAsState()
             val layoutSpec by spec.collectAsState()
-            val colors = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicDarkColorScheme(service) else darkColorScheme()
+            val revision = colorRevision
+            val colors =
+                remember(revision) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicDarkColorScheme(service) else darkColorScheme()
+                }
             MaterialTheme(colorScheme = colors, typography = IslandTypography) {
                 val base = LocalDensity.current
                 CompositionLocalProvider(

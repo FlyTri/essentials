@@ -57,6 +57,7 @@ import com.sameerasw.essentials.domain.controller.CaffeinateController
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.domain.model.AppIcon
 import com.sameerasw.essentials.domain.model.AppSelection
+import com.sameerasw.essentials.domain.model.BackGestureAppConfig
 import com.sameerasw.essentials.domain.model.AppStandbyInfo
 import com.sameerasw.essentials.domain.model.DnsPreset
 import com.sameerasw.essentials.domain.model.HilightEffect
@@ -150,6 +151,9 @@ class MainViewModel : ViewModel() {
     val lockscreenSystemShortcutsState = mutableStateOf(SystemShortcutsState.UNKNOWN)
     val isVolumeStepsEnabled = mutableStateOf(false)
     val volumeStepsPerPress = mutableIntStateOf(2)
+    val isAppVolumeEnabled = mutableStateOf(false)
+    val isAppVolumeOverlayEnabled = mutableStateOf(false)
+    val appVolumeLevels = mutableStateOf<Map<String, Float>>(emptyMap())
     val remapHapticType = mutableStateOf(HapticFeedbackType.DOUBLE)
     val isDynamicNightLightEnabled = mutableStateOf(false)
     val isSmartPixelsEnabled = mutableStateOf(false)
@@ -393,6 +397,7 @@ class MainViewModel : ViewModel() {
     val currentWallpaperBitmap = mutableStateOf<Bitmap?>(null)
     val isPocketModeEnabled = mutableStateOf(false)
     val isFaceUnlockBrightnessEnabled = mutableStateOf(false)
+    val isScreenshotShareCleanupEnabled = mutableStateOf(false)
     val faceUnlockMaxBrightness = mutableIntStateOf(100)
     val faceUnlockAmbientThreshold = mutableFloatStateOf(10f)
     val isFaceUnlockTriggerUnlock = mutableStateOf(true)
@@ -413,6 +418,9 @@ class MainViewModel : ViewModel() {
     val isCircleToSearchGestureEnabled = mutableStateOf(false)
     val circleToSearchGestureHeight = mutableFloatStateOf(48f)
     val circleToSearchGestureWidth = mutableFloatStateOf(240f)
+    val backGestureLeftScale = mutableFloatStateOf(1f)
+    val backGestureRightScale = mutableFloatStateOf(1f)
+    val backGestureAppConfigs = mutableStateOf<List<BackGestureAppConfig>>(emptyList())
     val isCircleToSearchPreviewEnabled = mutableStateOf(false)
     val isDisableRotationSuggestionEnabled = mutableStateOf(false)
     val isAllowOverlaysInSettingsEnabled = mutableStateOf(false)
@@ -1376,6 +1384,9 @@ class MainViewModel : ViewModel() {
                     SettingsRepository.KEY_FACE_UNLOCK_BRIGHTNESS_ENABLED ->
                         isFaceUnlockBrightnessEnabled.value = settingsRepository.isFaceUnlockBrightnessEnabled()
 
+                    SettingsRepository.KEY_SCREENSHOT_SHARE_CLEANUP_ENABLED ->
+                        isScreenshotShareCleanupEnabled.value = settingsRepository.isScreenshotShareCleanupEnabled()
+
                     SettingsRepository.KEY_FACE_UNLOCK_MAX_BRIGHTNESS ->
                         faceUnlockMaxBrightness.intValue = settingsRepository.getFaceUnlockMaxBrightness()
 
@@ -2313,6 +2324,9 @@ class MainViewModel : ViewModel() {
         isLockscreenShortcutsEnabled.value = settingsRepository.isLockscreenShortcutsEnabled()
         isVolumeStepsEnabled.value = settingsRepository.isVolumeStepsEnabled()
         volumeStepsPerPress.intValue = settingsRepository.getVolumeStepsPerPress()
+        isAppVolumeEnabled.value = settingsRepository.isAppVolumeEnabled()
+        isAppVolumeOverlayEnabled.value = settingsRepository.isAppVolumeOverlayEnabled()
+        appVolumeLevels.value = settingsRepository.getAppVolumeLevels()
         LockscreenShortcutSide.entries.forEach { side ->
             lockscreenShortcutActions[side] = settingsRepository.getRemapActions(side.prefKey)
         }
@@ -2811,6 +2825,7 @@ class MainViewModel : ViewModel() {
         isPocketModeEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_POCKET_MODE_ENABLED)
         isFaceUnlockBrightnessEnabled.value = settingsRepository.isFaceUnlockBrightnessEnabled()
+        isScreenshotShareCleanupEnabled.value = settingsRepository.isScreenshotShareCleanupEnabled()
         faceUnlockMaxBrightness.intValue = settingsRepository.getFaceUnlockMaxBrightness()
         faceUnlockAmbientThreshold.floatValue = settingsRepository.getFaceUnlockAmbientThreshold()
         isFaceUnlockTriggerUnlock.value = settingsRepository.isFaceUnlockTriggerUnlockEnabled()
@@ -3757,6 +3772,48 @@ class MainViewModel : ViewModel() {
     fun setCircleToSearchGestureHeight(height: Float) {
         circleToSearchGestureHeight.floatValue = height
         settingsRepository.putFloat(SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_HEIGHT, height)
+    }
+
+    fun refreshBackGestureState() {
+        backGestureLeftScale.floatValue = settingsRepository.backGesture.defaultScale(left = true)
+        backGestureRightScale.floatValue = settingsRepository.backGesture.defaultScale(left = false)
+        backGestureAppConfigs.value = settingsRepository.loadBackGestureAppConfigs()
+    }
+
+    fun applyBackGestureScale(left: Boolean) {
+        val scale = if (left) backGestureLeftScale.floatValue else backGestureRightScale.floatValue
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsRepository.backGesture.setDefaultScale(left, scale)
+        }
+    }
+
+    fun updateBackGestureAppConfig(
+        config: BackGestureAppConfig,
+        context: Context,
+    ) {
+        val current = backGestureAppConfigs.value
+        val configs =
+            if (current.any { it.packageName == config.packageName }) {
+                current.map { if (it.packageName == config.packageName) config else it }
+            } else {
+                current + config
+            }
+        backGestureAppConfigs.value = configs
+        settingsRepository.saveBackGestureAppConfigs(configs)
+        updateAppDetectionService(context)
+    }
+
+    fun removeBackGestureAppConfig(
+        packageName: String,
+        context: Context,
+    ) {
+        val configs = backGestureAppConfigs.value.filterNot { it.packageName == packageName }
+        backGestureAppConfigs.value = configs
+        settingsRepository.saveBackGestureAppConfigs(configs)
+        updateAppDetectionService(context)
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsRepository.backGesture.onAppRemoved(packageName)
+        }
     }
 
     /**
@@ -5122,6 +5179,29 @@ class MainViewModel : ViewModel() {
     fun setVolumeStepsPerPress(steps: Int) {
         volumeStepsPerPress.intValue = steps
         settingsRepository.setVolumeStepsPerPress(steps)
+    }
+
+    fun setAppVolumeEnabled(enabled: Boolean) {
+        isAppVolumeEnabled.value = enabled
+        settingsRepository.setAppVolumeEnabled(enabled)
+    }
+
+    fun setAppVolumeOverlayEnabled(enabled: Boolean) {
+        isAppVolumeOverlayEnabled.value = enabled
+        settingsRepository.setAppVolumeOverlayEnabled(enabled)
+    }
+
+    fun setAppVolumeLevel(
+        packageName: String,
+        level: Float,
+    ) {
+        appVolumeLevels.value = appVolumeLevels.value + (packageName to level)
+        settingsRepository.setAppVolumeLevels(appVolumeLevels.value)
+    }
+
+    fun removeAppVolumeLevel(packageName: String) {
+        appVolumeLevels.value = appVolumeLevels.value - packageName
+        settingsRepository.setAppVolumeLevels(appVolumeLevels.value)
     }
 
     fun setLockscreenShortcutsEnabled(enabled: Boolean) {
@@ -9523,6 +9603,11 @@ class MainViewModel : ViewModel() {
     fun setFaceUnlockBrightnessEnabled(enabled: Boolean) {
         settingsRepository.setFaceUnlockBrightnessEnabled(enabled)
         isFaceUnlockBrightnessEnabled.value = enabled
+    }
+
+    fun setScreenshotShareCleanupEnabled(enabled: Boolean) {
+        settingsRepository.setScreenshotShareCleanupEnabled(enabled)
+        isScreenshotShareCleanupEnabled.value = enabled
     }
 
     fun setFaceUnlockAmbientThreshold(value: Float) {

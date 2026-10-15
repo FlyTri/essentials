@@ -317,6 +317,15 @@
     <string name="lockscreen_shortcuts_open_wallpaper_style">Open Wallpaper &amp; style</string>
     <string name="diy_category_pixel_shortcuts">Pixel shortcuts</string>
     <string name="diy_action_toggle_dnd">Toggle Do Not Disturb</string>
+    <string name="diy_action_set_mode">Set Mode</string>
+    <string name="diy_set_mode_desc">Turn one of your Modes from Settings on or off.</string>
+    <string name="diy_set_mode_turn_on">Turn on</string>
+    <string name="diy_set_mode_turn_off">Turn off</string>
+    <string name="diy_set_mode_disabled">Disabled in Settings</string>
+    <string name="diy_set_mode_empty">No modes found. Check that Shizuku is running.</string>
+    <string name="diy_set_mode_not_found">Mode \"%1$s\" no longer exists</string>
+    <string name="diy_set_mode_failed">Couldn\'t change mode \"%1$s\": %2$s</string>
+    <string name="diy_set_mode_no_condition">Mode \"%1$s\" can\'t be switched by apps</string>
     <string name="diy_action_open_camera">Open Camera</string>
     <string name="diy_action_open_video_camera">Open Video Camera</string>
     <string name="diy_action_open_qr_scanner">Open QR Code Scanner</string>
@@ -337,6 +346,25 @@
     <string name="search_volume_steps_enable_title">Volume steps</string>
     <string name="search_volume_steps_enable_desc">Change how much media volume moves per key press</string>
     <string name="search_volume_steps_per_press_desc">Number of volume steps per key press</string>
+    <string name="feat_app_volume_title">App volume</string>
+    <string name="feat_app_volume_desc">Set a separate volume for each app</string>
+    <string name="about_desc_app_volume">Turns down an app\'s audio on its own, without changing the media volume for everything else. Pick a level for each app and it is applied every time that app plays sound, including in the background.\n\nLevels can only go down from the normal volume, never above it. Some games and low latency audio apps may ignore the level. Shizuku must be running for new levels to apply, so start it again after a reboot.</string>
+    <string name="app_volume_enable_title">Enable app volume</string>
+    <string name="app_volume_apps_section">Apps</string>
+    <string name="app_volume_add_app">Add app</string>
+    <string name="app_volume_add_app_desc">Set a volume before the app starts playing</string>
+    <string name="app_volume_playing_summary">Playing now · %1$s</string>
+    <string name="app_volume_level_title">Volume</string>
+    <string name="app_volume_sheet_desc">The change is applied while you drag, so you can listen for the right level. 100% is the app\'s normal volume.</string>
+    <string name="app_volume_hint">Apps playing sound show up here automatically. Tap an app to change its volume, or remove it to return to the normal volume.</string>
+    <string name="search_app_volume_enable_title">App volume</string>
+    <string name="search_app_volume_enable_desc">Set a separate volume for each app</string>
+    <string name="search_app_volume_apps_desc">Volume levels for individual apps</string>
+    <string name="app_volume_overlay_title">Control UI overlay</string>
+    <string name="search_app_volume_overlay_desc">Button under the volume panel that opens volume controls for the apps playing now</string>
+    <string name="app_volume_overlay_button_desc">Volume controls for playing apps</string>
+    <string name="app_volume_overlay_sheet_title">Now playing</string>
+    <string name="app_volume_overlay_empty">Nothing is playing right now</string>
     <string name="flashlight_intensity_title">Flashlight Intensity</string>
     <string name="flashlight_fade_title">Fade in and out</string>
     <string name="flashlight_fade_desc">Smoothly toggle flashlight</string>
@@ -1343,6 +1371,8 @@
     <string name="diy_notification_trigger_app">App</string>
     <string name="diy_notification_trigger_any_app">Any app</string>
     <string name="diy_notification_trigger_text">Text contains (optional)</string>
+    <string name="diy_trigger_android_auto_connected">Android Auto Connected</string>
+    <string name="diy_trigger_android_auto_disconnected">Android Auto Disconnected</string>
     <string name="diy_trigger_accessibility_button">Accessibility Shortcut</string>
     <string name="accessibility_shortcut_service_name">Essentials Shortcut</string>
     <string name="accessibility_shortcut_service_1_name">Essentials Shortcut 1</string>
@@ -2499,6 +2529,30 @@
     <string name="feat_transparent_navigation_bar_desc">Make system navigation bar background transparent</string>
     <string name="cat_navigation">Navigation</string>
     <string name="feat_navigation_desc">Gesture bar, navigation gestures and navigation bar tweaks</string>
+    <string name="feat_back_gesture_title">Back gesture</string>
+    <string name="feat_back_gesture_left_title">Left edge width</string>
+    <string name="feat_back_gesture_right_title">Right edge width</string>
+    <string name="feat_back_gesture_width_desc">How far in from the edge a swipe triggers back</string>
+    <string name="feat_back_gesture_default_width_desc">How far in from the edge a swipe triggers back. Same as Back sensitivity in system settings.</string>
+    <string name="feat_back_gesture_off">Off</string>
+    <string name="feat_back_gesture_desc">Edge widths and per-app back gesture</string>
+    <string name="back_gesture_apps_section">Apps</string>
+    <string name="back_gesture_add_app">Add app</string>
+    <string name="back_gesture_add_app_desc">Use different edge widths while an app is open</string>
+    <string name="back_gesture_app_summary">Left %1$s · Right %2$s</string>
+    <string name="back_gesture_app_sheet_desc">These widths apply while this app is open. Set an edge to Off so swipes from it go to the app.</string>
+    <string name="back_gesture_both_off_title">Both edges are off</string>
+    <string name="back_gesture_both_off_desc">Back swipes won\'t work from either side. Use an app\'s own back button, or turn an edge back on here.</string>
+    <string name="back_gesture_automation_note">The Turn Off Back Gesture automation action overrides these apps until Turn On Back Gesture runs.</string>
+    <string name="diy_action_back_gesture_off">Turn Off Back Gesture</string>
+    <string name="diy_action_back_gesture_on">Turn On Back Gesture</string>
+    <string-array name="keywords_back_gesture">
+        <item>back</item>
+        <item>swipe</item>
+        <item>edge</item>
+        <item>gesture</item>
+        <item>sensitivity</item>
+    </string-array>
     <string name="feat_standby_apps_title">Standby apps</string>
     <string name="feat_standby_apps_desc">Optimize app background activities</string>
     <string name="about_desc_networks">Configure network download speed limits, keep mobile data continuously active even when connected to Wi-Fi, and enable wireless display certification settings.</string>
@@ -3304,6 +3358,10 @@
     <string name="island_notification_options_title">Notification options</string>
     <string name="feat_face_unlock_brightness_title">Face illumination</string>
     <string name="feat_face_unlock_brightness_desc">Bump brightness in low light</string>
+    <string name="feat_screenshot_share_cleanup_title">Delete shared screenshots</string>
+    <string name="feat_screenshot_share_cleanup_desc">Trash screenshots after sharing</string>
+    <string name="about_desc_screenshot_share_cleanup">After you share a screenshot from the screenshot preview, it is moved to the trash a minute after you leave the app you shared it to. Trashed screenshots can be restored from Files or Photos for 30 days.</string>
+    <string name="screenshot_share_cleanup_trashed">Shared screenshot moved to trash</string>
     <string name="face_unlock_illuminate">Illuminate</string>
     <string name="face_unlock_ambient_threshold_title">Ambient threshold</string>
     <string name="face_unlock_ambient_now">Now: %1$s</string>
