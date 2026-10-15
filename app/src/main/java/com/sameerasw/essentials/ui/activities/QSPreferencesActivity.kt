@@ -128,6 +128,12 @@ class QSPreferencesActivity : ComponentActivity() {
                 return
             }
 
+            if (componentName.className == "com.sameerasw.essentials.services.tiles.DefaultLauncherTileService") {
+                startActivity(Intent(this, DefaultLauncherSettingsActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                finish()
+                return
+            }
+
             if (componentName.className == "com.sameerasw.essentials.services.tiles.DeveloperOptionsTileService") {
                 val devIntent =
                     Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS).apply {

@@ -584,6 +584,10 @@
     <string name="debugging_tap_action_usb">USB</string>
     <string name="debugging_tap_action_wireless">Wireless</string>
     <string name="tile_color_picker">Color Picker</string>
+    <string name="tile_default_launcher">Default launcher</string>
+    <string name="tile_default_launcher_cycle_title">Launchers to cycle between</string>
+    <string name="subtitle_default_launcher">Choose home app</string>
+    <string name="about_desc_default_launcher">Open the system default home app picker from a QS tile.</string>
     <string name="toast_eyedropper_failed">Are you sure you\'re on Android 17? (╯°_°）╯</string>
     <string name="subtitle_eye_dropper">Eye Dropper</string>
     <string name="on">On</string>
