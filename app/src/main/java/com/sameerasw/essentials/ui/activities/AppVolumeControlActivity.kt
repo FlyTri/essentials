@@ -72,6 +72,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
+import com.sameerasw.essentials.island.ui.components.EqualizerBars
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.AppUtil
@@ -145,11 +146,21 @@ private fun NowPlayingSheet(onDismiss: () -> Unit) {
                     .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
         ) {
             MediaVolumeRow()
-            Text(
-                text = stringResource(R.string.app_volume_overlay_sheet_title),
-                style = MaterialTheme.typography.headlineSmall,
+            Row(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
-            )
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                EqualizerBars(
+                    playing = playing.isNotEmpty(),
+                    color = MaterialTheme.colorScheme.primary,
+                    size = 18.dp,
+                )
+                Text(
+                    text = stringResource(R.string.app_volume_overlay_sheet_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
             AnimatedVisibility(
                 visibleState = remember { MutableTransitionState(rows.none { it.isPresent }) }.apply { targetState = rows.none { it.isPresent } },
                 enter = expandVertically(spring(stiffness = Spring.StiffnessLow)) + fadeIn(tween(ENTER_MS)),
