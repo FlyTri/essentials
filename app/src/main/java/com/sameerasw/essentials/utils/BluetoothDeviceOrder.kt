@@ -34,6 +34,8 @@ object BluetoothDeviceOrder {
         SettingsRepository(context).putString(KEY, merged.joinToString(","))
     }
 
+    fun visibleAddresses(context: Context, addresses: List<String>): List<String> = apply(context, addresses) { it }
+
     fun <T> apply(context: Context, items: List<T>, address: (T) -> String): List<T> {
         val order = saved(context)
         if (order.isEmpty()) return items

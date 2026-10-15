@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.utils.BluetoothDeviceOrder
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.island.model.CompactCell
 import com.sameerasw.essentials.island.model.CompactPlacement
@@ -130,8 +131,7 @@ class DevicesPlugin : BaseIslandPlugin() {
     @SuppressLint("MissingPermission")
     private fun refreshBattery() {
         if (ctx == null) return
-        val order = settings.getIslandDevicesBatteryOrder()
-        batteryDevice = if (order.isEmpty() || !settings.isIslandShowDevicesEnabled() || !hasPermission()) {
+        batteryDevice = if (!settings.isIslandShowDevicesEnabled() || !hasPermission()) {
             null
         } else {
             val bonded = try {
@@ -139,6 +139,7 @@ class DevicesPlugin : BaseIslandPlugin() {
             } catch (_: SecurityException) {
                 null
             }.orEmpty().associateBy { it.address }
+            val order = BluetoothDeviceOrder.visibleAddresses(context, bonded.keys.toList())
             val onlyLow = settings.isIslandDevicesBatteryOnlyLowEnabled()
             order.firstNotNullOfOrNull { address ->
                 val device = bonded[address] ?: return@firstNotNullOfOrNull null
@@ -149,6 +150,16 @@ class DevicesPlugin : BaseIslandPlugin() {
             }
         }
         render()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun visibleBondedAddresses(): List<String> {
+        val bonded = try {
+            (context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter?.bondedDevices
+        } catch (_: SecurityException) {
+            null
+        }.orEmpty().map { it.address }
+        return BluetoothDeviceOrder.visibleAddresses(context, bonded)
     }
 
     @SuppressLint("MissingPermission")
@@ -166,7 +177,7 @@ class DevicesPlugin : BaseIslandPlugin() {
     private fun announce(device: BluetoothDevice, connected: Boolean) {
         val c = ctx ?: return
         if (!settings.isIslandShowDevicesEnabled() || !settings.isIslandLineStageEnabled() || !hasPermission()) return
-        if (isComputer(device) || device.address !in settings.getIslandDevicesBatteryOrder()) return
+        if (isComputer(device) || device.address !in visibleBondedAddresses()) return
         val name = nameOf(device)
         val battery = if (connected) batteryOf(device) else -1
         event = DeviceEvent(device.address, connected, name, iconFor(device, name), battery)
