@@ -250,6 +250,8 @@ class SettingsRepository(
         const val KEY_LOCKSCREEN_SHORTCUT_LEFT_ACTIONS = "lockscreen_shortcut_left_actions"
         const val KEY_LOCKSCREEN_SHORTCUT_RIGHT_ACTIONS = "lockscreen_shortcut_right_actions"
         const val KEY_LOCKSCREEN_SYSTEM_SHORTCUTS_STATE = "lockscreen_system_shortcuts_state"
+        const val KEY_VOLUME_STEPS_ENABLED = "volume_steps_enabled"
+        const val KEY_VOLUME_STEPS_PER_PRESS = "volume_steps_per_press"
 
         const val KEY_DYNAMIC_NIGHT_LIGHT_ENABLED = "dynamic_night_light_enabled"
         const val KEY_DYNAMIC_NIGHT_LIGHT_SELECTED_APPS = "dynamic_night_light_selected_apps"
@@ -612,6 +614,7 @@ class SettingsRepository(
         const val KEY_ISLAND_ALARM_WINDOW_HOURS = "island_alarm_window_hours"
         const val KEY_ISLAND_SHOW_TRAVEL = "island_show_travel"
         const val KEY_ISLAND_SHOW_CAFFEINATE = "island_show_caffeinate"
+        const val KEY_ISLAND_CAFFEINATE_SHOW_TIME = "island_caffeinate_show_time"
         const val KEY_ISLAND_SHOW_DEVICES = "island_show_devices"
         const val KEY_ISLAND_SHOW_HOTSPOT = "island_show_hotspot"
         const val KEY_ISLAND_BRIEF_ENABLED = "island_brief_enabled"
@@ -629,8 +632,16 @@ class SettingsRepository(
         const val KEY_ISLAND_MEDIA_SHOW_LIKE = "island_media_show_like"
         const val KEY_ISLAND_NOTIF_COMPACT_HEADS_UP = "island_notif_compact_heads_up"
         const val KEY_ISLAND_NOTIF_CONDENSED_INFO = "island_notif_condensed_info"
+        const val KEY_ISLAND_NOTIF_PEEK_STYLE = "island_notif_peek_style"
+        const val ISLAND_NOTIF_PEEK_STYLE_FULL = "full"
+        const val ISLAND_NOTIF_PEEK_STYLE_COMPACT = "compact"
+        const val ISLAND_NOTIF_PEEK_STYLE_MINIMAL = "minimal"
         const val KEY_ISLAND_NOTIF_KEEP_PROGRESS = "island_notif_keep_progress"
         const val KEY_ISLAND_NOTIF_QUEUE = "island_notif_queue"
+        const val KEY_ISLAND_NOTIF_QUEUE_STYLE = "island_notif_queue_style"
+        const val ISLAND_NOTIF_QUEUE_STYLE_STACK = "stack"
+        const val ISLAND_NOTIF_QUEUE_STYLE_OVERLAP = "overlap"
+        const val KEY_ISLAND_NOTIF_QUEUE_INLINE = "island_notif_queue_inline"
         const val KEY_ISLAND_NOTIF_SKIP_SILENT = "island_notif_skip_silent"
         const val KEY_ISLAND_NOTIF_FOLLOW_DND = "island_notif_follow_dnd"
         const val KEY_ISLAND_NOTIF_FILTER_APPS = "island_notif_filter_apps"
@@ -4051,6 +4062,8 @@ class SettingsRepository(
 
     fun isIslandShowCaffeinateEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_CAFFEINATE, true)
     fun setIslandShowCaffeinateEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_CAFFEINATE, enabled)
+    fun isIslandCaffeinateShowTimeEnabled(): Boolean = getBoolean(KEY_ISLAND_CAFFEINATE_SHOW_TIME, false)
+    fun setIslandCaffeinateShowTimeEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_CAFFEINATE_SHOW_TIME, enabled)
 
     fun isIslandShowDevicesEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_DEVICES, true)
     fun setIslandShowDevicesEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_DEVICES, enabled)
@@ -4154,6 +4167,14 @@ class SettingsRepository(
     fun isIslandNotifQueueEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_QUEUE, true)
     fun setIslandNotifQueueEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_QUEUE, enabled)
 
+    fun getIslandNotifQueueStyle(): String =
+        if (getString(KEY_ISLAND_NOTIF_QUEUE_STYLE, null) == ISLAND_NOTIF_QUEUE_STYLE_OVERLAP) ISLAND_NOTIF_QUEUE_STYLE_OVERLAP
+        else ISLAND_NOTIF_QUEUE_STYLE_STACK
+    fun setIslandNotifQueueStyle(style: String) = putString(KEY_ISLAND_NOTIF_QUEUE_STYLE, style)
+
+    fun isIslandNotifQueueInlineEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_QUEUE_INLINE, false)
+    fun setIslandNotifQueueInlineEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_QUEUE_INLINE, enabled)
+
     fun isFaceUnlockBrightnessEnabled(): Boolean = getBoolean(KEY_FACE_UNLOCK_BRIGHTNESS_ENABLED, false)
     fun setFaceUnlockBrightnessEnabled(enabled: Boolean) = putBoolean(KEY_FACE_UNLOCK_BRIGHTNESS_ENABLED, enabled)
 
@@ -4190,8 +4211,10 @@ class SettingsRepository(
     fun isIslandNotifCompactHeadsUpEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_COMPACT_HEADS_UP, true)
     fun setIslandNotifCompactHeadsUpEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_COMPACT_HEADS_UP, enabled)
 
-    fun isIslandNotifCondensedInfoEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_CONDENSED_INFO, false)
-    fun setIslandNotifCondensedInfoEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_CONDENSED_INFO, enabled)
+    fun getIslandNotifPeekStyle(): String =
+        getString(KEY_ISLAND_NOTIF_PEEK_STYLE, null)
+            ?: if (getBoolean(KEY_ISLAND_NOTIF_CONDENSED_INFO, false)) ISLAND_NOTIF_PEEK_STYLE_COMPACT else ISLAND_NOTIF_PEEK_STYLE_FULL
+    fun setIslandNotifPeekStyle(style: String) = putString(KEY_ISLAND_NOTIF_PEEK_STYLE, style)
 
     fun isIslandNotifKeepProgressEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_KEEP_PROGRESS, true)
     fun setIslandNotifKeepProgressEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_KEEP_PROGRESS, enabled)
@@ -4337,4 +4360,12 @@ class SettingsRepository(
 
     fun setLockscreenSystemShortcutsState(state: SystemShortcutsState) =
         putString(KEY_LOCKSCREEN_SYSTEM_SHORTCUTS_STATE, state.name)
+
+    fun isVolumeStepsEnabled(): Boolean = getBoolean(KEY_VOLUME_STEPS_ENABLED, false)
+
+    fun setVolumeStepsEnabled(enabled: Boolean) = putBoolean(KEY_VOLUME_STEPS_ENABLED, enabled)
+
+    fun getVolumeStepsPerPress(): Int = getInt(KEY_VOLUME_STEPS_PER_PRESS, 2)
+
+    fun setVolumeStepsPerPress(steps: Int) = putInt(KEY_VOLUME_STEPS_PER_PRESS, steps)
 }

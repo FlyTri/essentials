@@ -147,6 +147,8 @@ class MainViewModel : ViewModel() {
     val isLockscreenShortcutsEnabled = mutableStateOf(false)
     val lockscreenShortcutActions = mutableStateMapOf<LockscreenShortcutSide, List<Action>>()
     val lockscreenSystemShortcutsState = mutableStateOf(SystemShortcutsState.UNKNOWN)
+    val isVolumeStepsEnabled = mutableStateOf(false)
+    val volumeStepsPerPress = mutableIntStateOf(2)
     val remapHapticType = mutableStateOf(HapticFeedbackType.DOUBLE)
     val isDynamicNightLightEnabled = mutableStateOf(false)
     val isSmartPixelsEnabled = mutableStateOf(false)
@@ -261,9 +263,11 @@ class MainViewModel : ViewModel() {
     val isIslandMediaShowPrevious = mutableStateOf(false)
     val isIslandMediaShowLike = mutableStateOf(true)
     val isIslandNotifCompactHeadsUp = mutableStateOf(true)
-    val isIslandNotifCondensedInfo = mutableStateOf(false)
+    val islandNotifPeekStyle = mutableStateOf(SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_FULL)
     val isIslandNotifKeepProgress = mutableStateOf(true)
     val isIslandNotifQueue = mutableStateOf(true)
+    val islandNotifQueueStyle = mutableStateOf(SettingsRepository.ISLAND_NOTIF_QUEUE_STYLE_STACK)
+    val isIslandNotifQueueInline = mutableStateOf(false)
     val isIslandNotifSkipSilent = mutableStateOf(true)
     val isIslandNotifFollowDnd = mutableStateOf(true)
     val isIslandNotifFilterApps = mutableStateOf(false)
@@ -917,11 +921,17 @@ class MainViewModel : ViewModel() {
                     SettingsRepository.KEY_ISLAND_NOTIF_COMPACT_HEADS_UP ->
                         isIslandNotifCompactHeadsUp.value = settingsRepository.isIslandNotifCompactHeadsUpEnabled()
 
-                    SettingsRepository.KEY_ISLAND_NOTIF_CONDENSED_INFO ->
-                        isIslandNotifCondensedInfo.value = settingsRepository.isIslandNotifCondensedInfoEnabled()
+                    SettingsRepository.KEY_ISLAND_NOTIF_PEEK_STYLE ->
+                        islandNotifPeekStyle.value = settingsRepository.getIslandNotifPeekStyle()
 
                     SettingsRepository.KEY_ISLAND_NOTIF_QUEUE ->
                         isIslandNotifQueue.value = settingsRepository.isIslandNotifQueueEnabled()
+
+                    SettingsRepository.KEY_ISLAND_NOTIF_QUEUE_STYLE ->
+                        islandNotifQueueStyle.value = settingsRepository.getIslandNotifQueueStyle()
+
+                    SettingsRepository.KEY_ISLAND_NOTIF_QUEUE_INLINE ->
+                        isIslandNotifQueueInline.value = settingsRepository.isIslandNotifQueueInlineEnabled()
 
                     SettingsRepository.KEY_ISLAND_NOTIF_SKIP_SILENT ->
                         isIslandNotifSkipSilent.value = settingsRepository.isIslandNotifSkipSilentEnabled()
@@ -2296,6 +2306,8 @@ class MainViewModel : ViewModel() {
         hilightAppEffects.clear()
         hilightAppEffects.putAll(settingsRepository.getHilightAppEffects())
         isLockscreenShortcutsEnabled.value = settingsRepository.isLockscreenShortcutsEnabled()
+        isVolumeStepsEnabled.value = settingsRepository.isVolumeStepsEnabled()
+        volumeStepsPerPress.intValue = settingsRepository.getVolumeStepsPerPress()
         LockscreenShortcutSide.entries.forEach { side ->
             lockscreenShortcutActions[side] = settingsRepository.getRemapActions(side.prefKey)
         }
@@ -2435,9 +2447,11 @@ class MainViewModel : ViewModel() {
         isIslandMediaShowPrevious.value = settingsRepository.isIslandMediaShowPreviousEnabled()
         isIslandMediaShowLike.value = settingsRepository.isIslandMediaShowLikeEnabled()
         isIslandNotifCompactHeadsUp.value = settingsRepository.isIslandNotifCompactHeadsUpEnabled()
-        isIslandNotifCondensedInfo.value = settingsRepository.isIslandNotifCondensedInfoEnabled()
+        islandNotifPeekStyle.value = settingsRepository.getIslandNotifPeekStyle()
         isIslandNotifKeepProgress.value = settingsRepository.isIslandNotifKeepProgressEnabled()
         isIslandNotifQueue.value = settingsRepository.isIslandNotifQueueEnabled()
+        islandNotifQueueStyle.value = settingsRepository.getIslandNotifQueueStyle()
+        isIslandNotifQueueInline.value = settingsRepository.isIslandNotifQueueInlineEnabled()
         isIslandNotifSkipSilent.value = settingsRepository.isIslandNotifSkipSilentEnabled()
         isIslandNotifFollowDnd.value = settingsRepository.isIslandNotifFollowDndEnabled()
         isIslandNotifFilterApps.value = settingsRepository.isIslandNotifFilterAppsEnabled()
@@ -5067,6 +5081,16 @@ class MainViewModel : ViewModel() {
         settingsRepository.setRemapActions(slot.prefKey, actions)
     }
 
+    fun setVolumeStepsEnabled(enabled: Boolean) {
+        isVolumeStepsEnabled.value = enabled
+        settingsRepository.setVolumeStepsEnabled(enabled)
+    }
+
+    fun setVolumeStepsPerPress(steps: Int) {
+        volumeStepsPerPress.intValue = steps
+        settingsRepository.setVolumeStepsPerPress(steps)
+    }
+
     fun setLockscreenShortcutsEnabled(enabled: Boolean) {
         isLockscreenShortcutsEnabled.value = enabled
         settingsRepository.setLockscreenShortcutsEnabled(enabled)
@@ -5737,6 +5761,16 @@ class MainViewModel : ViewModel() {
         settingsRepository.setIslandShowNotificationsEnabled(enabled)
     }
 
+    fun setIslandNotifQueueInline(enabled: Boolean) {
+        isIslandNotifQueueInline.value = enabled
+        settingsRepository.setIslandNotifQueueInlineEnabled(enabled)
+    }
+
+    fun setIslandNotifQueueStyle(style: String) {
+        islandNotifQueueStyle.value = style
+        settingsRepository.setIslandNotifQueueStyle(style)
+    }
+
     fun setIslandNotifQueue(enabled: Boolean) {
         isIslandNotifQueue.value = enabled
         settingsRepository.setIslandNotifQueueEnabled(enabled)
@@ -5786,9 +5820,9 @@ class MainViewModel : ViewModel() {
         settingsRepository.setIslandNotifCompactHeadsUpEnabled(enabled)
     }
 
-    fun setIslandNotifCondensedInfo(enabled: Boolean) {
-        isIslandNotifCondensedInfo.value = enabled
-        settingsRepository.setIslandNotifCondensedInfoEnabled(enabled)
+    fun setIslandNotifPeekStyle(style: String) {
+        islandNotifPeekStyle.value = style
+        settingsRepository.setIslandNotifPeekStyle(style)
     }
 
     fun setIslandCatchUpEnabled(enabled: Boolean) {

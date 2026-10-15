@@ -273,10 +273,10 @@ object FeatureRegistry {
                 id = "Navigation",
                 title = R.string.cat_navigation,
                 iconRes = R.drawable.rounded_bottom_navigation_24,
-                category = R.string.cat_interface,
-                description = R.string.feat_other_customizations_desc,
+                category = R.string.cat_interaction,
+                description = R.string.feat_navigation_desc,
                 showToggle = false,
-                parentFeatureId = "Display",
+                parentFeatureId = "Input",
                 animationRes = R.raw.navigation_animation,
             ) {
                 override fun isEnabled(viewModel: MainViewModel) = true
@@ -1000,13 +1000,23 @@ object FeatureRegistry {
                         ),
                         SearchSetting(
                             R.string.island_notif_condensed_info_title,
-                            R.string.island_notif_condensed_info_desc,
-                            "island_notif_condensed_info",
+                            R.string.island_notif_peek_style_search_desc,
+                            "island_notif_peek_style",
                         ),
                         SearchSetting(
                             R.string.island_notif_queue_title,
                             R.string.island_notif_queue_desc,
                             "island_notif_queue",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_queue_style_title,
+                            R.string.island_notif_queue_style_search_desc,
+                            "island_notif_queue_style",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_queue_inline_title,
+                            R.string.island_notif_queue_inline_desc,
+                            "island_notif_queue_inline",
                         ),
                         SearchSetting(
                             R.string.island_notif_tap_to_open_title,
@@ -1783,6 +1793,45 @@ object FeatureRegistry {
                     context: Context,
                     enabled: Boolean,
                 ) = viewModel.setLockscreenShortcutsEnabled(enabled)
+            },
+            object : Feature(
+                id = "Volume steps",
+                contributors = listOf("jawzf"),
+                title = R.string.feat_volume_steps_title,
+                iconRes = R.drawable.rounded_volume_up_24,
+                category = R.string.cat_system,
+                description = R.string.feat_volume_steps_desc,
+                aboutDescription = R.string.about_desc_volume_steps,
+                permissionKeys = listOf("ACCESSIBILITY"),
+                showToggle = true,
+                searchableSettings =
+                    listOf(
+                        SearchSetting(
+                            R.string.search_volume_steps_enable_title,
+                            R.string.search_volume_steps_enable_desc,
+                            "enable_volume_steps",
+                            R.array.keywords_switch_master,
+                        ),
+                        SearchSetting(
+                            R.string.volume_steps_per_press_title,
+                            R.string.search_volume_steps_per_press_desc,
+                            "volume_steps_per_press",
+                        ),
+                    ),
+                parentFeatureId = "Sound",
+            ) {
+                override fun isEnabled(viewModel: MainViewModel) = viewModel.isVolumeStepsEnabled.value
+
+                override fun isToggleEnabled(
+                    viewModel: MainViewModel,
+                    context: Context,
+                ) = viewModel.isAccessibilityEnabled.value
+
+                override fun onToggle(
+                    viewModel: MainViewModel,
+                    context: Context,
+                    enabled: Boolean,
+                ) = viewModel.setVolumeStepsEnabled(enabled)
             },
             object : Feature(
                 id = "Dynamic night light",

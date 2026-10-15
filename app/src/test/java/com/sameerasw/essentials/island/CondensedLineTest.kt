@@ -13,13 +13,13 @@ class CondensedLineTest {
     private val cellSize = 28.dp
     private val edgePad = 12.dp
 
-    private fun title(natural: Dp, endInset: Dp = 0.dp) =
-        condensedTitleWidth(natural, lineWidth, cameraSlot, cellSize, edgePad, endInset)
+    private fun title(natural: Dp, queueInset: Dp = 0.dp) =
+        condensedTitleWidth(natural, lineWidth, cameraSlot, cellSize, edgePad, queueInset)
 
     // Mirrors CondensedLine: each half is the title width plus the edge padding, with the camera slot between them.
-    private fun side(natural: Dp, endInset: Dp = 0.dp) = title(natural, endInset) + edgePad
+    private fun side(natural: Dp, queueInset: Dp = 0.dp) = title(natural, queueInset) + edgePad
 
-    private fun pillWidth(natural: Dp, endInset: Dp = 0.dp) = side(natural, endInset) * 2 + cameraSlot
+    private fun pillWidth(natural: Dp, queueInset: Dp = 0.dp) = side(natural, queueInset) * 2 + cameraSlot
 
     @Test fun shortTitleHugsTheText() {
         assertEquals(60.dp, title(natural = 60.dp))
@@ -39,15 +39,17 @@ class CondensedLineTest {
 
     @Test fun longestTitleStillFitsTheLineWidth() = assertTrue(pillWidth(natural = 900.dp) <= lineWidth)
 
-    @Test fun rightEdgeStaysInsideHalfTheMaxWidth() {
+    @Test fun queueBesideThePillStaysInsideHalfTheMaxWidth() {
         listOf(0.dp, 60.dp, 900.dp).forEach { natural ->
-            listOf(0.dp, 46.dp).forEach { endInset ->
-                val fromCentre = cameraSlot / 2 + edgePad + title(natural, endInset)
-                val budget = (lineWidth - endInset) / 2
-                assertTrue("natural=$natural endInset=$endInset gave $fromCentre", fromCentre <= budget)
+            listOf(0.dp, 46.dp, 90.dp).forEach { queueInset ->
+                val fromCentre = cameraSlot / 2 + edgePad + title(natural, queueInset) + queueInset
+                assertTrue("natural=$natural queueInset=$queueInset gave $fromCentre", fromCentre <= lineWidth / 2)
             }
         }
     }
+
+    @Test fun widerQueueLeavesLessRoomForTheTitle() =
+        assertTrue(title(natural = 900.dp, queueInset = 90.dp) < title(natural = 900.dp, queueInset = 46.dp))
 
     @Test fun titleGrowsMonotonicallyWithItsText() {
         val widths = listOf(0.dp, 30.dp, 60.dp, 140.dp, 900.dp).map { title(it) }
