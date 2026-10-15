@@ -242,6 +242,9 @@ class MainViewModel : ViewModel() {
     val isIslandShowTravel = mutableStateOf(true)
     val isIslandShowCaffeinate = mutableStateOf(true)
     val isIslandShowNavigation = mutableStateOf(true)
+    val islandNavigationOnNew = mutableStateOf(SettingsRepository.ISLAND_NAVIGATION_ON_NEW_EXPAND)
+    val islandNavigationExpandDistance = mutableIntStateOf(200)
+    val isIslandNavigationPeekAfterExpand = mutableStateOf(false)
     val isIslandShowHotspot = mutableStateOf(false)
     val isIslandShowDevices = mutableStateOf(true)
     val isIslandBriefEnabled = mutableStateOf(false)
@@ -946,6 +949,18 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_ISLAND_NOTIF_TAP_TO_OPEN ->
                         isIslandNotifTapToOpen.value = settingsRepository.isIslandNotifTapToOpenEnabled()
+
+                    SettingsRepository.KEY_ISLAND_SHOW_NAVIGATION ->
+                        isIslandShowNavigation.value = settingsRepository.isIslandShowNavigationEnabled()
+
+                    SettingsRepository.KEY_ISLAND_NAVIGATION_ON_NEW ->
+                        islandNavigationOnNew.value = settingsRepository.getIslandNavigationOnNew()
+
+                    SettingsRepository.KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE ->
+                        islandNavigationExpandDistance.intValue = settingsRepository.getIslandNavigationExpandDistance()
+
+                    SettingsRepository.KEY_ISLAND_NAVIGATION_PEEK_AFTER_EXPAND ->
+                        isIslandNavigationPeekAfterExpand.value = settingsRepository.isIslandNavigationPeekAfterExpandEnabled()
 
                     SettingsRepository.KEY_ISLAND_CATCH_UP_ENABLED ->
                         isIslandCatchUpEnabled.value = settingsRepository.isIslandCatchUpEnabled()
@@ -2417,6 +2432,9 @@ class MainViewModel : ViewModel() {
         isDuoDisableInteractionsInFullscreen.value = settingsRepository.isDuoDisableInteractionsInFullscreenEnabled()
         isIslandShowCaffeinate.value = settingsRepository.isIslandShowCaffeinateEnabled()
         isIslandShowNavigation.value = settingsRepository.isIslandShowNavigationEnabled()
+        islandNavigationOnNew.value = settingsRepository.getIslandNavigationOnNew()
+        islandNavigationExpandDistance.intValue = settingsRepository.getIslandNavigationExpandDistance()
+        isIslandNavigationPeekAfterExpand.value = settingsRepository.isIslandNavigationPeekAfterExpandEnabled()
         isIslandShowHotspot.value = settingsRepository.isIslandShowHotspotEnabled()
         isIslandShowDevices.value = settingsRepository.isIslandShowDevicesEnabled()
         isIslandBriefEnabled.value = settingsRepository.isIslandBriefEnabled()
@@ -5509,6 +5527,21 @@ class MainViewModel : ViewModel() {
     fun setIslandShowNavigation(enabled: Boolean) {
         isIslandShowNavigation.value = enabled
         settingsRepository.setIslandShowNavigationEnabled(enabled)
+    }
+
+    fun setIslandNavigationOnNew(mode: String) {
+        islandNavigationOnNew.value = mode
+        settingsRepository.setIslandNavigationOnNew(mode)
+    }
+
+    fun setIslandNavigationExpandDistance(meters: Int) {
+        islandNavigationExpandDistance.intValue = meters
+        settingsRepository.setIslandNavigationExpandDistance(meters)
+    }
+
+    fun setIslandNavigationPeekAfterExpand(enabled: Boolean) {
+        isIslandNavigationPeekAfterExpand.value = enabled
+        settingsRepository.setIslandNavigationPeekAfterExpandEnabled(enabled)
     }
 
     fun setIslandShowHotspot(enabled: Boolean) {

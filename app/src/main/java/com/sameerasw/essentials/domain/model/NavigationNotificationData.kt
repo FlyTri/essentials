@@ -9,7 +9,6 @@ data class NavigationNotificationData(
     val instruction: String?,
     val distance: String?,
     val eta: String?,
-    // Turn arrow, usually the notification's large icon.
     val maneuver: Bitmap?,
     val contentIntent: PendingIntent?,
     val exitIntent: PendingIntent?,
@@ -19,7 +18,13 @@ data class NavigationNotificationData(
 object NavigationParser {
     data class Parsed(val instruction: String?, val distance: String?, val eta: String?)
 
-    private val distanceRegex = Regex("""\d[\d.,]*\s?(km|m|mi|ft|yd)\b""", RegexOption.IGNORE_CASE)
+    private val unitMeters = mapOf(
+        "km" to 1000.0, "m" to 1.0, "mi" to 1609.344, "ft" to 0.3048, "yd" to 0.9144,
+        "км" to 1000.0, "м" to 1.0,
+        "公里" to 1000.0, "千米" to 1000.0, "公尺" to 1.0, "米" to 1.0,
+    )
+    private val units = unitMeters.keys.sortedByDescending { it.length }.joinToString("|")
+    private val distanceRegex = Regex("""\d[\d.,]*\s?($units)(?!\p{L})""", RegexOption.IGNORE_CASE)
     private val exitRegex = Regex(
         """\b(exit|stop|end|close|quit|salir|terminar|detener|finalizar|beenden|quitter|arrêter|sair|encerrar)\b""",
         RegexOption.IGNORE_CASE,
@@ -27,8 +32,6 @@ object NavigationParser {
 
     fun isDistance(s: String?) = s != null && s.length <= 24 && distanceRegex.containsMatchIn(s)
 
-    // Apps put the distance in either the title or the text, so take whichever looks like one.
-    // `chip` is the Live Update status-bar text, which navigation apps fill with the distance.
     fun parse(title: String?, text: String?, subText: String?, chip: String?): Parsed {
         val titleIsDistance = isDistance(title)
         val textIsDistance = !titleIsDistance && isDistance(text)
@@ -50,10 +53,8 @@ object NavigationParser {
         )
     }
 
-    private val meterRegex = Regex("""(\d{1,3}(?:,\d{3})+|\d+(?:[.,]\d+)?)\s?(km|m|mi|ft|yd)\b""", RegexOption.IGNORE_CASE)
-    private val unitMeters = mapOf("km" to 1000.0, "m" to 1.0, "mi" to 1609.344, "ft" to 0.3048, "yd" to 0.9144)
+    private val meterRegex = Regex("""(\d{1,3}(?:,\d{3})+|\d+(?:[.,]\d+)?)\s?($units)(?!\p{L})""", RegexOption.IGNORE_CASE)
 
-    // "1,200 ft" uses a thousands separator; "1,2 km" uses a decimal comma.
     fun meters(distance: String?): Double? {
         val match = meterRegex.find(distance ?: return null) ?: return null
         val (number, unit) = match.destructured
@@ -61,13 +62,6 @@ object NavigationParser {
         return value.toDoubleOrNull()?.times(unitMeters.getValue(unit.lowercase()))
     }
 
-    // ponytail: matches the button label; an app with several unlabeled-looking actions gets no Exit button
-    fun exitActionIndex(titles: List<String?>): Int {
-        val match = titles.indexOfFirst { it != null && exitRegex.containsMatchIn(it) }
-        return when {
-            match >= 0 -> match
-            titles.size == 1 -> 0
-            else -> -1
-        }
-    }
+    fun exitActionIndex(titles: List<String?>): Int =
+        titles.indexOfFirst { it != null && exitRegex.containsMatchIn(it) }
 }

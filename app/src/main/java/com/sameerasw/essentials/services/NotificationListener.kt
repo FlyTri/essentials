@@ -1048,7 +1048,6 @@ class NotificationListener : NotificationListenerService() {
         if (extras != null && (extras.getInt(Notification.EXTRA_PROGRESS_MAX, 0) > 0 || extras.containsKey(Notification.EXTRA_PROGRESS_INDETERMINATE))) {
             scheduleProgressRefresh()
         } else if (sbn.isOngoing && isNavigationNotification(sbn)) {
-            // Navigation shares the progress refresh pass
             scheduleProgressRefresh()
         } else if (HilightProgressTracker.isTracking(sbn.key)) {
             // Its progress bar was replaced, e.g. by "Download complete"
@@ -1897,6 +1896,14 @@ class NotificationListener : NotificationListenerService() {
     private val progressRefreshRunnable =
         Runnable {
             progressExecutor.execute {
+                val navigation =
+                    try {
+                        extractLatestNavigationNotification()
+                    } catch (e: Exception) {
+                        Log.e("NotificationListener", "Failed to extract navigation notification", e)
+                        null
+                    }
+                progressHandler.post { notifyNavigationListeners(navigation) }
                 val data =
                     try {
                         extractLatestProgressNotification()
@@ -1905,17 +1912,7 @@ class NotificationListener : NotificationListenerService() {
                         return@execute
                     }
                 HilightProgressTracker.onProgress(applicationContext, data)
-                val navigation =
-                    try {
-                        extractLatestNavigationNotification()
-                    } catch (e: Exception) {
-                        Log.e("NotificationListener", "Failed to extract navigation notification", e)
-                        null
-                    }
-                progressHandler.post {
-                    notifyProgressListeners(data)
-                    notifyNavigationListeners(navigation)
-                }
+                progressHandler.post { notifyProgressListeners(data) }
             }
         }
 
@@ -1952,12 +1949,14 @@ class NotificationListener : NotificationListenerService() {
         return progressNotifs.maxByOrNull { it.postTime }
     }
 
-    // The island's navigation item replaces the progress ring for these
     private val islandShowsNavigation: Boolean
         get() = getSharedPreferences(SettingsRepository.PREFS_NAME, MODE_PRIVATE).let {
             it.getBoolean(SettingsRepository.KEY_ISLAND_ENABLED, false) &&
                 it.getBoolean(SettingsRepository.KEY_ISLAND_SHOW_NAVIGATION, true)
         }
+
+    @Volatile
+    private var navigationManeuverCache: Triple<String, Long, Bitmap?>? = null
 
     fun extractLatestNavigationNotification(): NavigationNotificationData? {
         val active = (safeActiveNotifications() ?: return null).toList() + LiveUpdateSnoozer.snoozedNotifications()
@@ -1976,10 +1975,16 @@ class NotificationListener : NotificationListenerService() {
             subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString(),
             chip = extras.getCharSequence(EXTRA_SHORT_CRITICAL_TEXT)?.toString(),
         )
-        val maneuver = try {
-            notif.getLargeIcon()?.loadDrawable(this)?.let { AppUtil.drawableToBitmap(it) }
-        } catch (_: Exception) {
-            null
+        val postTime = if (sbn.postTime > 0) sbn.postTime else notif.`when`
+        val cached = navigationManeuverCache
+        val maneuver = if (cached != null && cached.first == sbn.key && cached.second == postTime) {
+            cached.third
+        } else {
+            try {
+                notif.getLargeIcon()?.loadDrawable(this)?.let { AppUtil.drawableToBitmap(it) }
+            } catch (_: Exception) {
+                null
+            }.also { navigationManeuverCache = Triple(sbn.key, postTime, it) }
         }
         val actions = notif.actions.orEmpty()
         val exit = NavigationParser.exitActionIndex(actions.map { it.title?.toString() })
@@ -1992,7 +1997,7 @@ class NotificationListener : NotificationListenerService() {
             maneuver = maneuver,
             contentIntent = notif.contentIntent,
             exitIntent = actions.getOrNull(exit)?.actionIntent,
-            postTime = if (sbn.postTime > 0) sbn.postTime else notif.`when`,
+            postTime = postTime,
         )
     }
 

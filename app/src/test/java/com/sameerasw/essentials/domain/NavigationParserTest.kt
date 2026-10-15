@@ -39,6 +39,13 @@ class NavigationParserTest {
     }
 
     @Test
+    fun nonLatinDistanceInTitle() {
+        val p = NavigationParser.parse("300 м", "Поверните направо", null, null)
+        assertEquals("300 м", p.distance)
+        assertEquals("Поверните направо", p.instruction)
+    }
+
+    @Test
     fun longTextIsNotADistance() {
         val p = NavigationParser.parse("Continue on Highway 15D for 25 km", null, null, null)
         assertNull(p.distance)
@@ -48,7 +55,8 @@ class NavigationParserTest {
     fun exitAction() {
         assertEquals(1, NavigationParser.exitActionIndex(listOf("Mute", "Exit navigation")))
         assertEquals(0, NavigationParser.exitActionIndex(listOf("Salir")))
-        assertEquals(0, NavigationParser.exitActionIndex(listOf("Something")))
+        assertEquals(-1, NavigationParser.exitActionIndex(listOf("Something")))
+        assertEquals(-1, NavigationParser.exitActionIndex(listOf("Mute")))
         assertEquals(-1, NavigationParser.exitActionIndex(listOf("Mute", "Send")))
         assertEquals(-1, NavigationParser.exitActionIndex(emptyList()))
     }
@@ -61,6 +69,12 @@ class NavigationParserTest {
         assertEquals(0.2 * 1609.344, NavigationParser.meters("0.2 mi")!!, 0.01)
         assertEquals(300.0, NavigationParser.meters("300 m")!!, 0.01)
         assertEquals(50.0, NavigationParser.meters("In 50m")!!, 0.01)
+        assertEquals(300.0, NavigationParser.meters("300 м")!!, 0.01)
+        assertEquals(1500.0, NavigationParser.meters("1,5 км")!!, 0.01)
+        assertEquals(300.0, NavigationParser.meters("300米")!!, 0.01)
+        assertEquals(1200.0, NavigationParser.meters("1.2公里")!!, 0.01)
+        assertEquals(1200.0, NavigationParser.meters("1.2千米")!!, 0.01)
+        assertNull(NavigationParser.meters("5 мин"))
         assertNull(NavigationParser.meters("Western Road"))
         assertNull(NavigationParser.meters(null))
     }

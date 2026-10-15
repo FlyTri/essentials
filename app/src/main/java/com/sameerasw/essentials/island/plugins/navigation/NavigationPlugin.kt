@@ -36,16 +36,9 @@ class NavigationPlugin : BaseIslandPlugin() {
 
     private var data: NavigationNotificationData? = null
 
-    private val expandedFor = HashSet<String>()
+    private val trigger = NavigationTrigger()
 
-    private val surfaced = LinkedHashSet<String>()
-    private var lastSurfacedAt = 0L
-
-    private val endRoute = Runnable {
-        expandedFor.clear()
-        surfaced.clear()
-        lastSurfacedAt = 0L
-    }
+    private val endRoute = Runnable { trigger.reset() }
 
     private val endExpand = Runnable {
         val c = ctx ?: return@Runnable
@@ -99,54 +92,30 @@ class NavigationPlugin : BaseIslandPlugin() {
         }
         c.mainHandler.removeCallbacks(endRoute)
         if (!enabled()) return
-        val instruction = next.instruction.orEmpty()
-        val threshold = settings.getIslandNavigationExpandDistance()
-        val meters = NavigationParser.meters(next.distance)
-        // Distance jumped back up: a new maneuver with the same text ("Turn right" twice in a row)
-        if (meters != null && meters > threshold * REARM_FACTOR) {
-            expandedFor.remove(instruction)
-            surfaced.remove(instruction)
-        }
-        val approaching =
-            threshold > 0 && meters != null && meters <= threshold && instruction !in expandedFor
-        val expandSoon = threshold > 0 && meters != null && meters <= threshold * REARM_FACTOR
-        val now = System.currentTimeMillis()
-        val announce =
-            turned && instruction !in surfaced && !expandSoon && now - lastSurfacedAt >= COOLDOWN_MS
-
-        when {
-            approaching && expand(c) -> {
-                expandedFor += instruction
-                markSurfaced(instruction, now)
-            }
-
-            !announce -> {}
-            settings.getIslandNavigationOnNew() == SettingsRepository.ISLAND_NAVIGATION_ON_NEW_EXPAND -> {
-                if (expand(c)) markSurfaced(instruction, now)
-            }
-
-            settings.getIslandNavigationOnNew() == SettingsRepository.ISLAND_NAVIGATION_ON_NEW_PEEK && settings.isIslandLineStageEnabled() -> {
-                c.request(PluginRequest.Peek(ITEM_KEY, settings.getIslandPeekDurationMs()))
-                markSurfaced(instruction, now)
-            }
-        }
-    }
-
-    private fun markSurfaced(instruction: String, now: Long) {
-        surfaced += instruction
-        if (surfaced.size > MAX_SURFACED) surfaced.remove(surfaced.first())
-        lastSurfacedAt = now
-    }
-
-    private fun expand(c: IslandPluginContext): Boolean {
         val focused = c.focusedKey()
-        if (focused != null && focused != ITEM_KEY) return false
-        if (focused == ITEM_KEY && c.currentStage() == IslandStage.Expanded) return true
+        val action = trigger.decide(
+            instruction = next.instruction.orEmpty(),
+            turned = turned,
+            meters = NavigationParser.meters(next.distance),
+            threshold = settings.getIslandNavigationExpandDistance(),
+            onNew = settings.getIslandNavigationOnNew(),
+            canPeek = settings.isIslandLineStageEnabled(),
+            canExpand = focused == null || focused == ITEM_KEY,
+            now = System.currentTimeMillis(),
+        )
+        when (action) {
+            NavigationTrigger.Action.Expand -> expand(c)
+            NavigationTrigger.Action.Peek -> c.request(PluginRequest.Peek(ITEM_KEY, settings.getIslandPeekDurationMs()))
+            NavigationTrigger.Action.None -> {}
+        }
+    }
+
+    private fun expand(c: IslandPluginContext) {
+        if (c.focusedKey() == ITEM_KEY && c.currentStage() == IslandStage.Expanded) return
         c.mainHandler.removeCallbacks(peekAfterCollapse)
         c.request(PluginRequest.Expand(ITEM_KEY))
         c.mainHandler.removeCallbacks(endExpand)
         c.mainHandler.postDelayed(endExpand, EXPANDED_MS)
-        return true
     }
 
     private fun enabled() = settings.isIslandShowNavigationEnabled()
@@ -202,10 +171,7 @@ class NavigationPlugin : BaseIslandPlugin() {
 
         private const val EXPANDED_MS = 6_000L
         private const val COLLAPSE_ANIM_MS = 600L
-        private const val REARM_FACTOR = 1.5
-        private const val COOLDOWN_MS = 30_000L
         private const val ROUTE_GRACE_MS = 60_000L
-        private const val MAX_SURFACED = 50
     }
 }
 
@@ -219,5 +185,60 @@ internal fun Maneuver(d: NavigationNotificationData, size: Int) {
             size = size.dp,
             tint = MaterialTheme.colorScheme.primary
         )
+    }
+}
+
+internal class NavigationTrigger {
+    enum class Action { None, Expand, Peek }
+
+    private val expandedFor = HashSet<String>()
+    private val surfaced = LinkedHashSet<String>()
+    private var lastSurfacedAt = 0L
+
+    fun reset() {
+        expandedFor.clear()
+        surfaced.clear()
+        lastSurfacedAt = 0L
+    }
+
+    fun decide(
+        instruction: String,
+        turned: Boolean,
+        meters: Double?,
+        threshold: Int,
+        onNew: String,
+        canPeek: Boolean,
+        canExpand: Boolean,
+        now: Long,
+    ): Action {
+        if (meters != null && meters > threshold * REARM_FACTOR) {
+            expandedFor.remove(instruction)
+            surfaced.remove(instruction)
+        }
+        val approaching = threshold > 0 && meters != null && meters <= threshold && instruction !in expandedFor
+        val expandSoon = threshold > 0 && meters != null && meters <= threshold * REARM_FACTOR
+        val announce = turned && instruction !in surfaced && !expandSoon && now - lastSurfacedAt >= COOLDOWN_MS
+        val action = when {
+            approaching && canExpand -> {
+                expandedFor += instruction
+                Action.Expand
+            }
+            !announce -> Action.None
+            onNew == SettingsRepository.ISLAND_NAVIGATION_ON_NEW_EXPAND && canExpand -> Action.Expand
+            onNew == SettingsRepository.ISLAND_NAVIGATION_ON_NEW_PEEK && canPeek -> Action.Peek
+            else -> Action.None
+        }
+        if (action != Action.None) {
+            surfaced += instruction
+            if (surfaced.size > MAX_SURFACED) surfaced.remove(surfaced.first())
+            lastSurfacedAt = now
+        }
+        return action
+    }
+
+    companion object {
+        const val REARM_FACTOR = 1.5
+        const val COOLDOWN_MS = 30_000L
+        private const val MAX_SURFACED = 50
     }
 }

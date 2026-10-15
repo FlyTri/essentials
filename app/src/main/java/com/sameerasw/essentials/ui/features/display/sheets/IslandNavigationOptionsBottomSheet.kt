@@ -9,12 +9,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,18 +22,17 @@ import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.viewmodels.MainViewModel
 
 private val EXPAND_DISTANCE_OPTIONS = listOf(0, 50, 100, 200, 500)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IslandNavigationOptionsBottomSheet(onDismissRequest: () -> Unit) {
-    val context = LocalContext.current
+fun IslandNavigationOptionsBottomSheet(
+    viewModel: MainViewModel,
+    onDismissRequest: () -> Unit,
+) {
     val view = LocalView.current
-    val settings = remember { SettingsRepository(context) }
-    var onNew by remember { mutableStateOf(settings.getIslandNavigationOnNew()) }
-    var expandDistance by remember { mutableStateOf(settings.getIslandNavigationExpandDistance()) }
-    var peekAfterExpand by remember { mutableStateOf(settings.isIslandNavigationPeekAfterExpandEnabled()) }
 
     @Composable
     fun distanceLabel(meters: Int) =
@@ -85,11 +79,8 @@ fun IslandNavigationOptionsBottomSheet(onDismissRequest: () -> Unit) {
                     )
                     SegmentedPicker(
                         items = labels.keys.toList(),
-                        selectedItem = onNew,
-                        onItemSelected = {
-                            onNew = it
-                            settings.setIslandNavigationOnNew(it)
-                        },
+                        selectedItem = viewModel.islandNavigationOnNew.value,
+                        onItemSelected = { viewModel.setIslandNavigationOnNew(it) },
                         labelProvider = { labels[it].orEmpty() },
                         title = R.string.island_navigation_on_new_title,
                         modifier = Modifier.fillMaxWidth(),
@@ -99,7 +90,7 @@ fun IslandNavigationOptionsBottomSheet(onDismissRequest: () -> Unit) {
                 ConfigPickerItem(
                     title = stringResource(R.string.island_navigation_expand_title),
                     description = stringResource(R.string.island_navigation_expand_desc),
-                    selectedValue = distanceLabel(expandDistance),
+                    selectedValue = distanceLabel(viewModel.islandNavigationExpandDistance.intValue),
                     iconRes = R.drawable.rounded_magnify_fullscreen_24,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -108,8 +99,7 @@ fun IslandNavigationOptionsBottomSheet(onDismissRequest: () -> Unit) {
                             text = { Text(distanceLabel(meters)) },
                             onClick = {
                                 HapticUtil.performVirtualKeyHaptic(view)
-                                expandDistance = meters
-                                settings.setIslandNavigationExpandDistance(meters)
+                                viewModel.setIslandNavigationExpandDistance(meters)
                             },
                         )
                     }
@@ -119,11 +109,10 @@ fun IslandNavigationOptionsBottomSheet(onDismissRequest: () -> Unit) {
                     iconRes = R.drawable.round_navigation_24,
                     title = stringResource(R.string.island_navigation_peek_after_expand_title),
                     description = stringResource(R.string.island_navigation_peek_after_expand_desc),
-                    isChecked = peekAfterExpand,
+                    isChecked = viewModel.isIslandNavigationPeekAfterExpand.value,
                     onCheckedChange = {
                         HapticUtil.performVirtualKeyHaptic(view)
-                        peekAfterExpand = it
-                        settings.setIslandNavigationPeekAfterExpandEnabled(it)
+                        viewModel.setIslandNavigationPeekAfterExpand(it)
                     },
                 )
             }
