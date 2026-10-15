@@ -158,7 +158,8 @@ class BatteriesWidget : GlanceAppWidget() {
         val gap = 8.dp
 
         val minItemWidth = if (single) 120.dp else 72.dp
-        val columns = (size.width / minItemWidth).toInt().coerceIn(1, items.size.coerceAtLeast(1).coerceAtMost(MAX_COLUMNS))
+        val widthColumns = (size.width / minItemWidth).toInt().coerceIn(1, items.size.coerceAtLeast(1))
+        val columns = maxOf(widthColumns, (items.size + MAX_ROWS - 1) / MAX_ROWS).coerceIn(1, MAX_COLUMNS)
         val rows = items.chunked(columns)
 
         val columnWidth = (size.width - outerPadding * 2) / columns
@@ -270,7 +271,8 @@ class BatteriesWidget : GlanceAppWidget() {
     }
 
     private companion object {
-        const val MAX_COLUMNS = 8
+        const val MAX_COLUMNS = 10
+        const val MAX_ROWS = 8
         const val LOW_LEVEL = 15
         const val MIN_BITMAP_PX = 64
         const val MAX_BITMAP_PX = 256

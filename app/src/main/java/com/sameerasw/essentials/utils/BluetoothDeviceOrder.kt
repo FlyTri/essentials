@@ -12,17 +12,26 @@ object BluetoothDeviceOrder {
     private fun saved(context: Context): List<String> =
         SettingsRepository(context).getString(KEY, null)?.split(",")?.filter { it.isNotBlank() }.orEmpty()
 
-    fun load(context: Context, addresses: List<String>): List<String> {
+    fun load(context: Context, addresses: List<String>, hiddenByDefault: Set<String> = emptySet()): List<String> {
         val saved = saved(context)
         val known = saved.filter { it == SEPARATOR || it in addresses }.distinct()
         val withSeparator = if (SEPARATOR in known) known else known + SEPARATOR
         val separatorAt = withSeparator.indexOf(SEPARATOR)
         val fresh = addresses.filter { it !in withSeparator }
-        return withSeparator.take(separatorAt) + fresh + withSeparator.drop(separatorAt)
+        val freshHidden = fresh.filter { it in hiddenByDefault }
+        val freshVisible = fresh.filter { it !in hiddenByDefault }
+        return withSeparator.take(separatorAt) + freshVisible + withSeparator.drop(separatorAt) + freshHidden
     }
 
     fun save(context: Context, order: List<String>) {
-        SettingsRepository(context).putString(KEY, order.joinToString(","))
+        val previous = saved(context)
+        val previousSeparator = previous.indexOf(SEPARATOR).let { if (it < 0) previous.size else it }
+        val missing = previous.filter { it != SEPARATOR && it !in order }
+        val missingVisible = missing.filter { previous.indexOf(it) < previousSeparator }
+        val missingHidden = missing.filter { previous.indexOf(it) >= previousSeparator }
+        val separatorAt = order.indexOf(SEPARATOR)
+        val merged = order.take(separatorAt) + missingVisible + order.drop(separatorAt) + missingHidden
+        SettingsRepository(context).putString(KEY, merged.joinToString(","))
     }
 
     fun <T> apply(context: Context, items: List<T>, address: (T) -> String): List<T> {

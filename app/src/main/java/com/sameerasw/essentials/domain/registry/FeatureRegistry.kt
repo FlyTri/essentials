@@ -1505,30 +1505,6 @@ object FeatureRegistry {
                 }
             },
             object : Feature(
-                id = "Battery notification",
-                title = R.string.feat_battery_notification_title,
-                iconRes = R.drawable.rounded_battery_charging_60_24,
-                category = R.string.cat_system,
-                description = R.string.feat_battery_notification_desc,
-                aboutDescription = R.string.about_desc_battery_notification,
-                permissionKeys = listOf("POST_NOTIFICATIONS", "BLUETOOTH_CONNECT", "BLUETOOTH_SCAN"),
-                showToggle = true,
-                parentFeatureId = "Power and battery",
-            ) {
-                override fun isEnabled(viewModel: MainViewModel) = viewModel.isBatteryNotificationEnabled.value
-
-                override fun isToggleEnabled(
-                    viewModel: MainViewModel,
-                    context: Context,
-                ) = viewModel.isPostNotificationsEnabled.value && viewModel.isBluetoothPermissionGranted.value
-
-                override fun onToggle(
-                    viewModel: MainViewModel,
-                    context: Context,
-                    enabled: Boolean,
-                ) = viewModel.setBatteryNotificationEnabled(enabled, context)
-            },
-            object : Feature(
                 id = "Quick settings tiles",
                 title = R.string.feat_qs_tiles_title,
                 iconRes = R.drawable.rounded_tile_small_24,
@@ -2293,14 +2269,13 @@ object FeatureRegistry {
                 id = "Batteries",
                 title = R.string.feat_batteries_title,
                 iconRes = R.drawable.rounded_battery_charging_60_24,
-                // "Batteries"
-                category = R.string.cat_tools,
+                category = R.string.cat_system,
                 description = R.string.feat_batteries_desc,
                 aboutDescription = R.string.about_desc_batteries,
-                permissionKeys = listOf("BLUETOOTH_CONNECT", "BLUETOOTH_SCAN"),
+                permissionKeys = listOf("POST_NOTIFICATIONS", "BLUETOOTH_CONNECT", "BLUETOOTH_SCAN"),
                 showToggle = false,
                 hasMoreSettings = true,
-                parentFeatureId = "Widgets",
+                parentFeatureId = "Power and battery",
             ) {
                 override fun isEnabled(viewModel: MainViewModel) = true
 

@@ -255,12 +255,14 @@ class BatteryNotificationService : Service() {
         val itemSize = 256
         val spacing = 48
 
-        val actualContentWidth = items.size * itemSize + (items.size - 1).coerceAtLeast(0) * spacing
+        val perRow = items.size.coerceIn(1, 8)
+        val rowCount = (items.size + perRow - 1) / perRow
+        val actualContentWidth = perRow * itemSize + (perRow - 1).coerceAtLeast(0) * spacing
 
         val minWideItems = 3
         val minWideWidth = minWideItems * itemSize + (minWideItems - 1) * spacing
         val totalWidth = actualContentWidth.coerceAtLeast(minWideWidth)
-        val totalHeight = itemSize
+        val totalHeight = rowCount * itemSize + (rowCount - 1) * spacing
 
         val composite = Bitmap.createBitmap(totalWidth, totalHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(composite)
@@ -300,8 +302,8 @@ class BatteryNotificationService : Service() {
                 )
             canvas.drawBitmap(
                 itemBitmap,
-                startX + (index * (itemSize + spacing)).toFloat(),
-                0f,
+                startX + ((index % perRow) * (itemSize + spacing)).toFloat(),
+                ((index / perRow) * (itemSize + spacing)).toFloat(),
                 null,
             )
         }

@@ -744,10 +744,8 @@ private fun readDevices(context: Context): List<BriefDevice> {
             devices += BriefDevice(com.sameerasw.essentials.utils.BluetoothDeviceIcons.resolve(context, device.address, device.name), device.level)
         }
     }
-    return devices.take(MAX_DEVICES)
+    return devices.take(settings.getBatteryWidgetMaxDevices())
 }
-
-private const val MAX_DEVICES = 4
 
 @Composable
 private fun BriefAlarmChip(time: String, accent: Color) {

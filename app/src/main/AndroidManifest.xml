@@ -822,6 +822,18 @@
         </receiver>
 
         <activity
+            android:name=".ui.activities.BatteriesWidgetConfigureActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Essentials.Translucent">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".ui.activities.ScreenOffWidgetConfigureActivity"
             android:excludeFromRecents="true"
             android:exported="true"

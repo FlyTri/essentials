@@ -64,84 +64,34 @@ fun BatteriesSettingsUI(
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // AirSync connection
-        val isAirSyncInstalled =
-            try {
-                context.packageManager.getPackageInfo("com.sameerasw.airsync", 0)
-                true
-            } catch (e: android.content.pm.PackageManager.NameNotFoundException) {
-                false
+        val notificationPermission =
+            rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+                if (granted) {
+                    viewModel.isPostNotificationsEnabled.value = true
+                    viewModel.setBatteryNotificationEnabled(true, context)
+                }
             }
 
         RoundedCardContainer {
-            if (isAirSyncInstalled) {
-                IconToggleItem(
-                    iconRes = R.drawable.rounded_laptop_mac_24,
-                    title = stringResource(R.string.connect_to_airsync),
-                    description = stringResource(R.string.connect_to_airsync_summary),
-                    isChecked = viewModel.isAirSyncConnectionEnabled.value,
-                    onCheckedChange = {
-                        viewModel.setAirSyncConnectionEnabled(it, context)
-                    },
-                )
-            } else {
-                ListItem(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    leadingContent = {
-                        Icon(
-                            painter = painterResource(R.drawable.rounded_laptop_mac_24),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                    },
-                    contentPadding =
-                        PaddingValues(
-                            horizontal = 16.dp,
-                            vertical = 16.dp,
-                        ),
-                    verticalAlignment = Alignment.CenterVertically,
-                    colors =
-                        ListItemDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.surfaceBright,
-                        ),
-                    trailingContent = {
-                        Button(
-                            onClick = {
-                                HapticUtil.performVirtualKeyHaptic(view)
-                                val intent =
-                                    Intent(
-                                        Intent.ACTION_VIEW,
-                                        Uri.parse("https://play.google.com/store/apps/details?id=com.sameerasw.airsync"),
-                                    )
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                context.startActivity(intent)
-                            },
-                            colors = ButtonDefaults.filledTonalButtonColors(),
-                        ) {
-                            Text(stringResource(R.string.action_download))
-                        }
-                    },
-                    content = {
-                        Column {
-                            Text(
-                                text = stringResource(R.string.download_airsync),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
-                    },
-                    supportingContent = {
-                        Text(
-                            text = stringResource(R.string.download_airsync_summary),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    },
-                )
-            }
+            IconToggleItem(
+                iconRes = R.drawable.rounded_battery_charging_60_24,
+                title = stringResource(R.string.batteries_notification_title),
+                isChecked = viewModel.isBatteryNotificationEnabled.value,
+                onCheckedChange = { enabled ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    if (enabled &&
+                        android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
+                        !viewModel.isPostNotificationsEnabled.value
+                    ) {
+                        notificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        viewModel.setBatteryNotificationEnabled(enabled, context)
+                    }
+                },
+            )
+        }
 
+        RoundedCardContainer {
             // Bluetooth Devices
             val isBluetoothEnabled = viewModel.isBluetoothDevicesEnabled.value
             val isPermissionGranted = viewModel.isBluetoothPermissionGranted.value
@@ -160,7 +110,6 @@ fun BatteriesSettingsUI(
             IconToggleItem(
                 iconRes = R.drawable.rounded_bluetooth_24,
                 title = stringResource(R.string.show_bluetooth_devices),
-                description = stringResource(R.string.show_bluetooth_devices_summary),
                 isChecked = isBluetoothEnabled,
                 onCheckedChange = { enabled ->
                     if (enabled) {
@@ -215,17 +164,6 @@ fun BatteriesSettingsUI(
                     },
                 )
             }
-
-            // Widget Background Toggle
-            IconToggleItem(
-                iconRes = R.drawable.rounded_circles_24,
-                title = stringResource(R.string.widget_background_title),
-                description = stringResource(R.string.widget_background_summary),
-                isChecked = viewModel.isBatteryWidgetBackgroundEnabled.value,
-                onCheckedChange = {
-                    viewModel.setBatteryWidgetBackgroundEnabled(it, context)
-                },
-            )
         }
 
         run {
@@ -235,7 +173,7 @@ fun BatteriesSettingsUI(
                 modifier = Modifier.padding(start = 16.dp, bottom = 0.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            com.sameerasw.essentials.ui.features.battery.BluetoothDeviceIconsSection()
+            com.sameerasw.essentials.ui.features.battery.BluetoothDeviceIconsSection(viewModel, viewModel.isBluetoothDevicesEnabled.value && viewModel.isBluetoothPermissionGranted.value)
         }
 
         // Max Devices Slider
@@ -280,8 +218,8 @@ fun BatteriesSettingsUI(
                                     viewModel.setBatteryWidgetMaxDevices(newInt, context)
                                 }
                             },
-                            valueRange = 1f..8f,
-                            steps = 6,
+                            valueRange = 1f..16f,
+                            steps = 14,
                             modifier = Modifier.weight(1f),
                         )
                         Spacer(modifier = Modifier.width(12.dp))

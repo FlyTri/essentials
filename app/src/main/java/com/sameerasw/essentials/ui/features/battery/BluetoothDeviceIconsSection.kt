@@ -68,19 +68,30 @@ private fun pairedDevices(context: Context): List<PairedDevice> =
     }
 
 @Composable
-fun BluetoothDeviceIconsSection() {
+fun BluetoothDeviceIconsSection(
+    viewModel: com.sameerasw.essentials.viewmodels.MainViewModel,
+    bluetoothEnabled: Boolean,
+) {
     val context = LocalContext.current
     val view = LocalView.current
     val devices =
-        remember {
+        remember(bluetoothEnabled) {
             listOf(
                 PairedDevice("Phone", BluetoothDeviceOrder.PHONE, R.drawable.rounded_mobile_24),
-                PairedDevice("Mac", BluetoothDeviceOrder.MAC, R.drawable.rounded_laptop_mac_24),
-            ) + pairedDevices(context)
+                PairedDevice("AirSync - Your Mac", BluetoothDeviceOrder.MAC, R.drawable.rounded_laptop_mac_24),
+            ) + if (bluetoothEnabled) pairedDevices(context) else emptyList()
         }
     var version by remember { mutableIntStateOf(0) }
     var editing by remember { mutableStateOf<PairedDevice?>(null) }
-    var order by remember { mutableStateOf(BluetoothDeviceOrder.load(context, devices.map { it.address })) }
+    var order by remember(devices) {
+        mutableStateOf(
+            BluetoothDeviceOrder.load(
+                context,
+                devices.map { it.address },
+                if (viewModel.isAirSyncConnectionEnabled.value) emptySet() else setOf(BluetoothDeviceOrder.MAC),
+            ),
+        )
+    }
     val byAddress = remember(devices) { devices.associateBy { it.address } }
     val separatorAt = order.indexOf(BluetoothDeviceOrder.SEPARATOR)
 
@@ -89,6 +100,10 @@ fun BluetoothDeviceIconsSection() {
         onSettle = { from, to ->
             order = order.toMutableList().apply { add(to, removeAt(from)) }
             BluetoothDeviceOrder.save(context, order)
+            val macVisible = order.indexOf(BluetoothDeviceOrder.MAC) < order.indexOf(BluetoothDeviceOrder.SEPARATOR)
+            if (macVisible != viewModel.isAirSyncConnectionEnabled.value) {
+                viewModel.setAirSyncConnectionEnabled(macVisible, context)
+            }
             context.sendBroadcast(
                 Intent(context, BatteriesWidgetReceiver::class.java).apply {
                     action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
@@ -149,6 +164,7 @@ fun BluetoothDeviceIconsSection() {
                         Text(
                             text = device.name,
                             style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.weight(1f).padding(start = 16.dp),
                         )
                         if (device.iconRes == null) {
