@@ -11,72 +11,38 @@ package com.sameerasw.essentials.services.handlers
 
 import android.accessibilityservice.AccessibilityService
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Outline
 import android.graphics.PixelFormat
 import android.graphics.Rect
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewOutlineProvider
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityWindowInfo
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import android.widget.ImageView
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.setViewTreeLifecycleOwner
-import androidx.lifecycle.setViewTreeViewModelStoreOwner
-import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import androidx.compose.ui.graphics.toArgb
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
-import com.sameerasw.essentials.island.service.OverlayLifecycleOwner
 import com.sameerasw.essentials.ui.activities.AppVolumeControlActivity
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.HapticUtil
@@ -85,7 +51,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
@@ -98,34 +63,41 @@ class AppVolumeOverlayHandler(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val windowManager = service.getSystemService(WindowManager::class.java)
     private val density = service.resources.displayMetrics.density
+    private val iconCache = ConcurrentHashMap<String, Bitmap>()
+    private val ovalOutline =
+        object : ViewOutlineProvider() {
+            override fun getOutline(
+                view: View,
+                outline: Outline,
+            ) = outline.setOval(0, 0, view.width, view.height)
+        }
 
-    private val iconCache = ConcurrentHashMap<String, ImageBitmap>()
-    private var overlayView: View? = null
-    private var owner: OverlayLifecycleOwner? = null
+    private var button: ButtonView? = null
     private var params: WindowManager.LayoutParams? = null
-    private var isShown by mutableStateOf(false)
-    private var isPressed = false
+    private var isShown = false
+    private var isButtonPressed = false
     private var hidePending = false
+    private var isPolling = false
     private var lastTouchAt = 0L
 
-    private var isPolling = false
     private val pollRunnable =
         Runnable {
             isPolling = false
             if (isShown) onWindowsChanged()
         }
-    private val parkRunnable = Runnable { park() }
+    private val parkRunnable = Runnable { setTouchable(false) }
     private val hideRunnable =
         object : Runnable {
             override fun run() {
-                if (isPressed) {
+                if (isButtonPressed) {
                     handler.postDelayed(this, HIDE_GRACE_MS)
                     return
                 }
                 hidePending = false
                 isShown = false
+                button?.animateOut()
                 handler.removeCallbacks(parkRunnable)
-                handler.postDelayed(parkRunnable, EXIT_ANIMATION_MS)
+                handler.postDelayed(parkRunnable, EXIT_MS + PARK_MARGIN_MS)
             }
         }
 
@@ -141,6 +113,7 @@ class AppVolumeOverlayHandler(
         scope.launch {
             AppVolumeController.playingPackages.collect { packages ->
                 withContext(Dispatchers.IO) { packages.forEach { loadIcon(it) } }
+                button?.setPlaying(packages)
                 onWindowsChanged()
             }
         }
@@ -153,7 +126,7 @@ class AppVolumeOverlayHandler(
             removeView()
             return
         }
-        if (overlayView == null) create()
+        if (button == null) create()
         val bounds = if (isEnabled()) findVolumePanelBounds() else null
         if (bounds == null) {
             scheduleHide()
@@ -169,7 +142,17 @@ class AppVolumeOverlayHandler(
         }
     }
 
-    fun onScreenOff() = hideNow()
+    fun onScreenOff() {
+        handler.removeCallbacks(hideRunnable)
+        handler.removeCallbacks(pollRunnable)
+        handler.removeCallbacks(parkRunnable)
+        isPolling = false
+        hidePending = false
+        isButtonPressed = false
+        isShown = false
+        button?.hideImmediately()
+        setTouchable(false)
+    }
 
     fun onDestroy() {
         settings.unregisterOnSharedPreferenceChangeListener(prefsListener)
@@ -197,77 +180,51 @@ class AppVolumeOverlayHandler(
         if (hidePending || !isShown) return
         hidePending = true
         val remaining = TOUCH_GRACE_MS - (SystemClock.uptimeMillis() - lastTouchAt)
-        if (isPressed || remaining > 0) handler.postDelayed(hideRunnable, remaining.coerceAtLeast(HIDE_GRACE_MS)) else hideRunnable.run()
-    }
-
-    private fun hideNow() {
-        handler.removeCallbacks(hideRunnable)
-        handler.removeCallbacks(pollRunnable)
-        handler.removeCallbacks(parkRunnable)
-        isPolling = false
-        hidePending = false
-        isPressed = false
-        isShown = false
-        park()
-    }
-
-    private fun park() {
-        val current = params ?: return
-        current.x = OFFSCREEN_PX
-        current.y = OFFSCREEN_PX
-        current.flags = current.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        runCatching { windowManager?.updateViewLayout(overlayView, current) }
+        if (isButtonPressed || remaining > 0) handler.postDelayed(hideRunnable, remaining.coerceAtLeast(HIDE_GRACE_MS)) else hideRunnable.run()
     }
 
     private fun show(panel: Rect) {
-        val windowWidth = (WINDOW_WIDTH_DP * density).toInt()
-        val x = (panel.centerX() - windowWidth / 2).coerceAtLeast(0)
-        val y = panel.bottom + (PANEL_GAP_DP * density).toInt()
-        val existing = params ?: return
-        val flags = existing.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
-        if (existing.x != x || existing.y != y || existing.flags != flags) {
-            existing.x = x
-            existing.y = y
-            existing.flags = flags
-            runCatching { windowManager?.updateViewLayout(overlayView, existing) }
+        val current = params ?: return
+        val view = button ?: return
+        val x = (panel.centerX() - dp(WINDOW_WIDTH_DP) / 2).coerceAtLeast(0)
+        val y = panel.bottom + dp(PANEL_GAP_DP)
+        val flags = current.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+        if (current.x != x || current.y != y || current.flags != flags) {
+            current.x = x
+            current.y = y
+            current.flags = flags
+            runCatching { windowManager?.updateViewLayout(view, current) }
         }
-        isShown = true
+        if (!isShown) {
+            isShown = true
+            view.animateIn()
+        }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private fun create() {
-        val lifecycleOwner = OverlayLifecycleOwner().also { it.onCreate() }
-        val container =
-            FrameLayout(service).apply {
-                setViewTreeLifecycleOwner(lifecycleOwner)
-                setViewTreeSavedStateRegistryOwner(lifecycleOwner)
-                setViewTreeViewModelStoreOwner(lifecycleOwner)
-                addView(
-                    ComposeView(service).apply {
-                        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
-                        setContent {
-                            OverlayButton(
-                                visible = isShown,
-                                onPressChanged = {
-                                    isPressed = it
-                                    lastTouchAt = SystemClock.uptimeMillis()
-                                },
-                                onTap = ::openControls,
-                            )
-                        }
-                    },
-                )
+    private fun setTouchable(touchable: Boolean) {
+        val current = params ?: return
+        val view = button ?: return
+        val flags =
+            if (touchable) {
+                current.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+            } else {
+                current.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
             }
-        val layoutParams = layoutParams(OFFSCREEN_PX, OFFSCREEN_PX)
+        if (flags == current.flags) return
+        current.flags = flags
+        runCatching { windowManager?.updateViewLayout(view, current) }
+    }
+
+    private fun create() {
+        val view = ButtonView(service)
+        val layoutParams = layoutParams()
         try {
-            windowManager?.addView(container, layoutParams)
-            overlayView = container
-            owner = lifecycleOwner
+            windowManager?.addView(view, layoutParams)
+            button = view
             params = layoutParams
-            isShown = false
+            view.setPlaying(AppVolumeController.playingPackages.value)
         } catch (e: Exception) {
             e.printStackTrace()
-            lifecycleOwner.onDestroy()
         }
     }
 
@@ -275,11 +232,9 @@ class AppVolumeOverlayHandler(
         isShown = false
         isPolling = false
         handler.removeCallbacks(pollRunnable)
-        overlayView?.let { runCatching { windowManager?.removeView(it) } }
-        overlayView = null
+        button?.let { runCatching { windowManager?.removeView(it) } }
+        button = null
         params = null
-        owner?.onDestroy()
-        owner = null
     }
 
     private fun openControls() {
@@ -289,27 +244,23 @@ class AppVolumeOverlayHandler(
         service.startActivity(intent)
     }
 
-    private fun layoutParams(
-        x: Int,
-        y: Int,
-    ) = WindowManager.LayoutParams(
-        (WINDOW_WIDTH_DP * density).toInt(),
-        (WINDOW_HEIGHT_DP * density).toInt(),
-        WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-        PixelFormat.TRANSLUCENT,
-    ).apply {
-        gravity = Gravity.TOP or Gravity.START
-        this.x = x
-        this.y = y
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+    private fun layoutParams() =
+        WindowManager.LayoutParams(
+            dp(WINDOW_WIDTH_DP),
+            dp(WINDOW_HEIGHT_DP),
+            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            PixelFormat.TRANSLUCENT,
+        ).apply {
+            gravity = Gravity.TOP or Gravity.START
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
         }
-    }
 
     private fun colorScheme(): ColorScheme {
         val isDark =
@@ -323,133 +274,142 @@ class AppVolumeOverlayHandler(
         }
     }
 
-    private class StackEntry(
-        val packageName: String,
-        depth: Int,
-    ) {
-        var depth by mutableIntStateOf(depth)
-        var isPresent by mutableStateOf(true)
-    }
-
-    @Composable
-    private fun OverlayButton(
-        visible: Boolean,
-        onPressChanged: (Boolean) -> Unit,
-        onTap: () -> Unit,
-    ) {
-        val view = LocalView.current
-        val colors = remember { colorScheme() }
-        val label = service.getString(R.string.app_volume_overlay_button_desc)
-        var pressed by remember { mutableStateOf(false) }
-        val pressScale by animateFloatAsState(if (pressed) PRESSED_SCALE else 1f, label = "overlayPressScale")
-
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-            AnimatedVisibility(
-                visible = visible,
-                enter =
-                    fadeIn(tween(ENTER_FADE_MS)) +
-                        scaleIn(spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow), initialScale = 0.5f),
-                exit = fadeOut(tween(EXIT_MS)) + scaleOut(tween(EXIT_MS), targetScale = 0.6f),
-            ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(BUTTON_SIZE_DP.dp)
-                            .graphicsLayer {
-                                scaleX = pressScale
-                                scaleY = pressScale
-                            }.clip(CircleShape)
-                            .background(colors.surfaceContainerHigh)
-                            .semantics { contentDescription = label }
-                            .pointerInput(Unit) {
-                                detectTapGestures(
-                                    onPress = {
-                                        pressed = true
-                                        onPressChanged(true)
-                                        tryAwaitRelease()
-                                        pressed = false
-                                        onPressChanged(false)
-                                    },
-                                    onTap = {
-                                        HapticUtil.performVirtualKeyHaptic(view)
-                                        onTap()
-                                    },
-                                )
-                            },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    IconStack()
-                }
-            }
-        }
-    }
-
-    @Composable
-    private fun IconStack() {
-        val playing by AppVolumeController.playingPackages.collectAsState()
-        val top = playing.take(MAX_STACKED)
-        val entries = remember { mutableStateListOf<StackEntry>() }
-
-        LaunchedEffect(top) {
-            entries.forEach { entry ->
-                val depth = top.indexOf(entry.packageName)
-                entry.isPresent = depth >= 0
-                if (depth >= 0) entry.depth = depth
-            }
-            top.forEachIndexed { depth, packageName ->
-                if (entries.none { it.packageName == packageName && it.isPresent }) entries.add(StackEntry(packageName, depth))
-            }
-            delay(EXIT_ANIMATION_MS)
-            entries.removeAll { !it.isPresent }
-        }
-
-        entries.sortedByDescending { it.depth }.forEach { entry ->
-            key(entry) { StackedIcon(entry) }
-        }
-    }
-
-    @Composable
-    private fun StackedIcon(entry: StackEntry) {
-        val icon = remember(entry.packageName) { loadIcon(entry.packageName) } ?: return
-        var appeared by remember { mutableStateOf(false) }
-        LaunchedEffect(Unit) { appeared = true }
-        val visible = appeared && entry.isPresent
-        val motion = if (visible) spring<Float>(dampingRatio = 0.75f, stiffness = Spring.StiffnessLow) else tween(EXIT_MS)
-        val offsetY by animateDpAsState(
-            (FRONT_SHIFT_DP - STACK_STEP_DP * entry.depth).dp,
-            spring(dampingRatio = 0.75f, stiffness = Spring.StiffnessLow),
-            label = "stackOffset",
-        )
-        val scale by animateFloatAsState(
-            if (visible) 1f - DEPTH_SCALE_STEP * entry.depth else 0.5f,
-            motion,
-            label = "stackScale",
-        )
-        val alpha by animateFloatAsState(
-            if (visible) 1f - DEPTH_FADE_STEP * entry.depth else 0f,
-            motion,
-            label = "stackAlpha",
-        )
-        Image(
-            bitmap = icon,
-            contentDescription = null,
-            modifier =
-                Modifier
-                    .offset(y = offsetY)
-                    .size(ICON_SIZE_DP.dp)
-                    .graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
-                        this.alpha = alpha
-                    }.clip(CircleShape),
-        )
-    }
-
-    private fun loadIcon(packageName: String): ImageBitmap? =
+    private fun loadIcon(packageName: String): Bitmap? =
         iconCache[packageName]
             ?: runCatching {
-                AppUtil.drawableToBitmap(service.packageManager.getApplicationIcon(packageName)).asImageBitmap()
+                AppUtil.drawableToBitmap(service.packageManager.getApplicationIcon(packageName))
             }.getOrNull()?.also { iconCache[packageName] = it }
+
+    private fun dp(value: Int) = (value * density).toInt()
+
+    @SuppressLint("ViewConstructor", "ClickableViewAccessibility")
+    private inner class ButtonView(
+        context: Context,
+    ) : FrameLayout(context) {
+        private val circle = FrameLayout(context)
+        private val icons = LinkedHashMap<String, ImageView>()
+
+        init {
+            circle.layoutParams = LayoutParams(dp(BUTTON_SIZE_DP), dp(BUTTON_SIZE_DP), Gravity.TOP or Gravity.CENTER_HORIZONTAL)
+            circle.background =
+                GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(colorScheme().surfaceContainerHigh.toArgb())
+                }
+            circle.outlineProvider = ovalOutline
+            circle.clipToOutline = true
+            circle.contentDescription = context.getString(R.string.app_volume_overlay_button_desc)
+            circle.alpha = 0f
+            circle.scaleX = HIDDEN_SCALE
+            circle.scaleY = HIDDEN_SCALE
+            circle.setOnTouchListener { _, event -> onTouch(event) }
+            addView(circle)
+        }
+
+        private fun onTouch(event: MotionEvent): Boolean {
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    isButtonPressed = true
+                    lastTouchAt = SystemClock.uptimeMillis()
+                    animate().scaleX(PRESSED_SCALE).scaleY(PRESSED_SCALE).setDuration(PRESS_MS).start()
+                }
+
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    isButtonPressed = false
+                    lastTouchAt = SystemClock.uptimeMillis()
+                    animate().scaleX(1f).scaleY(1f).setDuration(PRESS_MS).start()
+                    if (event.actionMasked == MotionEvent.ACTION_UP && isInside(event)) {
+                        HapticUtil.performVirtualKeyHaptic(this)
+                        openControls()
+                    }
+                }
+            }
+            return true
+        }
+
+        private fun isInside(event: MotionEvent) = event.x in 0f..circle.width.toFloat() && event.y in 0f..circle.height.toFloat()
+
+        fun animateIn() {
+            circle.animate().cancel()
+            circle
+                .animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(ENTER_MS)
+                .setInterpolator(OvershootInterpolator(OVERSHOOT_TENSION))
+                .start()
+        }
+
+        fun animateOut() {
+            circle.animate().cancel()
+            circle
+                .animate()
+                .alpha(0f)
+                .scaleX(HIDDEN_SCALE)
+                .scaleY(HIDDEN_SCALE)
+                .setDuration(EXIT_MS)
+                .setInterpolator(AccelerateInterpolator())
+                .start()
+        }
+
+        fun hideImmediately() {
+            circle.animate().cancel()
+            circle.alpha = 0f
+            circle.scaleX = HIDDEN_SCALE
+            circle.scaleY = HIDDEN_SCALE
+        }
+
+        fun setPlaying(packages: List<String>) {
+            val top = packages.take(MAX_STACKED)
+            icons.keys.filter { it !in top }.forEach { packageName ->
+                val icon = icons.remove(packageName) ?: return@forEach
+                icon
+                    .animate()
+                    .alpha(0f)
+                    .scaleX(HIDDEN_SCALE)
+                    .scaleY(HIDDEN_SCALE)
+                    .setDuration(EXIT_MS)
+                    .setInterpolator(AccelerateInterpolator())
+                    .withEndAction { circle.removeView(icon) }
+                    .start()
+            }
+            top.forEachIndexed { depth, packageName ->
+                val icon =
+                    icons[packageName] ?: createIcon(packageName)?.also {
+                        icons[packageName] = it
+                        circle.addView(it)
+                        it.alpha = 0f
+                        it.scaleX = HIDDEN_SCALE
+                        it.scaleY = HIDDEN_SCALE
+                        it.translationY = offsetFor(depth)
+                    } ?: return@forEachIndexed
+                val scale = 1f - DEPTH_SCALE_STEP * depth
+                icon
+                    .animate()
+                    .translationY(offsetFor(depth))
+                    .scaleX(scale)
+                    .scaleY(scale)
+                    .alpha(1f - DEPTH_FADE_STEP * depth)
+                    .setDuration(STACK_MS)
+                    .setInterpolator(DecelerateInterpolator())
+                    .start()
+            }
+            top.indices.reversed().forEach { icons[top[it]]?.bringToFront() }
+        }
+
+        private fun offsetFor(depth: Int) = (FRONT_SHIFT_DP - STACK_STEP_DP * depth) * density
+
+        private fun createIcon(packageName: String): ImageView? {
+            val bitmap = loadIcon(packageName) ?: return null
+            return ImageView(context).apply {
+                layoutParams = LayoutParams(dp(ICON_SIZE_DP), dp(ICON_SIZE_DP), Gravity.CENTER)
+                setImageBitmap(bitmap)
+                outlineProvider = ovalOutline
+                clipToOutline = true
+            }
+        }
+    }
 
     private companion object {
         const val WINDOW_WIDTH_DP = 72
@@ -462,13 +422,16 @@ class AppVolumeOverlayHandler(
         const val MAX_STACKED = 3
         const val DEPTH_SCALE_STEP = 0.2f
         const val DEPTH_FADE_STEP = 0.25f
+        const val HIDDEN_SCALE = 0.5f
         const val PRESSED_SCALE = 0.9f
+        const val OVERSHOOT_TENSION = 1.4f
+        const val PRESS_MS = 90L
+        const val ENTER_MS = 320L
+        const val STACK_MS = 280L
+        const val EXIT_MS = 150L
+        const val PARK_MARGIN_MS = 50L
         const val HIDE_GRACE_MS = 150L
         const val TOUCH_GRACE_MS = 800L
-        const val EXIT_ANIMATION_MS = 200L
-        const val EXIT_MS = 160
-        const val ENTER_FADE_MS = 220
         const val POLL_INTERVAL_MS = 250L
-        const val OFFSCREEN_PX = -10000
     }
 }
