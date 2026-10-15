@@ -3273,6 +3273,8 @@
     <string name="island_otp_copied">Code copied</string>
     <string name="island_otp_show_message">Show message</string>
     <string name="island_otp_clip_label">One-time code</string>
+    <string name="island_otp_grant_title">Allow reading codes</string>
+    <string name="island_otp_grant_desc">Android hides one-time codes from apps. Tap to grant access with Shizuku or root</string>
     <string name="island_notif_filter_apps_desc">Only show notifications from the apps you pick</string>
     <string name="island_notif_skip_silent_desc">Ignore notifications that arrive without sound</string>
     <string name="island_notif_follow_dnd_title">Follow Do Not Disturb</string>

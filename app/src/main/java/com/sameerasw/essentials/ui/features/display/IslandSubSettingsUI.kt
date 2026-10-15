@@ -67,6 +67,7 @@ import com.sameerasw.essentials.ui.features.display.sheets.StatusGlanceCalendarO
 import com.sameerasw.essentials.ui.features.display.sheets.rememberIslandShowsWhileLocked
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.utils.PermissionGrantUtil
 import com.sameerasw.essentials.utils.PermissionUIHelper
 import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.ShellUtils
@@ -869,6 +870,7 @@ fun IslandNotificationSettingsUI(
     var otpTimeoutMs by remember {
         mutableStateOf(SettingsRepository(context).getIslandOtpTimeoutMs())
     }
+    var otpReadable by remember { mutableStateOf(PermissionGrantUtil.hasSensitiveNotifications(context)) }
     var concealed by remember {
         mutableStateOf(
             SettingsRepository(context).getBoolean(SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED, false)
@@ -1092,6 +1094,23 @@ fun IslandNotificationSettingsUI(
                 exit = fadeOut() + shrinkVertically(),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    if (!otpReadable) {
+                        val featureName = stringResource(R.string.island_otp_section)
+                        IconToggleItem(
+                            iconRes = R.drawable.rounded_vpn_key_24,
+                            title = stringResource(R.string.island_otp_grant_title),
+                            description = stringResource(R.string.island_otp_grant_desc),
+                            showToggle = false,
+                            onClick = {
+                                HapticUtil.performVirtualKeyHaptic(view)
+                                Thread {
+                                    PermissionGrantUtil.grantSensitiveNotifications(context, featureName)
+                                    val granted = PermissionGrantUtil.hasSensitiveNotifications(context)
+                                    view.post { otpReadable = granted }
+                                }.start()
+                            },
+                        )
+                    }
                     IslandPrefToggle(
                         settingKey = SettingsRepository.KEY_ISLAND_OTP_TAP_TO_COPY,
                         iconRes = R.drawable.rounded_content_copy_24,
