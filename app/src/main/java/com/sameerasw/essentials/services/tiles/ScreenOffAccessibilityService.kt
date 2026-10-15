@@ -47,6 +47,7 @@ import com.sameerasw.essentials.services.handlers.OmniGestureOverlayHandler
 import com.sameerasw.essentials.services.handlers.FaceUnlockBrightnessHandler
 import com.sameerasw.essentials.services.handlers.PocketModeHandler
 import com.sameerasw.essentials.services.handlers.ScreenshotShareCleanupHandler
+import com.sameerasw.essentials.services.handlers.AppVolumeOverlayHandler
 import com.sameerasw.essentials.services.handlers.StatusBarIconHandler
 import com.sameerasw.essentials.services.handlers.LockscreenShortcutsHandler
 import com.sameerasw.essentials.services.handlers.StatusGlanceHandler
@@ -90,6 +91,7 @@ class ScreenOffAccessibilityService :
     private lateinit var statusGlanceHandler: StatusGlanceHandler
     private lateinit var screenshotShareCleanupHandler: ScreenshotShareCleanupHandler
     private lateinit var lockscreenShortcutsHandler: LockscreenShortcutsHandler
+    private lateinit var appVolumeOverlayHandler: AppVolumeOverlayHandler
 
     private var lightSensor: Sensor? = null
     private var lightSensorLux: Float = 100f
@@ -339,6 +341,7 @@ class ScreenOffAccessibilityService :
         duoOverlayHandler.openBrief = { islandOverlayHandler.openBrief() }
         statusGlanceHandler = StatusGlanceHandler(this)
         lockscreenShortcutsHandler = LockscreenShortcutsHandler(this, flashlightHandler)
+        appVolumeOverlayHandler = AppVolumeOverlayHandler(this)
         screenshotShareCleanupHandler = ScreenshotShareCleanupHandler(this, serviceScope)
 
         flashlightHandler.register()
@@ -394,6 +397,7 @@ class ScreenOffAccessibilityService :
                             duoOverlayHandler.onScreenOff()
                             statusGlanceHandler.onScreenOff()
                             lockscreenShortcutsHandler.onScreenOff()
+                            appVolumeOverlayHandler.onScreenOff()
                             omniGestureOverlayHandler.updateOverlay(false) // Always hide when screen is off
                             pocketModeHandler.onScreenOff()
                             faceUnlockBrightnessHandler.onScreenOff()
@@ -556,6 +560,7 @@ class ScreenOffAccessibilityService :
         islandOverlayHandler.onDestroy()
         statusGlanceHandler.destroy()
         lockscreenShortcutsHandler.onDestroy()
+        appVolumeOverlayHandler.onDestroy()
         statusBarIconHandler.unregister()
         stopInputEventListener()
         cancelPocketFlashlightTurnOff()
@@ -603,6 +608,7 @@ class ScreenOffAccessibilityService :
             checkVolumeDialogState()
             faceUnlockBrightnessHandler.onWindowsChanged()
             lockscreenShortcutsHandler.onWindowsChanged()
+            appVolumeOverlayHandler.onWindowsChanged()
         }
     }
 

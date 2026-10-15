@@ -360,6 +360,11 @@
     <string name="search_app_volume_enable_title">App volume</string>
     <string name="search_app_volume_enable_desc">Set a separate volume for each app</string>
     <string name="search_app_volume_apps_desc">Volume levels for individual apps</string>
+    <string name="app_volume_overlay_title">Control UI overlay</string>
+    <string name="search_app_volume_overlay_desc">Button under the volume panel that opens volume controls for the apps playing now</string>
+    <string name="app_volume_overlay_button_desc">Volume controls for playing apps</string>
+    <string name="app_volume_overlay_sheet_title">Now playing</string>
+    <string name="app_volume_overlay_empty">Nothing is playing right now</string>
     <string name="flashlight_intensity_title">Flashlight Intensity</string>
     <string name="flashlight_fade_title">Fade in and out</string>
     <string name="flashlight_fade_desc">Smoothly toggle flashlight</string>

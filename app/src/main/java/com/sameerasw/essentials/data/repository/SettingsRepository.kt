@@ -261,6 +261,7 @@ class SettingsRepository(
         const val KEY_VOLUME_STEPS_PER_PRESS = "volume_steps_per_press"
         const val KEY_APP_VOLUME_ENABLED = "app_volume_enabled"
         const val KEY_APP_VOLUME_LEVELS = "app_volume_levels"
+        const val KEY_APP_VOLUME_OVERLAY_ENABLED = "app_volume_overlay_enabled"
 
         const val KEY_DYNAMIC_NIGHT_LIGHT_ENABLED = "dynamic_night_light_enabled"
         const val KEY_DYNAMIC_NIGHT_LIGHT_SELECTED_APPS = "dynamic_night_light_selected_apps"
@@ -4490,6 +4491,10 @@ class SettingsRepository(
     fun isAppVolumeEnabled(): Boolean = getBoolean(KEY_APP_VOLUME_ENABLED, false)
 
     fun setAppVolumeEnabled(enabled: Boolean) = putBoolean(KEY_APP_VOLUME_ENABLED, enabled)
+
+    fun isAppVolumeOverlayEnabled(): Boolean = getBoolean(KEY_APP_VOLUME_OVERLAY_ENABLED, false)
+
+    fun setAppVolumeOverlayEnabled(enabled: Boolean) = putBoolean(KEY_APP_VOLUME_OVERLAY_ENABLED, enabled)
 
     fun getAppVolumeLevels(): Map<String, Float> =
         getString(KEY_APP_VOLUME_LEVELS)?.let {

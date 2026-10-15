@@ -152,6 +152,7 @@ class MainViewModel : ViewModel() {
     val isVolumeStepsEnabled = mutableStateOf(false)
     val volumeStepsPerPress = mutableIntStateOf(2)
     val isAppVolumeEnabled = mutableStateOf(false)
+    val isAppVolumeOverlayEnabled = mutableStateOf(false)
     val appVolumeLevels = mutableStateOf<Map<String, Float>>(emptyMap())
     val remapHapticType = mutableStateOf(HapticFeedbackType.DOUBLE)
     val isDynamicNightLightEnabled = mutableStateOf(false)
@@ -2324,6 +2325,7 @@ class MainViewModel : ViewModel() {
         isVolumeStepsEnabled.value = settingsRepository.isVolumeStepsEnabled()
         volumeStepsPerPress.intValue = settingsRepository.getVolumeStepsPerPress()
         isAppVolumeEnabled.value = settingsRepository.isAppVolumeEnabled()
+        isAppVolumeOverlayEnabled.value = settingsRepository.isAppVolumeOverlayEnabled()
         appVolumeLevels.value = settingsRepository.getAppVolumeLevels()
         LockscreenShortcutSide.entries.forEach { side ->
             lockscreenShortcutActions[side] = settingsRepository.getRemapActions(side.prefKey)
@@ -5182,6 +5184,11 @@ class MainViewModel : ViewModel() {
     fun setAppVolumeEnabled(enabled: Boolean) {
         isAppVolumeEnabled.value = enabled
         settingsRepository.setAppVolumeEnabled(enabled)
+    }
+
+    fun setAppVolumeOverlayEnabled(enabled: Boolean) {
+        isAppVolumeOverlayEnabled.value = enabled
+        settingsRepository.setAppVolumeOverlayEnabled(enabled)
     }
 
     fun setAppVolumeLevel(

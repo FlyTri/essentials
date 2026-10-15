@@ -1882,6 +1882,12 @@ object FeatureRegistry {
                             R.string.search_app_volume_apps_desc,
                             "app_volume_apps",
                         ),
+                        SearchSetting(
+                            R.string.app_volume_overlay_title,
+                            R.string.search_app_volume_overlay_desc,
+                            "app_volume_overlay",
+                            R.array.keywords_switch_master,
+                        ),
                     ),
                 parentFeatureId = "Sound",
             ) {

@@ -79,6 +79,14 @@ fun AppVolumeSettingsUI(
                 enabled = viewModel.isAccessibilityEnabled.value && viewModel.isShizukuPermissionGranted.value,
                 modifier = Modifier.highlight(highlightSetting == "enable_app_volume"),
             )
+            IconToggleItem(
+                iconRes = R.drawable.rounded_volume_up_24,
+                title = stringResource(R.string.app_volume_overlay_title),
+                isChecked = viewModel.isAppVolumeOverlayEnabled.value,
+                onCheckedChange = { viewModel.setAppVolumeOverlayEnabled(it) },
+                enabled = isEnabled && viewModel.isAccessibilityEnabled.value && viewModel.isShizukuPermissionGranted.value,
+                modifier = Modifier.highlight(highlightSetting == "app_volume_overlay"),
+            )
         }
 
         Text(
