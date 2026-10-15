@@ -328,6 +328,15 @@
     <string name="lockscreen_shortcut_content_desc">Essentials shortcut: %1$s</string>
     <string name="search_lockscreen_shortcuts_enable_title">Lock screen shortcuts</string>
     <string name="search_lockscreen_shortcuts_enable_desc">Custom shortcut buttons on the lock screen</string>
+    <string name="feat_volume_steps_title">Volume steps</string>
+    <string name="feat_volume_steps_desc">Change media volume faster with each key press</string>
+    <string name="about_desc_volume_steps">Sets how many steps the media volume moves each time you press a volume key. Holding a key keeps stepping until you let go. Calls, ringing, alarms and camera apps keep the normal volume behavior.\n\nIf Button remap has a long press action for a volume key, holding that key runs the action instead of changing the volume, and a short press still moves the volume by your step size. While the volume panel is showing, Button remap pauses by default, so holding the key then changes the volume. Turn off \"Disabled while volume dialog open\" in Button remap if you want the action to always win.</string>
+    <string name="volume_steps_enable_title">Enable volume steps</string>
+    <string name="volume_steps_per_press_title">Steps per press</string>
+    <string name="volume_steps_hint">Each press of a volume key moves the media volume by this many steps. Holding a key repeats it, unless Button remap has a long press action for that key, which takes priority.</string>
+    <string name="search_volume_steps_enable_title">Volume steps</string>
+    <string name="search_volume_steps_enable_desc">Change how much media volume moves per key press</string>
+    <string name="search_volume_steps_per_press_desc">Number of volume steps per key press</string>
     <string name="flashlight_intensity_title">Flashlight Intensity</string>
     <string name="flashlight_fade_title">Fade in and out</string>
     <string name="flashlight_fade_desc">Smoothly toggle flashlight</string>

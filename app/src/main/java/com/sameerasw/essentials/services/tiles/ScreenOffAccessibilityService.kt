@@ -49,6 +49,7 @@ import com.sameerasw.essentials.services.handlers.PocketModeHandler
 import com.sameerasw.essentials.services.handlers.StatusBarIconHandler
 import com.sameerasw.essentials.services.handlers.LockscreenShortcutsHandler
 import com.sameerasw.essentials.services.handlers.StatusGlanceHandler
+import com.sameerasw.essentials.services.handlers.VolumeStepsHandler
 import com.sameerasw.essentials.services.receivers.FlashlightActionReceiver
 import com.sameerasw.essentials.utils.FreezeManager
 import com.sameerasw.essentials.utils.performHapticFeedback
@@ -72,6 +73,7 @@ class ScreenOffAccessibilityService :
     lateinit var flashlightHandler: FlashlightHandler
     private lateinit var notificationLightingHandler: NotificationLightingHandler
     private lateinit var buttonRemapHandler: ButtonRemapHandler
+    private lateinit var volumeStepsHandler: VolumeStepsHandler
     private lateinit var appFlowHandler: AppFlowHandler
     private lateinit var ambientGlanceHandler: AmbientGlanceHandler
     private lateinit var aodForceTurnOffHandler: AodForceTurnOffHandler
@@ -308,7 +310,8 @@ class ScreenOffAccessibilityService :
         // Initialize Handlers
         flashlightHandler = FlashlightHandler(this, serviceScope)
         notificationLightingHandler = NotificationLightingHandler(this)
-        buttonRemapHandler = ButtonRemapHandler(this, flashlightHandler)
+        volumeStepsHandler = VolumeStepsHandler(this)
+        buttonRemapHandler = ButtonRemapHandler(this, flashlightHandler, volumeStepsHandler)
         appFlowHandler = AppFlowHandler(this, this)
         ambientGlanceHandler = AmbientGlanceHandler(this)
         aodForceTurnOffHandler = AodForceTurnOffHandler(this)
@@ -368,6 +371,7 @@ class ScreenOffAccessibilityService :
 
                         Intent.ACTION_SCREEN_OFF -> {
                             isScreenOn = false
+                            volumeStepsHandler.stop()
                             statusGlanceHandler.setShadeExpanded(false)
                             islandOverlayHandler.setShadeExpanded(false)
                             duoOverlayHandler.setShadeExpanded(false)
@@ -526,6 +530,7 @@ class ScreenOffAccessibilityService :
         } catch (_: Exception) {
         }
         LiveUpdateSnoozer.release()
+        volumeStepsHandler.stop()
         flashlightHandler.unregister()
         notificationLightingHandler.removeOverlay()
         ambientGlanceHandler.removeOverlay()
@@ -690,7 +695,9 @@ class ScreenOffAccessibilityService :
         }
     }
 
-    override fun onInterrupt() {}
+    override fun onInterrupt() {
+        if (::volumeStepsHandler.isInitialized) volumeStepsHandler.stop()
+    }
 
     private fun updatePocketModeSensors() {
         val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
@@ -848,6 +855,9 @@ class ScreenOffAccessibilityService :
             val powerManager = getSystemService(POWER_SERVICE) as? android.os.PowerManager
             if (powerManager?.isInteractive == false && event.action == KeyEvent.ACTION_DOWN) {
                 triggerAmbientGlanceVolume(keyCode)
+            }
+            if (volumeStepsHandler.onKeyEvent(event)) {
+                return true
             }
         }
         return super.onKeyEvent(event)
