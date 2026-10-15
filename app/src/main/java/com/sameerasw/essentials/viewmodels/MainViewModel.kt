@@ -3769,15 +3769,15 @@ class MainViewModel : ViewModel() {
     }
 
     fun refreshBackGestureState() {
-        backGestureLeftScale.floatValue = settingsRepository.getBackGestureScale(left = true)
-        backGestureRightScale.floatValue = settingsRepository.getBackGestureScale(left = false)
+        backGestureLeftScale.floatValue = settingsRepository.backGesture.defaultScale(left = true)
+        backGestureRightScale.floatValue = settingsRepository.backGesture.defaultScale(left = false)
         backGestureAppConfigs.value = settingsRepository.loadBackGestureAppConfigs()
     }
 
     fun applyBackGestureScale(left: Boolean) {
         val scale = if (left) backGestureLeftScale.floatValue else backGestureRightScale.floatValue
         viewModelScope.launch(Dispatchers.IO) {
-            settingsRepository.setBackGestureScale(left, scale)
+            settingsRepository.backGesture.setDefaultScale(left, scale)
         }
     }
 
@@ -3805,6 +3805,9 @@ class MainViewModel : ViewModel() {
         backGestureAppConfigs.value = configs
         settingsRepository.saveBackGestureAppConfigs(configs)
         updateAppDetectionService(context)
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsRepository.backGesture.onAppRemoved(packageName)
+        }
     }
 
     /**
