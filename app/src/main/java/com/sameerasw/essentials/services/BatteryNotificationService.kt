@@ -31,6 +31,7 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.ui.activities.BatteryDetailsActivity
 import com.sameerasw.essentials.utils.BatteryRingDrawer
 import com.sameerasw.essentials.utils.BluetoothBatteryUtils
+import com.sameerasw.essentials.utils.BluetoothDeviceIcons
 
 class BatteryNotificationService : Service() {
     private lateinit var settingsRepository: SettingsRepository
@@ -223,29 +224,7 @@ class BatteryNotificationService : Service() {
                             Array<BluetoothBatteryUtils.BluetoothDeviceBattery>::class.java,
                         ).toList()
                 devices.forEach { device ->
-                    val iconRes =
-                        when {
-                            device.name.contains("watch", true) ||
-                                device.name.contains(
-                                    "gear",
-                                    true,
-                                ) ||
-                                device.name.contains("fit", true) -> R.drawable.rounded_watch_24
-
-                            device.name.contains("bud", true) ||
-                                device.name.contains(
-                                    "pod",
-                                    true,
-                                ) ||
-                                device.name.contains("head", true) ||
-                                device.name.contains(
-                                    "audio",
-                                    true,
-                                ) ||
-                                device.name.contains("sound", true) -> R.drawable.rounded_headphones_24
-
-                            else -> R.drawable.rounded_bluetooth_24
-                        }
+                    val iconRes = BluetoothDeviceIcons.resolve(this, device.address, device.name)
                     val statusIcon =
                         if (device.level <= 15) R.drawable.rounded_battery_android_frame_alert_24 else null
                     items.add(BatteryItemData(device.level, iconRes, device.name, statusIcon))

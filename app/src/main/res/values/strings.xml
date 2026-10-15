@@ -595,6 +595,9 @@
     <string name="import_backup_picker_title">Auto backups</string>
     <string name="import_backup_none">No auto backups detected</string>
     <string name="import_backup_pick_custom">Pick older or custom</string>
+    <string name="bt_icon_auto">Auto</string>
+    <string name="bt_icon_custom">Custom</string>
+    <string name="bt_device_icons_title">Device icons</string>
     <string name="tile_default_launcher">Default launcher</string>
     <string name="tile_default_launcher_cycle_title">Launchers to cycle between</string>
     <string name="subtitle_default_launcher">Choose home app</string>

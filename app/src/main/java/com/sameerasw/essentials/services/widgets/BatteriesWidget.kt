@@ -170,18 +170,7 @@ class BatteriesWidget : GlanceAppWidget() {
 
                         devices.forEach { device ->
                             val iconRes =
-                                when {
-                                    device.name.contains("watch", true) -> R.drawable.rounded_watch_24
-                                    device.name.contains("bud", true) ||
-                                        device.name.contains("pod", true) ||
-                                        device.name.contains("momentum", true) ||
-                                        device.name.contains(
-                                            "head",
-                                            true,
-                                        ) -> R.drawable.rounded_headphones_24
-
-                                    else -> R.drawable.rounded_bluetooth_24
-                                }
+                                com.sameerasw.essentials.utils.BluetoothDeviceIcons.resolve(context, device.address, device.name)
 
                             val statusIcon =
                                 if (device.level <= 15) R.drawable.rounded_battery_android_frame_alert_24 else null

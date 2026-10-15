@@ -192,6 +192,16 @@ fun BatteriesSettingsUI(
             )
         }
 
+        if (viewModel.isBluetoothDevicesEnabled.value && viewModel.isBluetoothPermissionGranted.value) {
+            Text(
+                text = stringResource(R.string.bt_device_icons_title),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(start = 16.dp, bottom = 0.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            com.sameerasw.essentials.ui.features.battery.BluetoothDeviceIconsSection()
+        }
+
         // Max Devices Slider
         Text(
             text = stringResource(R.string.limit_max_devices),

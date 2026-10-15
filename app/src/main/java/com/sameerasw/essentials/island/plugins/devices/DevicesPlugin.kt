@@ -192,6 +192,9 @@ class DevicesPlugin : BaseIslandPlugin() {
         }
 
     private fun iconFor(device: BluetoothDevice, name: String): Int {
+        if (com.sameerasw.essentials.utils.BluetoothDeviceIcons.getOverrideId(context, device.address) != null) {
+            return com.sameerasw.essentials.utils.BluetoothDeviceIcons.resolve(context, device.address, name)
+        }
         val major = try {
             device.bluetoothClass?.majorDeviceClass
         } catch (_: SecurityException) {

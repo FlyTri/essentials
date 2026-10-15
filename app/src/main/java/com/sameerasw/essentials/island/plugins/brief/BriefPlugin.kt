@@ -741,18 +741,10 @@ private fun readDevices(context: Context): List<BriefDevice> {
         context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
     if (hasPermission) {
         BluetoothBatteryUtils.getPairedDevicesBattery(context).forEach { device ->
-            devices += BriefDevice(deviceIcon(device.name), device.level)
+            devices += BriefDevice(com.sameerasw.essentials.utils.BluetoothDeviceIcons.resolve(context, device.address, device.name), device.level)
         }
     }
     return devices.take(MAX_DEVICES)
-}
-
-private fun deviceIcon(name: String): Int = when {
-    name.contains("watch", true) || name.contains("gear", true) || name.contains("fit", true) -> R.drawable.rounded_watch_24
-    name.contains("bud", true) || name.contains("pod", true) || name.contains("head", true) ||
-        name.contains("audio", true) || name.contains("sound", true) -> R.drawable.rounded_headphones_24
-    name.contains("keyboard", true) -> R.drawable.rounded_keyboard_24
-    else -> R.drawable.rounded_bluetooth_24
 }
 
 private const val MAX_DEVICES = 4
