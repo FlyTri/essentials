@@ -63,6 +63,92 @@ object AutoBackupManager {
         )
     }
 
+    data class BackupEntry(
+        val uri: Uri,
+        val name: String,
+        val modified: Long,
+    )
+
+    private const val BACKUP_PREFIX = "essentials-config-"
+
+    fun canListBackups(context: Context): Boolean =
+        getMode(context) != MODE_NEVER &&
+            (!needsLegacyStoragePermission() ||
+                androidx.core.content.ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED)
+
+    fun listBackups(context: Context, limit: Int = 10): List<BackupEntry> =
+        try {
+            val folder = getFolder(context)
+            val all =
+                when {
+                    folder != null -> listTree(context, folder)
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> listDownloads(context)
+                    else -> listLegacy()
+                }
+            all.sortedByDescending { it.modified }.take(limit)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+
+    private fun listTree(context: Context, tree: Uri): List<BackupEntry> {
+        val children =
+            DocumentsContract.buildChildDocumentsUriUsingTree(tree, DocumentsContract.getTreeDocumentId(tree))
+        val result = mutableListOf<BackupEntry>()
+        context.contentResolver
+            .query(
+                children,
+                arrayOf(
+                    DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                    DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                    DocumentsContract.Document.COLUMN_LAST_MODIFIED,
+                ),
+                null,
+                null,
+                null,
+            )?.use { c ->
+                while (c.moveToNext()) {
+                    val name = c.getString(1) ?: continue
+                    if (!name.startsWith(BACKUP_PREFIX)) continue
+                    result += BackupEntry(DocumentsContract.buildDocumentUriUsingTree(tree, c.getString(0)), name, c.getLong(2))
+                }
+            }
+        return result
+    }
+
+    private fun listDownloads(context: Context): List<BackupEntry> {
+        val result = mutableListOf<BackupEntry>()
+        context.contentResolver
+            .query(
+                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                arrayOf(
+                    MediaStore.MediaColumns._ID,
+                    MediaStore.MediaColumns.DISPLAY_NAME,
+                    MediaStore.MediaColumns.DATE_MODIFIED,
+                ),
+                "${MediaStore.MediaColumns.RELATIVE_PATH} LIKE ? AND ${MediaStore.MediaColumns.DISPLAY_NAME} LIKE ?",
+                arrayOf("${Environment.DIRECTORY_DOWNLOADS}/$DEFAULT_FOLDER%", "$BACKUP_PREFIX%"),
+                null,
+            )?.use { c ->
+                while (c.moveToNext()) {
+                    val uri = android.content.ContentUris.withAppendedId(MediaStore.Downloads.EXTERNAL_CONTENT_URI, c.getLong(0))
+                    result += BackupEntry(uri, c.getString(1), c.getLong(2) * 1000L)
+                }
+            }
+        return result
+    }
+
+    private fun listLegacy(): List<BackupEntry> {
+        val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), DEFAULT_FOLDER)
+        return dir
+            .listFiles { f -> f.name.startsWith(BACKUP_PREFIX) }
+            ?.map { BackupEntry(Uri.fromFile(it), it.name, it.lastModified()) }
+            .orEmpty()
+    }
+
     fun backupBeforeUpdate(context: Context) {
         if (getMode(context) == MODE_UPDATING) runBackup(context)
     }

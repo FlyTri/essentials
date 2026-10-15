@@ -356,6 +356,7 @@ fun SettingsContent(
     var showPreReleaseConfirmSheet by remember { mutableStateOf(false) }
     var pendingPreReleaseState by remember { mutableStateOf(false) }
     var showImportConfirmSheet by remember { mutableStateOf(false) }
+    var showImportBackupPicker by remember { mutableStateOf(false) }
     var selectedImportUri by remember { mutableStateOf<Uri?>(null) }
 
     var showTranslationSessionSheet by remember { mutableStateOf(false) }
@@ -513,6 +514,21 @@ fun SettingsContent(
                     context.startActivity(intent)
                     Runtime.getRuntime().exit(0)
                 }
+            },
+        )
+    }
+
+    if (showImportBackupPicker) {
+        com.sameerasw.essentials.ui.features.system.ImportBackupPickerSheet(
+            onDismissRequest = { showImportBackupPicker = false },
+            onBackupSelected = {
+                showImportBackupPicker = false
+                selectedImportUri = it
+                showImportConfirmSheet = true
+            },
+            onPickCustom = {
+                showImportBackupPicker = false
+                importLauncher.launch(arrayOf("application/json"))
             },
         )
     }
@@ -1190,7 +1206,11 @@ fun SettingsContent(
                 Button(
                     onClick = {
                         HapticUtil.performVirtualKeyHaptic(view)
-                        importLauncher.launch(arrayOf("application/json"))
+                        if (com.sameerasw.essentials.utils.AutoBackupManager.canListBackups(context)) {
+                            showImportBackupPicker = true
+                        } else {
+                            importLauncher.launch(arrayOf("application/json"))
+                        }
                     },
                     modifier =
                         Modifier

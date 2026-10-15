@@ -592,6 +592,9 @@
     <string name="auto_backup_updating">Updating</string>
     <string name="auto_backup_daily">Daily</string>
     <string name="auto_backup_weekly">Weekly</string>
+    <string name="import_backup_picker_title">Auto backups</string>
+    <string name="import_backup_none">No auto backups detected</string>
+    <string name="import_backup_pick_custom">Pick older or custom</string>
     <string name="tile_default_launcher">Default launcher</string>
     <string name="tile_default_launcher_cycle_title">Launchers to cycle between</string>
     <string name="subtitle_default_launcher">Choose home app</string>
