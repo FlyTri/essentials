@@ -1005,13 +1005,23 @@ object FeatureRegistry {
                         ),
                         SearchSetting(
                             R.string.island_notif_condensed_info_title,
-                            R.string.island_notif_condensed_info_desc,
-                            "island_notif_condensed_info",
+                            R.string.island_notif_peek_style_search_desc,
+                            "island_notif_peek_style",
                         ),
                         SearchSetting(
                             R.string.island_notif_queue_title,
                             R.string.island_notif_queue_desc,
                             "island_notif_queue",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_queue_style_title,
+                            R.string.island_notif_queue_style_search_desc,
+                            "island_notif_queue_style",
+                        ),
+                        SearchSetting(
+                            R.string.island_notif_queue_inline_title,
+                            R.string.island_notif_queue_inline_desc,
+                            "island_notif_queue_inline",
                         ),
                         SearchSetting(
                             R.string.island_notif_tap_to_open_title,

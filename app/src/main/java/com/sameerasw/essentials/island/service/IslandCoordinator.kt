@@ -68,6 +68,12 @@ import com.sameerasw.essentials.island.ui.IslandFontFamily
 import com.sameerasw.essentials.island.ui.IslandLayoutSpec
 import com.sameerasw.essentials.island.ui.IslandMotion
 import com.sameerasw.essentials.island.ui.IslandRoot
+import com.sameerasw.essentials.island.ui.QueueStyle
+import com.sameerasw.essentials.island.ui.IslandStackBubble
+import com.sameerasw.essentials.island.ui.IslandStackOverlap
+import com.sameerasw.essentials.island.model.SideBubble
+import com.sameerasw.essentials.island.model.SideBubblePriority
+import com.sameerasw.essentials.island.model.StackIcon
 import com.sameerasw.essentials.utils.ShellUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -475,8 +481,50 @@ class IslandCoordinator(
                 .distinctUntilChanged()
                 .collect { (stage, key) -> plugins.forEach { it.onFocusChanged(stage, key) } }
         }
+        newScope.launch { IslandPreviewRequests.queue.collect { showQueuePreview() } }
         if (settings.isIslandSuppressSystemHeadsUpEnabled()) settings.applyHeadsUpSuppression(true)
         applyPreviewStage()
+    }
+
+    private val endQueuePreview = Runnable {
+        controller.holdFocus = settings.getIslandPreviewStage() != SettingsRepository.ISLAND_PREVIEW_STAGE_AUTO
+        controller.setItems(QUEUE_PREVIEW_SOURCE, emptyList())
+    }
+
+    private fun showQueuePreview() {
+        mainHandler.post {
+            if (!running) return@post
+            mainHandler.removeCallbacks(endQueuePreview)
+            val minimal = settings.isIslandLineStageEnabled() && settings.isIslandNotifCompactHeadsUpEnabled() &&
+                settings.getIslandNotifPeekStyle() == SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_MINIMAL
+            val layout = when {
+                !minimal -> QueuePreviewLayout.Peek
+                settings.isIslandNotifQueueInlineEnabled() -> QueuePreviewLayout.MinimalInline
+                else -> QueuePreviewLayout.MinimalStack
+            }
+            controller.holdFocus = layout == QueuePreviewLayout.Peek
+            controller.setItems(
+                QUEUE_PREVIEW_SOURCE,
+                listOf(
+                    queuePreviewItem(
+                        service.getString(R.string.island_preview_sample_title),
+                        service.getString(R.string.island_preview_sample_text),
+                        layout,
+                        overlap = settings.getIslandNotifQueueStyle() == SettingsRepository.ISLAND_NOTIF_QUEUE_STYLE_OVERLAP,
+                    ),
+                ),
+            )
+            val state = controller.state.value
+            if (layout == QueuePreviewLayout.Peek) {
+                if (state.focusedKey != QUEUE_PREVIEW_KEY || state.stage != IslandStage.Line) {
+                    controller.collapseImmediately()
+                    controller.peek(QUEUE_PREVIEW_KEY, 0L, force = true)
+                }
+            } else if (state.focusedKey == QUEUE_PREVIEW_KEY) {
+                controller.collapseImmediately()
+            }
+            mainHandler.postDelayed(endQueuePreview, QUEUE_PREVIEW_HOLD_MS)
+        }
     }
 
     private fun applyPreviewRing() {
@@ -525,6 +573,38 @@ class IslandCoordinator(
         compactVisible = false,
     )
 
+    private enum class QueuePreviewLayout { Peek, MinimalInline, MinimalStack }
+
+    private fun queuePreviewItem(title: String, text: String, layout: QueuePreviewLayout, overlap: Boolean): IslandItem {
+        fun icon(key: String, current: Boolean = false) = StackIcon(key, current = current) { size ->
+            IslandIcon(R.drawable.rounded_notifications_unread_24, size = size * 0.7f)
+        }
+        val waiting = listOf(icon("$QUEUE_PREVIEW_KEY.1"), icon("$QUEUE_PREVIEW_KEY.2"))
+        val iconCell = CompactCell("preview.queue.icon") { IslandIcon(R.drawable.rounded_notifications_unread_24, size = 18.dp) }
+        val queueCell = CompactCell("preview.queue.stack") {
+            if (overlap) IslandStackOverlap(waiting, 22.dp) else IslandStackBubble(waiting, 26.dp)
+        }
+        return IslandItem(
+            key = QUEUE_PREVIEW_KEY,
+            priority = IslandPriority.NOTIFICATION,
+            placement = CompactPlacement.Dynamic,
+            compact = if (layout == QueuePreviewLayout.MinimalInline) listOf(queueCell, iconCell) else listOf(iconCell),
+            line = LineContent(
+                icon = { IslandIcon(R.drawable.rounded_notifications_unread_24, size = 24.dp) },
+                start = title,
+                end = text,
+            ),
+            compactVisible = layout != QueuePreviewLayout.Peek,
+            sideBubble = if (layout == QueuePreviewLayout.MinimalStack) {
+                SideBubble(priority = SideBubblePriority.NOTIFICATION, onOpen = {}, icons = waiting)
+            } else {
+                null
+            },
+            stack = listOf(icon(QUEUE_PREVIEW_KEY, current = true)) + waiting,
+            queued = waiting,
+        )
+    }
+
     private var revealing = false
     private var hiding = false
     private var pendingStop: Runnable? = null
@@ -553,6 +633,8 @@ class IslandCoordinator(
         running = false
         controller.holdFocus = false
         controller.setItems(PREVIEW_SOURCE, emptyList())
+        mainHandler.removeCallbacks(endQueuePreview)
+        controller.setItems(QUEUE_PREVIEW_SOURCE, emptyList())
         plugins.forEach {
             it.stop()
             controller.setItems(it.id, emptyList())
@@ -613,6 +695,11 @@ class IslandCoordinator(
             pulseYShift = settings.getIslandPulseShadowYShift().coerceIn(0f, 1f),
             pulseSpread = settings.getIslandPulseShadowSpread().coerceIn(1f, 4f),
             pulseDurationMs = settings.getIslandPulseShadowDurationMs().coerceIn(300f, 4000f).toInt(),
+            queueStyle = when (settings.getIslandNotifQueueStyle()) {
+                SettingsRepository.ISLAND_NOTIF_QUEUE_STYLE_OVERLAP -> QueueStyle.Overlap
+                else -> QueueStyle.Stack
+            },
+            queueInline = settings.isIslandNotifQueueInlineEnabled(),
         )
         windowHost.maxWidthPx = (maxOf(lineWidth, expandedWidth * scale) * density).toInt()
         windowHost.updateGeometry(geo)
@@ -678,12 +765,17 @@ class IslandCoordinator(
         const val SETTLE_MS = 300L
         const val PREVIEW_SOURCE = "preview"
         const val PREVIEW_KEY = "preview.sample"
+        const val QUEUE_PREVIEW_SOURCE = "preview.queue"
+        const val QUEUE_PREVIEW_KEY = "preview.queue.sample"
+        const val QUEUE_PREVIEW_HOLD_MS = 5000L
         val LAUNCHER_ONLY_KEYS = mapOf(
             "time_battery" to SettingsRepository.KEY_ISLAND_TIME_BATTERY_LAUNCHER_ONLY,
             "calendar" to SettingsRepository.KEY_ISLAND_CALENDAR_LAUNCHER_ONLY,
             "alarm" to SettingsRepository.KEY_ISLAND_ALARM_LAUNCHER_ONLY,
         )
         val CONFIG_KEYS = setOf(
+            SettingsRepository.KEY_ISLAND_NOTIF_QUEUE_STYLE,
+            SettingsRepository.KEY_ISLAND_NOTIF_QUEUE_INLINE,
             SettingsRepository.KEY_ISLAND_USE_AUTO_DETECT,
             SettingsRepository.KEY_ISLAND_CAMERA_OFFSET_X,
             SettingsRepository.KEY_ISLAND_CAMERA_OFFSET_Y,
