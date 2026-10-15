@@ -280,7 +280,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 var searchQuery by remember { mutableStateOf("") }
                 var allApps by remember { mutableStateOf<List<NotificationApp>>(emptyList()) }
                 var isLoadingApps by remember { mutableStateOf(false) }
-                var showSystemApps by remember { mutableStateOf(false) }
+                var showSystemApps by remember { mutableStateOf(true) }
 
                 // Load apps if needed
                 LaunchedEffect(automationType) {
