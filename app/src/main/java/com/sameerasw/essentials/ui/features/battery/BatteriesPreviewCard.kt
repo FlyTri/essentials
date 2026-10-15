@@ -59,7 +59,7 @@ private fun statusIcon(
     charging: Boolean,
 ): Int? =
     when {
-        charging -> R.drawable.rounded_flash_on_24
+        charging -> R.drawable.rounded_bolt_filled_24
         level <= 15 -> R.drawable.rounded_battery_android_frame_alert_24
         else -> null
     }
@@ -116,6 +116,7 @@ fun BatteriesPreviewCard(
     val context = LocalContext.current
     val maxDevices = viewModel.batteryWidgetMaxDevices.intValue
     val version = BatteriesPreviewTrigger.version.intValue
+    val showPercentage = remember(version) { SettingsRepository(context).isBatteryShowPercentageEnabled() }
     val bluetoothEnabled = viewModel.isBluetoothDevicesEnabled.value
     val airSyncEnabled = viewModel.isAirSyncConnectionEnabled.value
     var settled by remember { mutableIntStateOf(0) }
@@ -169,7 +170,7 @@ fun BatteriesPreviewCard(
                         else -> primary
                     }
                 val bitmap =
-                    remember(item.level, item.iconRes, item.statusIconRes, px, ring, onSurface, surface) {
+                    remember(item.level, item.iconRes, item.statusIconRes, px, ring, onSurface, surface, showPercentage) {
                         BatteryRingDrawer.drawBatteryWidget(
                             context,
                             item.level,
@@ -181,6 +182,13 @@ fun BatteriesPreviewCard(
                             item.statusIconRes?.let { ContextCompat.getDrawable(context, it) },
                             px,
                             px,
+                            percentText = if (showPercentage) "${item.level}" else null,
+                            percentIcon =
+                                if (showPercentage && item.statusIconRes == R.drawable.rounded_bolt_filled_24) {
+                                    ContextCompat.getDrawable(context, R.drawable.rounded_bolt_filled_24)
+                                } else {
+                                    null
+                                },
                         )
                     }
                 Image(bitmap = bitmap.asImageBitmap(), contentDescription = null, modifier = Modifier.size(cell))

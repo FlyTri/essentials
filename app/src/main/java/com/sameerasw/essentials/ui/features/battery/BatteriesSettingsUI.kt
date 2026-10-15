@@ -89,6 +89,28 @@ fun BatteriesSettingsUI(
                     }
                 },
             )
+
+            var showPercentage by remember {
+                mutableStateOf(
+                    com.sameerasw.essentials.data.repository
+                        .SettingsRepository(context)
+                        .isBatteryShowPercentageEnabled(),
+                )
+            }
+            IconToggleItem(
+                iconRes = R.drawable.rounded_percent_24,
+                title = stringResource(R.string.battery_show_percentage_title),
+                isChecked = showPercentage,
+                onCheckedChange = { enabled ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    showPercentage = enabled
+                    com.sameerasw.essentials.data.repository
+                        .SettingsRepository(context)
+                        .setBatteryShowPercentageEnabled(enabled)
+                    BatteriesPreviewTrigger.bump()
+                    viewModel.setBluetoothDevicesEnabled(viewModel.isBluetoothDevicesEnabled.value, context)
+                },
+            )
         }
 
         RoundedCardContainer {

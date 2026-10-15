@@ -194,7 +194,7 @@ class BatteryNotificationService : Service() {
         if (isAirSyncEnabled && macLevel != -1 && isMacConnected) {
             val statusIcon =
                 if (macIsCharging) {
-                    R.drawable.rounded_flash_on_24
+                    R.drawable.rounded_bolt_filled_24
                 } else if (macLevel <= 15) {
                     R.drawable.rounded_battery_android_frame_alert_24
                 } else {
@@ -276,6 +276,7 @@ class BatteryNotificationService : Service() {
                 Color.parseColor("#6200EE")
             }
 
+        val showPercentage = settingsRepository.isBatteryShowPercentageEnabled()
         val onSurface = Color.WHITE
         val trackColor = ColorUtils.setAlphaComponent(onSurface, 40)
         val surfaceColor = Color.parseColor("#99000000")
@@ -299,6 +300,13 @@ class BatteryNotificationService : Service() {
                     item.statusIconRes?.let { ContextCompat.getDrawable(this, it) },
                     itemSize,
                     itemSize,
+                    percentText = if (showPercentage) "${item.level}" else null,
+                    percentIcon =
+                        if (showPercentage && item.statusIconRes == R.drawable.rounded_bolt_filled_24) {
+                            ContextCompat.getDrawable(this, R.drawable.rounded_bolt_filled_24)
+                        } else {
+                            null
+                        },
                 )
             canvas.drawBitmap(
                 itemBitmap,

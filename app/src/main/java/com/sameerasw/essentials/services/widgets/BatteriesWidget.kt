@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -47,6 +48,9 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
+import androidx.glance.text.FontWeight
+import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
 import com.google.gson.Gson
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
@@ -68,7 +72,7 @@ class BatteriesWidget : GlanceAppWidget() {
                 val prefs = currentState<Preferences>()
                 val settings = WidgetSettings.from(prefs)
                 val items = buildItems(context, prefs, settings).take(settings.maxDevices)
-                BatteryGrid(items, settings.backgroundEnabled)
+                BatteryGrid(items, settings.backgroundEnabled, SettingsRepository(context).isBatteryShowPercentageEnabled())
             }
         }
     }
@@ -142,7 +146,7 @@ class BatteriesWidget : GlanceAppWidget() {
         charging: Boolean,
     ): Int? =
         when {
-            charging -> R.drawable.rounded_flash_on_24
+            charging -> R.drawable.rounded_bolt_filled_24
             level <= LOW_LEVEL -> R.drawable.rounded_battery_android_frame_alert_24
             else -> null
         }
@@ -151,6 +155,7 @@ class BatteriesWidget : GlanceAppWidget() {
     private fun BatteryGrid(
         items: List<Item>,
         backgroundEnabled: Boolean,
+        showPercentage: Boolean,
     ) {
         val size = LocalSize.current
         val single = items.size <= 1
@@ -189,7 +194,7 @@ class BatteriesWidget : GlanceAppWidget() {
                             modifier = GlanceModifier.defaultWeight().fillMaxHeight().padding(horizontal = gap / 2),
                             contentAlignment = Alignment.Center,
                         ) {
-                            BatteryRing(item, cell)
+                            BatteryRing(item, cell, showPercentage)
                         }
                     }
                     repeat(columns - row.size) {
@@ -204,11 +209,18 @@ class BatteriesWidget : GlanceAppWidget() {
     private fun BatteryRing(
         item: Item,
         cell: Dp,
+        showPercentage: Boolean,
     ) {
         val context = LocalContext.current
         val density = context.resources.displayMetrics.density
         val bitmapPx = (cell.value * density).toInt().coerceIn(MIN_BITMAP_PX, MAX_BITMAP_PX)
-        val hasStatus = item.statusIconRes != null
+        val hasStatus = item.statusIconRes != null || showPercentage
+        val gap =
+            if (showPercentage) {
+                BatteryRingDrawer.percentGapDegrees(bitmapPx, "${item.level}", item.statusIconRes == R.drawable.rounded_bolt_filled_24)
+            } else {
+                null
+            }
 
         val primary = GlanceTheme.colors.primary
         val error = GlanceTheme.colors.error
@@ -234,13 +246,13 @@ class BatteriesWidget : GlanceAppWidget() {
                 modifier = GlanceModifier.fillMaxSize().padding(ringPadding).background(surface).cornerRadius(100.dp),
             ) {}
             Image(
-                provider = ImageProvider(BatteryRingDrawer.drawProgressArc(item.level, android.graphics.Color.WHITE, hasStatus, bitmapPx, bitmapPx)),
+                provider = ImageProvider(BatteryRingDrawer.drawProgressArc(item.level, android.graphics.Color.WHITE, hasStatus, bitmapPx, bitmapPx, gap)),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(ringColor),
                 modifier = GlanceModifier.fillMaxSize(),
             )
             Image(
-                provider = ImageProvider(BatteryRingDrawer.drawTrackArc(item.level, android.graphics.Color.WHITE, hasStatus, bitmapPx, bitmapPx)),
+                provider = ImageProvider(BatteryRingDrawer.drawTrackArc(item.level, android.graphics.Color.WHITE, hasStatus, bitmapPx, bitmapPx, gap)),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(track),
                 modifier = GlanceModifier.fillMaxSize(),
@@ -251,7 +263,42 @@ class BatteriesWidget : GlanceAppWidget() {
                 colorFilter = ColorFilter.tint(onSurface),
                 modifier = GlanceModifier.fillMaxSize().padding(iconPadding),
             )
-            item.statusIconRes?.let { status ->
+            if (showPercentage) {
+                val charging = item.statusIconRes == R.drawable.rounded_bolt_filled_24
+                val fontSize = cell.value * 0.16f
+                val centerY = cell * 0.16f
+                Box(
+                    modifier = GlanceModifier.fillMaxSize().padding(top = (centerY - (fontSize * 0.62f).dp).coerceAtLeast(0.dp)),
+                    contentAlignment = Alignment.TopCenter,
+                ) {
+                    if (charging) {
+                        Row(
+                            modifier =
+                                GlanceModifier
+                                    .background(ringColor)
+                                    .cornerRadius(100.dp)
+                                    .padding(horizontal = (fontSize * 0.25f).dp, vertical = (fontSize * 0.06f).dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Image(
+                                provider = ImageProvider(R.drawable.rounded_bolt_filled_24),
+                                contentDescription = null,
+                                colorFilter = ColorFilter.tint(surface),
+                                modifier = GlanceModifier.size(fontSize.dp),
+                            )
+                            Text(
+                                text = "${item.level}",
+                                style = TextStyle(color = surface, fontSize = fontSize.sp, fontWeight = FontWeight.Bold),
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = "${item.level}",
+                            style = TextStyle(color = onSurface, fontSize = fontSize.sp, fontWeight = FontWeight.Bold),
+                        )
+                    }
+                }
+            } else item.statusIconRes?.let { status ->
                 val bubble = (cell * 0.28f).coerceIn(10.dp, 32.dp)
                 Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                     Box(
