@@ -61,6 +61,7 @@ import com.sameerasw.essentials.utils.BatteryRingDrawer
 import com.sameerasw.essentials.utils.BluetoothBatteryUtils
 import com.sameerasw.essentials.utils.BluetoothDeviceIcons
 import com.sameerasw.essentials.utils.BluetoothDeviceOrder
+import com.sameerasw.essentials.utils.battery.ChargeLimitUtil
 
 class BatteriesWidget : GlanceAppWidget() {
     override val sizeMode = SizeMode.Exact
@@ -112,7 +113,7 @@ class BatteriesWidget : GlanceAppWidget() {
         val phoneLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
         val phoneCharging =
             batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING
-        items += Item(BluetoothDeviceOrder.PHONE, phoneLevel, R.drawable.rounded_mobile_24, statusIcon(phoneLevel, phoneCharging))
+        items += Item(BluetoothDeviceOrder.PHONE, phoneLevel, R.drawable.rounded_mobile_24, statusIcon(phoneLevel, phoneCharging, ChargeLimitUtil.isShielded(context, phoneLevel, phoneCharging)))
 
         val macEnabled = prefs[booleanPreferencesKey(SettingsRepository.KEY_AIRSYNC_CONNECTION_ENABLED)] ?: false
         val macConnected = prefs[booleanPreferencesKey(SettingsRepository.KEY_AIRSYNC_MAC_CONNECTED)] ?: false
@@ -148,8 +149,10 @@ class BatteriesWidget : GlanceAppWidget() {
     private fun statusIcon(
         level: Int,
         charging: Boolean,
+        shielded: Boolean = false,
     ): Int? =
         when {
+            shielded -> R.drawable.rounded_shield_filled_24
             charging -> R.drawable.rounded_bolt_filled_24
             level <= LOW_LEVEL -> R.drawable.rounded_battery_android_frame_alert_24
             else -> null
@@ -229,7 +232,7 @@ class BatteriesWidget : GlanceAppWidget() {
         val hasStatus = item.statusIconRes != null || showPercentage
         val gap =
             if (showPercentage) {
-                BatteryRingDrawer.percentGapDegrees(context, bitmapPx, "${item.level}", item.statusIconRes == R.drawable.rounded_bolt_filled_24)
+                BatteryRingDrawer.percentGapDegrees(context, bitmapPx, "${item.level}", item.statusIconRes == R.drawable.rounded_bolt_filled_24 || item.statusIconRes == R.drawable.rounded_shield_filled_24)
             } else {
                 null
             }
@@ -276,14 +279,14 @@ class BatteriesWidget : GlanceAppWidget() {
                 modifier = GlanceModifier.fillMaxSize().padding(iconPadding),
             )
             if (showPercentage) {
-                val charging = item.statusIconRes == R.drawable.rounded_bolt_filled_24
+                val charging = item.statusIconRes == R.drawable.rounded_bolt_filled_24 || item.statusIconRes == R.drawable.rounded_shield_filled_24
                 val layers =
                     remember(item.level, charging, bitmapPx) {
                         BatteryRingDrawer.drawPercentLayers(
                             context,
                             bitmapPx,
                             "${item.level}",
-                            if (charging) ContextCompat.getDrawable(context, R.drawable.rounded_bolt_filled_24) else null,
+                            item.statusIconRes?.takeIf { charging }?.let { ContextCompat.getDrawable(context, it) },
                         )
                     }
                 val chipWidth = cell * (layers.widthPx.toFloat() / bitmapPx)
