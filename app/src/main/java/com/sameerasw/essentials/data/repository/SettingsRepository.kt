@@ -720,6 +720,7 @@ class SettingsRepository(
         const val KEY_WIRELESS_DISPLAY_CERTIFICATION = "wireless_display_certification"
         const val KEY_PREFER_GPU_COMPOSING = "prefer_gpu_composing"
         const val KEY_TRANSPARENT_NAVIGATION_BAR = "transparent_navigation_bar"
+        const val KEY_SPLIT_SCREEN_GESTURE = "split_screen_gesture"
         const val KEY_STANDBY_APPS = "standby_apps"
         const val KEY_PIXEL_SEARCHBAR = "pixel_searchbar"
         const val KEY_PIXEL_SEARCHBAR_TYPE = "pixel_searchbar_type"

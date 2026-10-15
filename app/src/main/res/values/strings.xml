@@ -742,6 +742,8 @@
     <string name="feat_hide_gesture_bar_on_launcher_desc">Dynamically show the gesture bar only when on the home screen</string>
     <string name="feat_circle_to_search_gesture_title">Circle to Search gesture</string>
     <string name="feat_circle_to_search_gesture_desc">Long-press the bottom area to trigger Circle to Search</string>
+    <string name="feat_split_screen_gesture_title">Split screen gesture</string>
+    <string name="feat_split_screen_gesture_desc">Swipe up with 2 fingers from the bottom to split or unsplit the current app</string>
     <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
     <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
     <string name="feat_circle_to_search_gesture_width_title">Gesture zone width</string>
@@ -1331,6 +1333,8 @@
     <string name="accessibility_shortcut_service_1_name">Essentials Shortcut 1</string>
     <string name="accessibility_shortcut_service_2_name">Essentials Shortcut 2</string>
     <string name="accessibility_shortcut_service_3_name">Essentials Shortcut 3</string>
+    <string name="split_screen_shortcut_service_name">Essentials Split Screen</string>
+    <string name="split_screen_shortcut_service_desc">Put the current app into split screen with the accessibility gesture or button</string>
     <string name="accessibility_shortcut_service_desc">Trigger DIY automations via system accessibility button or volume key shortcut</string>
     <string name="diy_select_bluetooth_device_title">Select Bluetooth Device</string>
     <string name="diy_bluetooth_permission_required">Bluetooth permission is required to list paired devices.</string>
@@ -1449,6 +1453,7 @@
     <string name="diy_action_open_now_playing_app">Open now playing app</string>
     <string name="diy_action_circle_to_search">Circle to Search</string>
     <string name="diy_action_pin_app">Pin Foreground App</string>
+    <string name="diy_action_split_screen">Toggle Split Screen</string>
     <string name="diy_action_sometimes_essentials">Sometimes Essential</string>
     <string name="diy_action_freeze_tag">Freeze by Tags</string>
     <string name="diy_action_open_app">Open App</string>

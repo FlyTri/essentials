@@ -64,6 +64,7 @@ object ActionRegistry {
                 Action.UnfreezeApps(),
                 Action.FreezeTag(),
                 Action.PinApp,
+                Action.SplitScreen,
                 Action.Keyboard(),
                 Action.OpenCamera,
                 Action.OpenVideoCamera,

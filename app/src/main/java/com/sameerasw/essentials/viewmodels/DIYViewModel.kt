@@ -242,6 +242,7 @@ class DIYViewModel(
                     "CircleToSearch" -> Action.CircleToSearch
                     "EssentialSearch" -> Action.EssentialSearch
                     "PinApp" -> Action.PinApp
+                    "SplitScreen" -> Action.SplitScreen
                     "SometimesEssentials" ->
                         Action.SometimesEssentials(
                             changeNotificationLighting = suggestion.notificationLightingEnabled != null,

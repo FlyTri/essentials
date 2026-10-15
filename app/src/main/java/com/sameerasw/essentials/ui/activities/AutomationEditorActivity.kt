@@ -870,7 +870,8 @@ class AutomationEditorActivity : ComponentActivity() {
                                                             else -> R.drawable.rounded_circle_24
                                                         }
                                                         val isSelected = selectedAccessibilitySlot == slot
-                                                        val isEnabled = slot !in usedAccessibilitySlots
+                                                        val isEnabled = slot !in usedAccessibilitySlots &&
+                                                            !PermissionUtils.isShortcutSlotTakenBySplitScreenGesture(context, slot)
 
                                                         EditorActionItem(
                                                             title = title,

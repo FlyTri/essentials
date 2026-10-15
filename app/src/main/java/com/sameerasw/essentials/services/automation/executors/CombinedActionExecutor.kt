@@ -52,6 +52,7 @@ import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.ShizukuUtils
+import com.sameerasw.essentials.utils.SplitScreenUtil
 import com.sameerasw.essentials.utils.overlay.fromPrefs
 import com.sameerasw.essentials.utils.overlay.writeTo
 import com.sameerasw.essentials.utils.performHapticFeedback
@@ -572,6 +573,8 @@ object CombinedActionExecutor {
                     com.sameerasw.essentials.utils.OmniTriggerUtil
                         .trigger(context)
                 }
+
+                is Action.SplitScreen -> SplitScreenUtil.toggle(context)
 
                 is Action.EssentialSearch -> {
                     try {
