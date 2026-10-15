@@ -100,6 +100,7 @@ fun BluetoothDeviceIconsSection(
         onSettle = { from, to ->
             order = order.toMutableList().apply { add(to, removeAt(from)) }
             BluetoothDeviceOrder.save(context, order)
+            BatteriesPreviewTrigger.bump()
             val macVisible = order.indexOf(BluetoothDeviceOrder.MAC) < order.indexOf(BluetoothDeviceOrder.SEPARATOR)
             if (macVisible != viewModel.isAirSyncConnectionEnabled.value) {
                 viewModel.setAirSyncConnectionEnabled(macVisible, context)
@@ -149,7 +150,6 @@ fun BluetoothDeviceIconsSection(
                 } else {
                     val device = byAddress[entry] ?: return@ReorderableItem
                     val iconRes = device.iconRes ?: remember(version, device.address) { BluetoothDeviceIcons.resolve(context, device.address, device.name) }
-                    val custom = device.iconRes == null && remember(version, device.address) { BluetoothDeviceIcons.getOverrideId(context, device.address) != null }
                     Row(
                         modifier =
                             Modifier
@@ -167,13 +167,6 @@ fun BluetoothDeviceIconsSection(
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.weight(1f).padding(start = 16.dp),
                         )
-                        if (device.iconRes == null) {
-                            Text(
-                                text = if (custom) stringResource(R.string.bt_icon_custom) else stringResource(R.string.bt_icon_auto),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
                         handle()
                     }
                 }
@@ -188,6 +181,7 @@ fun BluetoothDeviceIconsSection(
             onPick = { id ->
                 BluetoothDeviceIcons.setOverride(context, device.address, id)
                 version++
+                BatteriesPreviewTrigger.bump()
                 editing = null
                 context.sendBroadcast(
                     Intent(context, BatteriesWidgetReceiver::class.java).apply {

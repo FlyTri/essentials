@@ -161,6 +161,7 @@ fun BatteriesSettingsUI(
                             }
                         }
                         viewModel.setBluetoothDevicesEnabled(true, context)
+                        BatteriesPreviewTrigger.bump()
                     },
                 )
             }

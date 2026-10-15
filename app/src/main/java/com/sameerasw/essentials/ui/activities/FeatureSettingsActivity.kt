@@ -629,6 +629,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 )
                             }
 
+                            if (featureId == "Batteries") {
+                                com.sameerasw.essentials.ui.features.battery.BatteriesPreviewCard(
+                                    viewModel = viewModel,
+                                    height = headerHeight - 16.dp,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                )
+                            }
+
                             if (featureObj != null && featureObj.animationRes != 0) {
                                 LottieFeatureAnimation(
                                     resId = featureObj.animationRes,
