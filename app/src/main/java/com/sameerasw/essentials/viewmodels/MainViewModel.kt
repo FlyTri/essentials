@@ -147,6 +147,8 @@ class MainViewModel : ViewModel() {
     val isLockscreenShortcutsEnabled = mutableStateOf(false)
     val lockscreenShortcutActions = mutableStateMapOf<LockscreenShortcutSide, List<Action>>()
     val lockscreenSystemShortcutsState = mutableStateOf(SystemShortcutsState.UNKNOWN)
+    val isVolumeStepsEnabled = mutableStateOf(false)
+    val volumeStepsPerPress = mutableIntStateOf(2)
     val remapHapticType = mutableStateOf(HapticFeedbackType.DOUBLE)
     val isDynamicNightLightEnabled = mutableStateOf(false)
     val isSmartPixelsEnabled = mutableStateOf(false)
@@ -2304,6 +2306,8 @@ class MainViewModel : ViewModel() {
         hilightAppEffects.clear()
         hilightAppEffects.putAll(settingsRepository.getHilightAppEffects())
         isLockscreenShortcutsEnabled.value = settingsRepository.isLockscreenShortcutsEnabled()
+        isVolumeStepsEnabled.value = settingsRepository.isVolumeStepsEnabled()
+        volumeStepsPerPress.intValue = settingsRepository.getVolumeStepsPerPress()
         LockscreenShortcutSide.entries.forEach { side ->
             lockscreenShortcutActions[side] = settingsRepository.getRemapActions(side.prefKey)
         }
@@ -5075,6 +5079,16 @@ class MainViewModel : ViewModel() {
     ) {
         remapActions[slot] = actions
         settingsRepository.setRemapActions(slot.prefKey, actions)
+    }
+
+    fun setVolumeStepsEnabled(enabled: Boolean) {
+        isVolumeStepsEnabled.value = enabled
+        settingsRepository.setVolumeStepsEnabled(enabled)
+    }
+
+    fun setVolumeStepsPerPress(steps: Int) {
+        volumeStepsPerPress.intValue = steps
+        settingsRepository.setVolumeStepsPerPress(steps)
     }
 
     fun setLockscreenShortcutsEnabled(enabled: Boolean) {

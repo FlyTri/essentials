@@ -250,6 +250,8 @@ class SettingsRepository(
         const val KEY_LOCKSCREEN_SHORTCUT_LEFT_ACTIONS = "lockscreen_shortcut_left_actions"
         const val KEY_LOCKSCREEN_SHORTCUT_RIGHT_ACTIONS = "lockscreen_shortcut_right_actions"
         const val KEY_LOCKSCREEN_SYSTEM_SHORTCUTS_STATE = "lockscreen_system_shortcuts_state"
+        const val KEY_VOLUME_STEPS_ENABLED = "volume_steps_enabled"
+        const val KEY_VOLUME_STEPS_PER_PRESS = "volume_steps_per_press"
 
         const val KEY_DYNAMIC_NIGHT_LIGHT_ENABLED = "dynamic_night_light_enabled"
         const val KEY_DYNAMIC_NIGHT_LIGHT_SELECTED_APPS = "dynamic_night_light_selected_apps"
@@ -4358,4 +4360,12 @@ class SettingsRepository(
 
     fun setLockscreenSystemShortcutsState(state: SystemShortcutsState) =
         putString(KEY_LOCKSCREEN_SYSTEM_SHORTCUTS_STATE, state.name)
+
+    fun isVolumeStepsEnabled(): Boolean = getBoolean(KEY_VOLUME_STEPS_ENABLED, false)
+
+    fun setVolumeStepsEnabled(enabled: Boolean) = putBoolean(KEY_VOLUME_STEPS_ENABLED, enabled)
+
+    fun getVolumeStepsPerPress(): Int = getInt(KEY_VOLUME_STEPS_PER_PRESS, 2)
+
+    fun setVolumeStepsPerPress(steps: Int) = putInt(KEY_VOLUME_STEPS_PER_PRESS, steps)
 }

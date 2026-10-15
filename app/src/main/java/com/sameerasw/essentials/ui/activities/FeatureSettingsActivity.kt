@@ -112,6 +112,7 @@ import com.sameerasw.essentials.ui.features.system.NotificationSnoozingSettingsU
 import com.sameerasw.essentials.ui.features.system.OtherCustomizationsSettingsUI
 import com.sameerasw.essentials.ui.features.system.FaceUnlockBrightnessSettingsUI
 import com.sameerasw.essentials.ui.features.system.PocketModeSettingsUI
+import com.sameerasw.essentials.ui.features.system.VolumeStepsSettingsUI
 import com.sameerasw.essentials.ui.features.system.PowerAndBatterySettingsUI
 import com.sameerasw.essentials.ui.features.system.QuickSettingsTilesSettingsUI
 import com.sameerasw.essentials.ui.features.system.RefreshRateSettingsUI
@@ -379,6 +380,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 "Button remap" -> !isAccessibilityEnabled
                                 "Face unlock brightness" -> !isAccessibilityEnabled
                                 "Lock screen shortcuts" -> !isAccessibilityEnabled
+                                "Volume steps" -> !isAccessibilityEnabled
                                 "Pocket mode" -> !isAccessibilityEnabled
                                 "Dynamic night light" ->
                                     (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) ||
@@ -726,6 +728,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                             "Flashlight",
                                                             "Activity launcher",
                                                             "Lock screen shortcuts",
+                                                            "Volume steps",
                                                         ),
                                                         listOf(
                                                             "Navigation",
@@ -831,6 +834,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                             "Button remap" -> !isAccessibilityEnabled
                                                             "Face unlock brightness" -> !isAccessibilityEnabled
                                                             "Lock screen shortcuts" -> !isAccessibilityEnabled
+                                                            "Volume steps" -> !isAccessibilityEnabled
                                                             "Dynamic night light" ->
                                                                 (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) ||
                                                                     !isWriteSecureSettingsEnabled
@@ -1091,6 +1095,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                                     "Lock screen shortcuts" -> {
                                         LockscreenShortcutsSettingsUI(
+                                            viewModel = viewModel,
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            highlightSetting = highlightSetting,
+                                        )
+                                    }
+
+                                    "Volume steps" -> {
+                                        VolumeStepsSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
                                             highlightSetting = highlightSetting,
