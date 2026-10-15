@@ -146,7 +146,6 @@ private fun CondensedLine(line: LineContent, spec: IslandLayoutSpec, startInset:
             edgePad = edgePad,
             queueInset = maxOf(startInset, endInset),
         )
-        // The leading queue sits with the icon; if that side outgrows the title, both sides take its width.
         val side = maxOf(titleWidth, spec.cellSize + leadingWidth) + edgePad
         Row(
             modifier = Modifier.height(spec.compactHeight),

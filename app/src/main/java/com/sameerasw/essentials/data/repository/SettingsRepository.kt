@@ -628,7 +628,6 @@ class SettingsRepository(
         const val KEY_ISLAND_MEDIA_SHOW_PREVIOUS = "island_media_show_previous"
         const val KEY_ISLAND_MEDIA_SHOW_LIKE = "island_media_show_like"
         const val KEY_ISLAND_NOTIF_COMPACT_HEADS_UP = "island_notif_compact_heads_up"
-        // Legacy boolean (Compact vs Full); read only to seed KEY_ISLAND_NOTIF_PEEK_STYLE.
         const val KEY_ISLAND_NOTIF_CONDENSED_INFO = "island_notif_condensed_info"
         const val KEY_ISLAND_NOTIF_PEEK_STYLE = "island_notif_peek_style"
         const val ISLAND_NOTIF_PEEK_STYLE_FULL = "full"

@@ -8,6 +8,9 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.first
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.fadeIn
@@ -50,13 +53,20 @@ import com.sameerasw.essentials.island.model.StackIcon
 private const val BUBBLE_MAX_MINIS = 3
 private const val PILL_MAX_ICONS = 5
 
-private class QueueEntry(val icon: StackIcon, val visibility: MutableTransitionState<Boolean>, val leaving: Boolean)
+private class QueueEntry(
+    val icon: StackIcon,
+    val visibility: MutableTransitionState<Boolean>,
+    val leaving: Boolean,
+    val onExited: () -> Unit = {},
+)
 
 @Composable
 private fun rememberQueueEntries(icons: List<StackIcon>): List<QueueEntry> {
     val transitions = remember { HashMap<String, MutableTransitionState<Boolean>>() }
     val previous = remember { arrayListOf<StackIcon>() }
     val settled = remember { booleanArrayOf(false) }
+    val exits = remember { mutableIntStateOf(0) }
+    exits.intValue
     val currentKeys = icons.mapTo(HashSet()) { it.key }
     val leaving = previous.mapNotNull { icon ->
         if (icon.key in currentKeys) return@mapNotNull null
@@ -66,7 +76,7 @@ private fun rememberQueueEntries(icons: List<StackIcon>): List<QueueEntry> {
             return@mapNotNull null
         }
         state.targetState = false
-        QueueEntry(icon, state, leaving = true)
+        QueueEntry(icon, state, leaving = true, onExited = { exits.intValue++ })
     }
     val current = icons.map { icon ->
         val state = transitions.getOrPut(icon.key) { MutableTransitionState(!settled[0]) }
@@ -77,6 +87,15 @@ private fun rememberQueueEntries(icons: List<StackIcon>): List<QueueEntry> {
     previous.addAll(icons + leaving.map { it.icon })
     SideEffect { settled[0] = true }
     return leaving + current
+}
+
+@Composable
+private fun QueueExitWatcher(entry: QueueEntry) {
+    if (!entry.leaving) return
+    LaunchedEffect(entry.visibility) {
+        snapshotFlow { entry.visibility.isIdle && !entry.visibility.currentState }.first { it }
+        entry.onExited()
+    }
 }
 
 private val QueueEnter = scaleIn(IslandMotion.expressiveFastSpatial(), initialScale = 0.4f) + fadeIn(IslandMotion.expressiveFastEffects())
@@ -104,8 +123,6 @@ fun IslandStackBubble(
         else -> listOf(0.dp to -r, -r to r * 0.7f, r to r * 0.7f)[i]
     }
 
-    val lastSlot = remember { HashMap<String, Pair<Dp, Dp>>() }
-
     Box(
         modifier = modifier
             .size(size)
@@ -116,8 +133,10 @@ fun IslandStackBubble(
     ) {
         rememberQueueEntries(shown).forEach { entry ->
             key(entry.icon.key) {
+                QueueExitWatcher(entry)
+                val held = remember { arrayOfNulls<Pair<Dp, Dp>>(1) }
                 val index = shown.indexOfFirst { it.key == entry.icon.key }
-                val target = if (index >= 0) slot(index).also { lastSlot[entry.icon.key] = it } else lastSlot[entry.icon.key] ?: (0.dp to 0.dp)
+                val target = if (index >= 0) slot(index).also { held[0] = it } else held[0] ?: (0.dp to 0.dp)
                 val x by animateDpAsState(target.first, IslandMotion.expressiveDefaultSpatial(), label = "bubbleX")
                 val y by animateDpAsState(target.second, IslandMotion.expressiveDefaultSpatial(), label = "bubbleY")
                 val s by animateDpAsState(iconSize, IslandMotion.expressiveDefaultSpatial(), label = "bubbleSize")
@@ -188,13 +207,14 @@ fun IslandStackOverlap(
 ) {
     val shown = queueVisible(icons, OVERLAP_MAX)
     val width by animateDpAsState(stackOverlapWidth(shown.size, size), IslandMotion.expressiveDefaultSpatial(), label = "overlapWidth")
-    val lastX = remember { HashMap<String, Dp>() }
     Box(modifier.size(width, size)) {
         val order = shown.asReversed()
         rememberQueueEntries(order).forEach { entry ->
             key(entry.icon.key) {
+                QueueExitWatcher(entry)
+                val held = remember { arrayOf(0.dp) }
                 val index = order.indexOfFirst { it.key == entry.icon.key }
-                val target = if (index >= 0) (size * OVERLAP_STEP * index).also { lastX[entry.icon.key] = it } else lastX[entry.icon.key] ?: 0.dp
+                val target = if (index >= 0) (size * OVERLAP_STEP * index).also { held[0] = it } else held[0]
                 val x by animateDpAsState(target, IslandMotion.expressiveDefaultSpatial(), label = "overlapX")
                 AnimatedVisibility(
                     visibleState = entry.visibility,

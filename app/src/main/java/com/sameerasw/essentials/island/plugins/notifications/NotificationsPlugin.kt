@@ -284,7 +284,6 @@ class NotificationsPlugin : BaseIslandPlugin() {
         clearAll()
     }
 
-    // With catch up on, the minimal icon stays for the catch up duration; otherwise for the regular timeout.
     private fun holdMinimal() {
         val c = ctx ?: return
         if (!settings.isIslandCatchUpEnabled()) {

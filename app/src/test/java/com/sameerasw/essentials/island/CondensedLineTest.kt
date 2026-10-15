@@ -39,7 +39,6 @@ class CondensedLineTest {
 
     @Test fun longestTitleStillFitsTheLineWidth() = assertTrue(pillWidth(natural = 900.dp) <= lineWidth)
 
-    // The queue sits beside the centred pill (stack = one 40dp circle, overlap = three overlapping circles), plus the gap.
     @Test fun queueBesideThePillStaysInsideHalfTheMaxWidth() {
         listOf(0.dp, 60.dp, 900.dp).forEach { natural ->
             listOf(0.dp, 46.dp, 90.dp).forEach { queueInset ->

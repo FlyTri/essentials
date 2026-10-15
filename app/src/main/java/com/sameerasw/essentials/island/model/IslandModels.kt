@@ -136,7 +136,6 @@ class IslandItem(
     val bypassLauncherOnly: Boolean = false,
     
     val stack: List<StackIcon> = emptyList(),
-    // The waiting part of `stack` in the order it will be shown; null means `stack` minus the current icon.
     val queued: List<StackIcon>? = null,
     val priorityGroup: String? = null,
 ) {

@@ -36,9 +36,7 @@ fun CompactTemplate(
     spec: IslandLayoutSpec,
     onCellTap: (String) -> Unit,
     onCellLongPress: (String) -> Unit,
-    // 0..1 while a side bubble claims the space left of the camera: the sides stop mirroring and hug their own cells.
     sideBubble: () -> Float = { 0f },
-    // Right side minus left side once hugging; the surface shifts by half of it so the camera slot stays on the camera.
     onSlack: (Int) -> Unit = {},
 ) {
     val cells = buildMap {

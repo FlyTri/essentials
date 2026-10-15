@@ -573,7 +573,6 @@ class IslandCoordinator(
 
     private enum class QueuePreviewLayout { Peek, MinimalInline, MinimalStack }
 
-    // Sample notification with two waiting icons, shaped like NotificationsPlugin's output for the given layout.
     private fun queuePreviewItem(title: String, text: String, layout: QueuePreviewLayout, overlap: Boolean): IslandItem {
         fun icon(key: String, current: Boolean = false) = StackIcon(key, current = current) { size ->
             IslandIcon(R.drawable.rounded_notifications_unread_24, size = size * 0.7f)
