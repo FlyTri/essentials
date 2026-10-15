@@ -683,7 +683,6 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                         listOf(
                                                             "Text and animations",
                                                             "Screen refresh rate",
-                                                            "Navigation",
                                                         ),
                                                         listOf(
                                                             "Caffeinate",
@@ -729,6 +728,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                             "Lock screen shortcuts",
                                                         ),
                                                         listOf(
+                                                            "Navigation",
                                                             "Link actions",
                                                             "System Keyboard",
                                                         ),

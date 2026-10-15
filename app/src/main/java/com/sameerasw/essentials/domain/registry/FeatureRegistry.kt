@@ -273,10 +273,10 @@ object FeatureRegistry {
                 id = "Navigation",
                 title = R.string.cat_navigation,
                 iconRes = R.drawable.rounded_bottom_navigation_24,
-                category = R.string.cat_interface,
-                description = R.string.feat_other_customizations_desc,
+                category = R.string.cat_interaction,
+                description = R.string.feat_navigation_desc,
                 showToggle = false,
-                parentFeatureId = "Display",
+                parentFeatureId = "Input",
                 animationRes = R.raw.navigation_animation,
             ) {
                 override fun isEnabled(viewModel: MainViewModel) = true
