@@ -12,6 +12,8 @@ package com.sameerasw.essentials.services.widgets
 import android.content.Context
 import android.os.BatteryManager
 import androidx.compose.runtime.Composable
+import androidx.core.content.ContextCompat
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -217,7 +219,7 @@ class BatteriesWidget : GlanceAppWidget() {
         val hasStatus = item.statusIconRes != null || showPercentage
         val gap =
             if (showPercentage) {
-                BatteryRingDrawer.percentGapDegrees(bitmapPx, "${item.level}", item.statusIconRes == R.drawable.rounded_bolt_filled_24)
+                BatteryRingDrawer.percentGapDegrees(context, bitmapPx, "${item.level}", item.statusIconRes == R.drawable.rounded_bolt_filled_24)
             } else {
                 null
             }
@@ -265,36 +267,36 @@ class BatteriesWidget : GlanceAppWidget() {
             )
             if (showPercentage) {
                 val charging = item.statusIconRes == R.drawable.rounded_bolt_filled_24
-                val fontSize = cell.value * 0.16f
-                val centerY = cell * 0.16f
+                val layers =
+                    remember(item.level, charging, bitmapPx) {
+                        BatteryRingDrawer.drawPercentLayers(
+                            context,
+                            bitmapPx,
+                            "${item.level}",
+                            if (charging) ContextCompat.getDrawable(context, R.drawable.rounded_bolt_filled_24) else null,
+                        )
+                    }
+                val chipWidth = cell * (layers.widthPx.toFloat() / bitmapPx)
+                val chipHeight = cell * (layers.heightPx.toFloat() / bitmapPx)
+                val top = (cell * 0.16f - chipHeight / 2f).coerceAtLeast(0.dp)
                 Box(
-                    modifier = GlanceModifier.fillMaxSize().padding(top = (centerY - (fontSize * 0.62f).dp).coerceAtLeast(0.dp)),
+                    modifier = GlanceModifier.fillMaxSize().padding(top = top),
                     contentAlignment = Alignment.TopCenter,
                 ) {
-                    if (charging) {
-                        Row(
-                            modifier =
-                                GlanceModifier
-                                    .background(ringColor)
-                                    .cornerRadius(100.dp)
-                                    .padding(horizontal = (fontSize * 0.25f).dp, vertical = (fontSize * 0.06f).dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
+                    Box(modifier = GlanceModifier.size(width = chipWidth, height = chipHeight), contentAlignment = Alignment.Center) {
+                        layers.chip?.let {
                             Image(
-                                provider = ImageProvider(R.drawable.rounded_bolt_filled_24),
+                                provider = ImageProvider(it),
                                 contentDescription = null,
-                                colorFilter = ColorFilter.tint(surface),
-                                modifier = GlanceModifier.size(fontSize.dp),
-                            )
-                            Text(
-                                text = "${item.level}",
-                                style = TextStyle(color = surface, fontSize = fontSize.sp, fontWeight = FontWeight.Bold),
+                                colorFilter = ColorFilter.tint(ringColor),
+                                modifier = GlanceModifier.fillMaxSize(),
                             )
                         }
-                    } else {
-                        Text(
-                            text = "${item.level}",
-                            style = TextStyle(color = onSurface, fontSize = fontSize.sp, fontWeight = FontWeight.Bold),
+                        Image(
+                            provider = ImageProvider(layers.content),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(if (charging) surface else onSurface),
+                            modifier = GlanceModifier.fillMaxSize(),
                         )
                     }
                 }
