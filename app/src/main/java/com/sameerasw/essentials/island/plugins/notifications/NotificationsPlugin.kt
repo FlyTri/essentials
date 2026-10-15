@@ -315,11 +315,22 @@ class NotificationsPlugin : BaseIslandPlugin() {
         render()
     }
 
-    private fun popCurrent(reExpand: Boolean) {
+    private fun advanceQueue() {
         catchingUp = false
         advanceCurrent()
         scheduleTimeout()
         render()
+    }
+
+    private fun popCurrent(reExpand: Boolean) {
+        val simulated = currentAlert()?.takeIf { it.key.startsWith("simulated_") }
+        if (simulated != null) {
+            catchingUp = false
+            onRemoved(simulated.key)
+            if (reExpand && alerts.isNotEmpty()) ctx?.request?.invoke(PluginRequest.Expand(ITEM_KEY))
+            return
+        }
+        advanceQueue()
         if (reExpand) ctx?.request?.invoke(PluginRequest.Expand(ITEM_KEY))
     }
 
@@ -361,7 +372,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
                     queue = next?.let {
                         QueueInfo(
                             next = itemFor(it).withStack(null, alerts.map { a -> stackIconFor(a, current = a === it) }),
-                            onAdvance = { popCurrent(reExpand = false) },
+                            onAdvance = { advanceQueue() },
                         )
                     },
                     stack = stack,
