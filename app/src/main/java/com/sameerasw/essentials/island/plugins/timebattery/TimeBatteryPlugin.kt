@@ -196,6 +196,7 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
         val batteryItem = IslandItem(
             key = BATTERY_KEY,
             priority = IslandPriority.BATTERY,
+            priorityGroup = "battery",
             placement = CompactPlacement.Pinned,
             outlineAccent = displayColor,
             companionOnly = settings.isIslandBatteryIconConditional() && stateColor == null && System.currentTimeMillis() >= chargePeekUntil,
