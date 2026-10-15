@@ -74,7 +74,7 @@ class BatteriesWidget : GlanceAppWidget() {
                 val prefs = currentState<Preferences>()
                 val settings = WidgetSettings.from(prefs)
                 val items = buildItems(context, prefs, settings).take(settings.maxDevices)
-                BatteryGrid(items, settings.backgroundEnabled, SettingsRepository(context).isBatteryShowPercentageEnabled())
+                BatteryGrid(items, settings.backgroundEnabled, settings.centerItems, SettingsRepository(context).isBatteryShowPercentageEnabled())
             }
         }
     }
@@ -82,12 +82,14 @@ class BatteriesWidget : GlanceAppWidget() {
     private data class WidgetSettings(
         val maxDevices: Int,
         val backgroundEnabled: Boolean,
+        val centerItems: Boolean,
     ) {
         companion object {
             fun from(prefs: Preferences) =
                 WidgetSettings(
                     maxDevices = prefs[intPreferencesKey(SettingsRepository.KEY_BATTERY_WIDGET_MAX_DEVICES)] ?: 8,
                     backgroundEnabled = prefs[booleanPreferencesKey(SettingsRepository.KEY_BATTERY_WIDGET_BACKGROUND_ENABLED)] ?: true,
+                    centerItems = prefs[booleanPreferencesKey(SettingsRepository.KEY_BATTERY_WIDGET_CENTER_ITEMS)] ?: false,
                 )
         }
     }
@@ -157,6 +159,7 @@ class BatteriesWidget : GlanceAppWidget() {
     private fun BatteryGrid(
         items: List<Item>,
         backgroundEnabled: Boolean,
+        centerItems: Boolean,
         showPercentage: Boolean,
     ) {
         val size = LocalSize.current
@@ -193,14 +196,21 @@ class BatteriesWidget : GlanceAppWidget() {
                 ) {
                     row.forEach { item ->
                         Box(
-                            modifier = GlanceModifier.defaultWeight().fillMaxHeight().padding(horizontal = gap / 2),
+                            modifier =
+                                if (centerItems) {
+                                    GlanceModifier.fillMaxHeight().padding(horizontal = gap / 2)
+                                } else {
+                                    GlanceModifier.defaultWeight().fillMaxHeight().padding(horizontal = gap / 2)
+                                },
                             contentAlignment = Alignment.Center,
                         ) {
                             BatteryRing(item, cell, showPercentage)
                         }
                     }
-                    repeat(columns - row.size) {
-                        Spacer(GlanceModifier.defaultWeight().fillMaxHeight())
+                    if (!centerItems) {
+                        repeat(columns - row.size) {
+                            Spacer(GlanceModifier.defaultWeight().fillMaxHeight())
+                        }
                     }
                 }
             }
