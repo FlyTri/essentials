@@ -509,7 +509,11 @@
     <string name="app_colors_custom">Custom</string>
     <string name="lock_screen_clock_reset">Reset clock face</string>
     <string name="island_compact_hide_status_bar_title">Hide all items for compact island</string>
-    <string name="island_dynamic_hide_status_bar_title">Dynamically hide statusbar items</string>
+    <string name="island_dynamic_hide_status_bar_title">Hide all when expanded</string>
+    <string name="island_hide_icons_title">Dynamically hide statusbar icons</string>
+    <string name="island_hide_icon_system">System icons</string>
+    <string name="island_hide_icon_notifications">Notification icons</string>
+    <string name="island_hide_icon_clock">Clock</string>
     <string name="screen_locked_keep_qs_on_extended_unlock_title">Keep QS on extended unlock</string>
     <string name="screen_locked_disable_notification_interactions_title">Disable notification interactions</string>
     <string name="screen_locked_disable_notification_interactions_desc">Block the notification shade and Quick Settings from being pulled down while locked</string>

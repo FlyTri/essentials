@@ -732,6 +732,43 @@ fun IslandBehaviorSettingsUI(
 
             IconToggleItem(
                 iconRes = R.drawable.rounded_visibility_off_24,
+                title = stringResource(R.string.island_compact_hide_status_bar_title),
+                isChecked = viewModel.isIslandCompactHideStatusBar.value && hasShellPermission,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    if (checked && !hasShellPermission) {
+                        requestingPermissionsFor =
+                            Pair(
+                                R.string.island_compact_hide_status_bar_title,
+                                listOf(if (ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"),
+                            )
+                    } else {
+                        viewModel.setIslandCompactHideStatusBar(checked)
+                    }
+                },
+                modifier = Modifier.highlight(highlightSetting == "island_compact_hide_status_bar"),
+            )
+        }
+
+        RoundedCardContainer(
+            spacing = 2.dp,
+            cornerRadius = 24.dp,
+        ) {
+            IslandHideIconsToggle(
+                viewModel = viewModel,
+                hasShellPermission = hasShellPermission,
+                onNeedPermission = {
+                    requestingPermissionsFor =
+                        Pair(
+                            R.string.island_hide_icons_title,
+                            listOf(if (ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"),
+                        )
+                },
+                highlighted = highlightSetting == "island_hide_icons",
+            )
+
+            IconToggleItem(
+                iconRes = R.drawable.rounded_visibility_off_24,
                 title = stringResource(R.string.island_dynamic_hide_status_bar_title),
                 isChecked = viewModel.isIslandDynamicHideStatusBar.value && hasShellPermission,
                 onCheckedChange = { checked ->
@@ -749,24 +786,6 @@ fun IslandBehaviorSettingsUI(
                 modifier = Modifier.highlight(highlightSetting == "island_dynamic_hide_status_bar"),
             )
 
-            IconToggleItem(
-                iconRes = R.drawable.rounded_visibility_off_24,
-                title = stringResource(R.string.island_compact_hide_status_bar_title),
-                isChecked = viewModel.isIslandCompactHideStatusBar.value && hasShellPermission,
-                onCheckedChange = { checked ->
-                    HapticUtil.performVirtualKeyHaptic(view)
-                    if (checked && !hasShellPermission) {
-                        requestingPermissionsFor =
-                            Pair(
-                                R.string.island_compact_hide_status_bar_title,
-                                listOf(if (ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"),
-                            )
-                    } else {
-                        viewModel.setIslandCompactHideStatusBar(checked)
-                    }
-                },
-                modifier = Modifier.highlight(highlightSetting == "island_compact_hide_status_bar"),
-            )
         }
 
         RoundedCardContainer(

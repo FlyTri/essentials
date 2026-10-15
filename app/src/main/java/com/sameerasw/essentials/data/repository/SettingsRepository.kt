@@ -511,6 +511,11 @@ class SettingsRepository(
         const val KEY_ISLAND_SUPPRESS_SYSTEM_HEADS_UP = "island_suppress_system_heads_up"
         const val KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR = "island_dynamic_hide_status_bar"
         const val KEY_ISLAND_COMPACT_HIDE_STATUS_BAR = "island_compact_hide_status_bar"
+        const val KEY_ISLAND_HIDE_ICONS_ENABLED = "island_hide_icons_enabled"
+        const val KEY_ISLAND_HIDE_ICONS = "island_hide_icons"
+        const val ISLAND_HIDE_ICON_SYSTEM = "system"
+        const val ISLAND_HIDE_ICON_NOTIFICATIONS = "notifications"
+        const val ISLAND_HIDE_ICON_CLOCK = "clock"
         const val KEY_ISLAND_HIDE_WHEN_SCREEN_OFF = "island_hide_when_screen_off"
         const val KEY_ISLAND_SHOW_WHEN = "island_show_when"
         const val ISLAND_SHOW_WHEN_UNLOCKED = "unlocked"
@@ -2591,6 +2596,11 @@ class SettingsRepository(
         com.sameerasw.essentials.utils.DeviceUtils.torchRestrictionLifted =
             isEnableUnsupportedFeatures() && isForceFlashlightControls()
     }
+
+    fun getIslandHideIcons(): Set<String> =
+        getString(KEY_ISLAND_HIDE_ICONS, "")?.split(",")?.filter { it.isNotBlank() }?.toSet().orEmpty()
+
+    fun setIslandHideIcons(icons: Set<String>) = putString(KEY_ISLAND_HIDE_ICONS, icons.joinToString(","))
 
     fun isShowLegacyFeatures(): Boolean = getBoolean(KEY_SHOW_LEGACY_FEATURES, true)
 
