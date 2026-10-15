@@ -74,6 +74,7 @@ fun NavigationSettingsUI(
                         R.string.feat_hide_gesture_bar_title,
                         R.string.feat_hide_gesture_bar_on_launcher_title,
                         R.string.feat_circle_to_search_gesture_title,
+                        R.string.feat_split_screen_gesture_title,
                         R.string.feat_transparent_navigation_bar_title,
                     ),
                 actionLabel =
@@ -139,6 +140,7 @@ fun NavigationSettingsUI(
 
                 PermissionModule.CIRCLE_TO_SEARCH -> listOf(shizukuPermission, accessibilityPermission)
                 PermissionModule.TRANSPARENT_NAVIGATION_BAR -> listOf(shizukuPermission)
+                PermissionModule.SPLIT_SCREEN_GESTURE -> listOf(shizukuPermission)
                 else -> emptyList()
             }
 
@@ -178,6 +180,7 @@ fun NavigationSettingsUI(
                         if (event == Lifecycle.Event.ON_RESUME) {
                             viewModel.setCircleToSearchPreviewEnabled(viewModel.isCircleToSearchGestureEnabled.value)
                             viewModel.refreshTransparentNavigationBarState(context)
+                            viewModel.refreshSplitScreenGestureState(context)
                         } else if (event == Lifecycle.Event.ON_PAUSE) {
                             viewModel.setCircleToSearchPreviewEnabled(false)
                         }
@@ -249,6 +252,28 @@ fun NavigationSettingsUI(
                 },
                 iconRes = R.drawable.rounded_touch_app_24,
                 modifier = Modifier.highlight(highlightSetting == "circle_to_search_gesture_toggle"),
+            )
+
+            IconToggleItem(
+                title = stringResource(R.string.feat_split_screen_gesture_title),
+                description = stringResource(R.string.feat_split_screen_gesture_desc),
+                isChecked = viewModel.isSplitScreenGestureEnabled.value,
+                onCheckedChange = { enabled ->
+                    HapticUtil.performUIHaptic(view)
+                    if (isShellGranted) {
+                        viewModel.setSplitScreenGestureEnabled(enabled, context)
+                    } else {
+                        requestingPermissionFor = PermissionModule.SPLIT_SCREEN_GESTURE
+                    }
+                },
+                enabled = true,
+                onDisabledClick = {
+                    if (!isShellGranted) {
+                        requestingPermissionFor = PermissionModule.SPLIT_SCREEN_GESTURE
+                    }
+                },
+                iconRes = R.drawable.rounded_splitscreen_24,
+                modifier = Modifier.highlight(highlightSetting == "split_screen_gesture_toggle"),
             )
 
             IconToggleItem(

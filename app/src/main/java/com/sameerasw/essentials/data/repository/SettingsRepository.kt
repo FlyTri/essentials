@@ -326,6 +326,7 @@ class SettingsRepository(
         const val KEY_PRIVILEGED_MODE = "privileged_mode"
         const val KEY_PITCH_BLACK_THEME_ENABLED = "pitch_black_theme_enabled"
         const val KEY_ENABLE_UNSUPPORTED_FEATURES = "enable_unsupported_features"
+        const val KEY_FORCE_FLASHLIGHT_CONTROLS = "force_flashlight_controls"
         const val KEY_SHOW_LEGACY_FEATURES = "show_legacy_features"
 
         const val KEY_KEYBOARD_HEIGHT = "keyboard_height"
@@ -352,6 +353,9 @@ class SettingsRepository(
 
         const val KEY_BLUETOOTH_DEVICES_BATTERY = "bluetooth_devices_battery"
         const val KEY_SHOW_BLUETOOTH_DEVICES = "show_bluetooth_devices"
+        const val KEY_BATTERY_SEPARATE_CHANNELS = "battery_separate_channels"
+        const val KEY_BATTERY_SHOW_PERCENTAGE = "battery_show_percentage"
+        const val KEY_BATTERY_WIDGET_CENTER_ITEMS = "battery_widget_center_items"
         const val KEY_BATTERY_WIDGET_MAX_DEVICES = "battery_widget_max_devices"
         const val KEY_BATTERY_WIDGET_BACKGROUND_ENABLED = "battery_widget_background_enabled"
 
@@ -510,6 +514,11 @@ class SettingsRepository(
         const val KEY_ISLAND_SUPPRESS_SYSTEM_HEADS_UP = "island_suppress_system_heads_up"
         const val KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR = "island_dynamic_hide_status_bar"
         const val KEY_ISLAND_COMPACT_HIDE_STATUS_BAR = "island_compact_hide_status_bar"
+        const val KEY_ISLAND_HIDE_ICONS_ENABLED = "island_hide_icons_enabled"
+        const val KEY_ISLAND_HIDE_ICONS = "island_hide_icons"
+        const val ISLAND_HIDE_ICON_SYSTEM = "system"
+        const val ISLAND_HIDE_ICON_NOTIFICATIONS = "notifications"
+        const val ISLAND_HIDE_ICON_CLOCK = "clock"
         const val KEY_ISLAND_HIDE_WHEN_SCREEN_OFF = "island_hide_when_screen_off"
         const val KEY_ISLAND_SHOW_WHEN = "island_show_when"
         const val ISLAND_SHOW_WHEN_UNLOCKED = "unlocked"
@@ -612,6 +621,7 @@ class SettingsRepository(
         const val KEY_ISLAND_CALENDAR_LAUNCHER_ONLY = "island_calendar_launcher_only"
         const val KEY_ISLAND_ALARM_LAUNCHER_ONLY = "island_alarm_launcher_only"
         const val KEY_ISLAND_ALARM_WINDOW_HOURS = "island_alarm_window_hours"
+        const val KEY_ISLAND_ALARM_HIDE_TIME = "island_alarm_hide_time"
         const val KEY_ISLAND_SHOW_TRAVEL = "island_show_travel"
         const val KEY_ISLAND_SHOW_CAFFEINATE = "island_show_caffeinate"
         const val KEY_ISLAND_CAFFEINATE_SHOW_TIME = "island_caffeinate_show_time"
@@ -719,6 +729,7 @@ class SettingsRepository(
         const val KEY_WIRELESS_DISPLAY_CERTIFICATION = "wireless_display_certification"
         const val KEY_PREFER_GPU_COMPOSING = "prefer_gpu_composing"
         const val KEY_TRANSPARENT_NAVIGATION_BAR = "transparent_navigation_bar"
+        const val KEY_SPLIT_SCREEN_GESTURE = "split_screen_gesture"
         const val KEY_STANDBY_APPS = "standby_apps"
         const val KEY_PIXEL_SEARCHBAR = "pixel_searchbar"
         const val KEY_PIXEL_SEARCHBAR_TYPE = "pixel_searchbar_type"
@@ -1981,6 +1992,14 @@ class SettingsRepository(
      * Executes the is bluetooth devices enabled operation.
      * @return The resulting Boolean data.
      */
+    fun isBatteryShowPercentageEnabled(): Boolean = getBoolean(KEY_BATTERY_SHOW_PERCENTAGE, false)
+
+    fun setBatteryShowPercentageEnabled(enabled: Boolean) = putBoolean(KEY_BATTERY_SHOW_PERCENTAGE, enabled)
+
+    fun isBatterySeparateChannelsEnabled(): Boolean = getBoolean(KEY_BATTERY_SEPARATE_CHANNELS, false)
+
+    fun setBatterySeparateChannelsEnabled(enabled: Boolean) = putBoolean(KEY_BATTERY_SEPARATE_CHANNELS, enabled)
+
     fun isBluetoothDevicesEnabled(): Boolean = getBoolean(KEY_SHOW_BLUETOOTH_DEVICES, false)
 
     /**
@@ -2573,9 +2592,26 @@ class SettingsRepository(
      * @param enabled [Boolean] Target enabled.
      */
     fun setEnableUnsupportedFeatures(enabled: Boolean) {
-        com.sameerasw.essentials.utils.DeviceUtils.torchRestrictionLifted = enabled
         putBoolean(KEY_ENABLE_UNSUPPORTED_FEATURES, enabled)
+        syncTorchRestriction()
     }
+
+    fun isForceFlashlightControls(): Boolean = getBoolean(KEY_FORCE_FLASHLIGHT_CONTROLS, false)
+
+    fun setForceFlashlightControls(enabled: Boolean) {
+        putBoolean(KEY_FORCE_FLASHLIGHT_CONTROLS, enabled)
+        syncTorchRestriction()
+    }
+
+    fun syncTorchRestriction() {
+        com.sameerasw.essentials.utils.DeviceUtils.torchRestrictionLifted =
+            isEnableUnsupportedFeatures() && isForceFlashlightControls()
+    }
+
+    fun getIslandHideIcons(): Set<String> =
+        getString(KEY_ISLAND_HIDE_ICONS, "")?.split(",")?.filter { it.isNotBlank() }?.toSet().orEmpty()
+
+    fun setIslandHideIcons(icons: Set<String>) = putString(KEY_ISLAND_HIDE_ICONS, icons.joinToString(","))
 
     fun isShowLegacyFeatures(): Boolean = getBoolean(KEY_SHOW_LEGACY_FEATURES, true)
 

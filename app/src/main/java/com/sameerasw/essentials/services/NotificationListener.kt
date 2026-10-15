@@ -1031,7 +1031,8 @@ class NotificationListener : NotificationListenerService() {
                 isSilent = isSilentNotification(sbn, rankingMap),
                 blockedByDnd = isBlockedByDnd(sbn, rankingMap),
             )
-            if (alert != null) {
+            val callHidden = CallNotificationParser.isCall(sbn) && !SettingsRepository(applicationContext).isIslandShowCallsEnabled()
+            if (alert != null && !callHidden) {
                 notifyAlertPosted(alert)
             }
         }

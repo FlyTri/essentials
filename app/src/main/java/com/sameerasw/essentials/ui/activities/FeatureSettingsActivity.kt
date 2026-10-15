@@ -68,7 +68,6 @@ import com.sameerasw.essentials.ui.features.battery.BatteriesSettingsUI
 import com.sameerasw.essentials.ui.features.consciousgate.CONSCIOUS_GATE_FEATURE_ID
 import com.sameerasw.essentials.ui.features.security.AppLockSettingsUI
 import com.sameerasw.essentials.ui.features.system.AlwaysOnDisplaySettingsUI
-import com.sameerasw.essentials.ui.features.system.BatteryNotificationSettingsUI
 import com.sameerasw.essentials.ui.features.system.ActivityLauncherSearchBar
 import com.sameerasw.essentials.ui.features.system.ActivityLauncherSettingsUI
 import com.sameerasw.essentials.ui.features.system.ButtonRemapSettingsUI
@@ -422,9 +421,6 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         )
 
                                 "Caffeinate" -> !viewModel.isPostNotificationsEnabled.value
-                                "Battery notification" ->
-                                    !viewModel.isPostNotificationsEnabled.value ||
-                                        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !viewModel.isBluetoothPermissionGranted.value)
                                 "Text and animations" -> !viewModel.isWriteSettingsEnabled.value || !isWriteSecureSettingsEnabled
                                 "Always on Display" -> !isWriteSecureSettingsEnabled
                                 "Lock screen clock" -> !isWriteSecureSettingsEnabled
@@ -633,6 +629,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 )
                             }
 
+                            if (featureId == "Batteries") {
+                                com.sameerasw.essentials.ui.features.battery.BatteriesPreviewCard(
+                                    viewModel = viewModel,
+                                    height = headerHeight - 16.dp,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                )
+                            }
+
                             if (featureObj != null && featureObj.animationRes != 0) {
                                 LottieFeatureAnimation(
                                     resId = featureObj.animationRes,
@@ -716,7 +720,6 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                         ),
                                                         listOf(
                                                             "Screen off widget",
-                                                            "Batteries",
                                                             "Widget stack",
                                                         ),
                                                     )
@@ -743,7 +746,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                             "Standby apps",
                                                         ),
                                                         listOf(
-                                                            "Battery notification",
+                                                            "Batteries",
                                                         ),
                                                     )
 
@@ -886,12 +889,6 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                                     )
 
                                                             "Caffeinate" -> !viewModel.isPostNotificationsEnabled.value
-                                                            "Battery notification" ->
-                                                                !viewModel.isPostNotificationsEnabled.value ||
-                                                                    (
-                                                                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                                                                            !viewModel.isBluetoothPermissionGranted.value
-                                                                    )
                                                             "Text and animations" ->
                                                                 !viewModel.isWriteSettingsEnabled.value ||
                                                                     !isWriteSecureSettingsEnabled
@@ -1232,14 +1229,6 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                     "Widget stack" -> {
                                         WidgetStackSettingsUI(
                                             modifier = Modifier.padding(top = 16.dp),
-                                        )
-                                    }
-
-                                    "Battery notification" -> {
-                                        BatteryNotificationSettingsUI(
-                                            viewModel = viewModel,
-                                            modifier = Modifier.padding(top = 16.dp),
-                                            highlightKey = highlightSetting,
                                         )
                                     }
 
