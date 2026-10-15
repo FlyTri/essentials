@@ -280,7 +280,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 var searchQuery by remember { mutableStateOf("") }
                 var allApps by remember { mutableStateOf<List<NotificationApp>>(emptyList()) }
                 var isLoadingApps by remember { mutableStateOf(false) }
-                var showSystemApps by remember { mutableStateOf(false) }
+                var showSystemApps by remember { mutableStateOf(true) }
 
                 // Load apps if needed
                 LaunchedEffect(automationType) {
@@ -401,6 +401,7 @@ class AutomationEditorActivity : ComponentActivity() {
                         is Action.OpenActivity -> action.className.isNotBlank()
                         is Action.CustomSettings -> action.entries.isNotEmpty()
                         is Action.Keyboard -> !action.inputMethodId.isNullOrBlank()
+                        is Action.SetMode -> action.modeId.isNotBlank()
                         else -> true
                     }
 
@@ -870,7 +871,8 @@ class AutomationEditorActivity : ComponentActivity() {
                                                             else -> R.drawable.rounded_circle_24
                                                         }
                                                         val isSelected = selectedAccessibilitySlot == slot
-                                                        val isEnabled = slot !in usedAccessibilitySlots
+                                                        val isEnabled = slot !in usedAccessibilitySlots &&
+                                                            !PermissionUtils.isShortcutSlotTakenBySplitScreenGesture(context, slot)
 
                                                         EditorActionItem(
                                                             title = title,
@@ -1036,6 +1038,8 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                             ssid =
                                                                                 (selectedTrigger as? Trigger.WifiDisconnected)?.ssid ?: "",
                                                                         ),
+                                                                        Trigger.AndroidAutoConnected,
+                                                                        Trigger.AndroidAutoDisconnected,
                                                                     ),
                                                                 R.string.diy_category_notifications to
                                                                     listOf(

@@ -100,10 +100,9 @@ class NotificationsPlugin : BaseIslandPlugin() {
         return alerts.drop(index + 1) + alerts.take(index).asReversed()
     }
 
-    private fun removeCurrent() {
-        if (alerts.isEmpty()) return
-        alerts.removeAt(currentIndex.coerceIn(0, alerts.size - 1))
-        currentIndex = currentIndex.coerceIn(0, (alerts.size - 1).coerceAtLeast(0))
+    private fun advanceCurrent() {
+        if (alerts.size < 2) return
+        currentIndex = (currentIndex.coerceIn(0, alerts.size - 1) + 1) % alerts.size
     }
 
     private fun select(key: String) {
@@ -254,7 +253,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         val c = ctx ?: return
         if (pendingPopUp) return
         if (showingHere() && alerts.size > 1 && !manualPick) {
-            removeCurrent()
+            advanceCurrent()
             scheduleTimeout()
             render()
             if (c.currentStage() == IslandStage.Line) popUp()
@@ -316,15 +315,22 @@ class NotificationsPlugin : BaseIslandPlugin() {
         render()
     }
 
-    private fun popCurrent(reExpand: Boolean) {
+    private fun advanceQueue() {
         catchingUp = false
-        removeCurrent()
-        if (alerts.isEmpty()) {
-            clearAll()
-            return
-        }
+        advanceCurrent()
         scheduleTimeout()
         render()
+    }
+
+    private fun popCurrent(reExpand: Boolean) {
+        val simulated = currentAlert()?.takeIf { it.key.startsWith("simulated_") }
+        if (simulated != null) {
+            catchingUp = false
+            onRemoved(simulated.key)
+            if (reExpand && alerts.isNotEmpty()) ctx?.request?.invoke(PluginRequest.Expand(ITEM_KEY))
+            return
+        }
+        advanceQueue()
         if (reExpand) ctx?.request?.invoke(PluginRequest.Expand(ITEM_KEY))
     }
 
@@ -366,7 +372,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
                     queue = next?.let {
                         QueueInfo(
                             next = itemFor(it).withStack(null, alerts.map { a -> stackIconFor(a, current = a === it) }),
-                            onAdvance = { popCurrent(reExpand = false) },
+                            onAdvance = { advanceQueue() },
                         )
                     },
                     stack = stack,

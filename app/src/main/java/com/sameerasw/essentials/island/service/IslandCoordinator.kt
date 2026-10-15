@@ -25,6 +25,9 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -38,6 +41,7 @@ import com.sameerasw.essentials.island.gestures.CompactGestures
 import com.sameerasw.essentials.island.state.IslandUiState
 import com.sameerasw.essentials.island.model.IslandPlugin
 import com.sameerasw.essentials.island.model.IslandPriorityEntries
+import com.sameerasw.essentials.utils.StatusBarManager
 import com.sameerasw.essentials.island.model.IslandPluginContext
 import com.sameerasw.essentials.island.model.IslandStage
 import com.sameerasw.essentials.island.plugins.calendar.CalendarPlugin
@@ -164,6 +168,7 @@ class IslandCoordinator(
 
     private var isScreenOff = false
     private var isLandscape = false
+    private var colorRevision by mutableIntStateOf(0)
     private var isFullscreenApp = false
     private var isShadeExpanded = false
     private var running = false
@@ -380,6 +385,7 @@ class IslandCoordinator(
     }
 
     fun onConfigurationChanged() {
+        colorRevision++
         val landscape = service.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         if (landscape != isLandscape) {
             isLandscape = landscape
@@ -429,7 +435,11 @@ class IslandCoordinator(
         val attached = windowHost.attach(geo) {
             val state by controller.state.collectAsState()
             val layoutSpec by spec.collectAsState()
-            val colors = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicDarkColorScheme(service) else darkColorScheme()
+            val revision = colorRevision
+            val colors =
+                remember(revision) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) dynamicDarkColorScheme(service) else darkColorScheme()
+                }
             MaterialTheme(colorScheme = colors, typography = IslandTypography) {
                 val base = LocalDensity.current
                 CompositionLocalProvider(
@@ -725,14 +735,30 @@ class IslandCoordinator(
     private fun syncStatusBar() {
         val dynamic = settings.getBoolean(SettingsRepository.KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR, false)
         val compact = settings.getBoolean(SettingsRepository.KEY_ISLAND_COMPACT_HIDE_STATUS_BAR, false)
-        if ((!dynamic && !compact) || !ShellUtils.hasPermission(service)) {
+        val selective = settings.getBoolean(SettingsRepository.KEY_ISLAND_HIDE_ICONS_ENABLED, false)
+        if ((!dynamic && !compact && !selective) || !ShellUtils.hasPermission(service)) {
             IslandStatusBarHider.restore(service)
             return
         }
         val state = controller.state.value
         val peekOrExpanded = dynamic && (state.stage == IslandStage.Line || state.stage == IslandStage.Expanded)
         val crowdedCompact = compact && state.stage == IslandStage.Compact && complicationCount(state) >= 2
-        IslandStatusBarHider.apply(service, peekOrExpanded || crowdedCompact)
+        val flags = mutableSetOf<String>()
+        if (peekOrExpanded || crowdedCompact) {
+            flags += StatusBarManager.FLAG_SYSTEM_ICONS
+            flags += StatusBarManager.FLAG_NOTIFICATION_ICONS
+            flags += StatusBarManager.FLAG_CLOCK
+        }
+        if (selective && state.stage != IslandStage.Hidden) {
+            settings.getIslandHideIcons().forEach {
+                when (it) {
+                    SettingsRepository.ISLAND_HIDE_ICON_SYSTEM -> flags += StatusBarManager.FLAG_SYSTEM_ICONS
+                    SettingsRepository.ISLAND_HIDE_ICON_NOTIFICATIONS -> flags += StatusBarManager.FLAG_NOTIFICATION_ICONS
+                    SettingsRepository.ISLAND_HIDE_ICON_CLOCK -> flags += StatusBarManager.FLAG_CLOCK
+                }
+            }
+        }
+        IslandStatusBarHider.applyFlags(service, flags)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -745,7 +771,8 @@ class IslandCoordinator(
             SettingsRepository.KEY_ISLAND_HIDE_LANDSCAPE -> updateState()
             SettingsRepository.KEY_ISLAND_ALWAYS_GESTURES -> syncGestureHitbox()
             SettingsRepository.KEY_ISLAND_PRIORITY_ORDER, SettingsRepository.KEY_ISLAND_PROVIDERS -> if (running) reloadPriorities()
-            SettingsRepository.KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR, SettingsRepository.KEY_ISLAND_COMPACT_HIDE_STATUS_BAR -> syncStatusBar()
+            SettingsRepository.KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR, SettingsRepository.KEY_ISLAND_COMPACT_HIDE_STATUS_BAR,
+            SettingsRepository.KEY_ISLAND_HIDE_ICONS_ENABLED, SettingsRepository.KEY_ISLAND_HIDE_ICONS -> syncStatusBar()
             SettingsRepository.KEY_ISLAND_HIDE_WHEN_SCREEN_OFF, SettingsRepository.KEY_ISLAND_SHOW_WHEN -> applySuppression()
             SettingsRepository.KEY_ISLAND_HIDE_IN_OWNER_APP -> applyOwnerAppHiding()
             in LAUNCHER_ONLY_KEYS.values, SettingsRepository.KEY_ISLAND_PROVIDERS_LAUNCHER_ONLY -> applyLauncherOnly()

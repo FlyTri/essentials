@@ -249,6 +249,18 @@ sealed interface Action {
     }
 
     @Keep
+    data class SetMode(
+        @SerializedName("modeId") val modeId: String = "",
+        @SerializedName("modeName") val modeName: String = "",
+        @SerializedName("active") val active: Boolean = true,
+    ) : Action {
+        override val title: Int get() = R.string.diy_action_set_mode
+        override val icon: Int get() = R.drawable.rounded_do_not_disturb_on_24
+        override val permissions: List<String> get() = listOf("SHIZUKU")
+        override val isConfigurable: Boolean get() = true
+    }
+
+    @Keep
     data object OpenCamera : Action {
         override val title: Int = R.string.diy_action_open_camera
         override val icon: Int = R.drawable.rounded_photo_camera_24
@@ -338,6 +350,13 @@ sealed interface Action {
     data object PinApp : Action {
         override val title: Int = R.string.diy_action_pin_app
         override val icon: Int = R.drawable.rounded_shield_lock_24
+        override val permissions: List<String> = listOf("shizuku", "root")
+    }
+
+    @Keep
+    data object SplitScreen : Action {
+        override val title: Int = R.string.diy_action_split_screen
+        override val icon: Int = R.drawable.rounded_splitscreen_24
         override val permissions: List<String> = listOf("shizuku", "root")
     }
 
@@ -452,6 +471,20 @@ sealed interface Action {
         override val title: Int = R.string.diy_action_hotspot_off
         override val icon: Int = R.drawable.rounded_wifi_tethering_24
         override val permissions: List<String> = listOf("shizuku", "root")
+    }
+
+    @Keep
+    data object TurnOffBackGesture : Action {
+        override val title: Int = R.string.diy_action_back_gesture_off
+        override val icon: Int = R.drawable.rounded_arrow_back_24
+        override val permissions: List<String> = listOf("SHIZUKU")
+    }
+
+    @Keep
+    data object TurnOnBackGesture : Action {
+        override val title: Int = R.string.diy_action_back_gesture_on
+        override val icon: Int = R.drawable.rounded_arrow_back_24
+        override val permissions: List<String> = listOf("SHIZUKU")
     }
 
     @Keep

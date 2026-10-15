@@ -12,13 +12,18 @@ package com.sameerasw.essentials.data.repository
 import com.sameerasw.essentials.ui.core.pickers.NetworkType
 import android.content.Context
 import android.content.SharedPreferences
+import android.provider.Settings
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sameerasw.essentials.domain.HapticFeedbackType
+import com.sameerasw.essentials.domain.controller.BackGestureController
+import com.sameerasw.essentials.domain.controller.BackGestureStore
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.domain.diy.ActionGsonAdapter
 import com.sameerasw.essentials.domain.model.AppIcon
 import com.sameerasw.essentials.domain.model.AppSelection
+import com.sameerasw.essentials.domain.model.BackGestureAppConfig
 import com.sameerasw.essentials.domain.model.AppTag
 import com.sameerasw.essentials.domain.model.DnsPreset
 import com.sameerasw.essentials.domain.model.HilightEffect
@@ -32,10 +37,12 @@ import com.sameerasw.essentials.domain.model.SystemShortcutsState
 import com.sameerasw.essentials.domain.model.TrackedRepo
 import com.sameerasw.essentials.domain.model.github.GitHubUser
 import com.sameerasw.essentials.utils.RootUtils
+import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.ShizukuUtils
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlin.math.abs
 
 class SettingsRepository(
     private val context: Context,
@@ -250,6 +257,11 @@ class SettingsRepository(
         const val KEY_LOCKSCREEN_SHORTCUT_LEFT_ACTIONS = "lockscreen_shortcut_left_actions"
         const val KEY_LOCKSCREEN_SHORTCUT_RIGHT_ACTIONS = "lockscreen_shortcut_right_actions"
         const val KEY_LOCKSCREEN_SYSTEM_SHORTCUTS_STATE = "lockscreen_system_shortcuts_state"
+        const val KEY_VOLUME_STEPS_ENABLED = "volume_steps_enabled"
+        const val KEY_VOLUME_STEPS_PER_PRESS = "volume_steps_per_press"
+        const val KEY_APP_VOLUME_ENABLED = "app_volume_enabled"
+        const val KEY_APP_VOLUME_LEVELS = "app_volume_levels"
+        const val KEY_APP_VOLUME_OVERLAY_ENABLED = "app_volume_overlay_enabled"
 
         const val KEY_DYNAMIC_NIGHT_LIGHT_ENABLED = "dynamic_night_light_enabled"
         const val KEY_DYNAMIC_NIGHT_LIGHT_SELECTED_APPS = "dynamic_night_light_selected_apps"
@@ -324,6 +336,7 @@ class SettingsRepository(
         const val KEY_PRIVILEGED_MODE = "privileged_mode"
         const val KEY_PITCH_BLACK_THEME_ENABLED = "pitch_black_theme_enabled"
         const val KEY_ENABLE_UNSUPPORTED_FEATURES = "enable_unsupported_features"
+        const val KEY_FORCE_FLASHLIGHT_CONTROLS = "force_flashlight_controls"
         const val KEY_SHOW_LEGACY_FEATURES = "show_legacy_features"
 
         const val KEY_KEYBOARD_HEIGHT = "keyboard_height"
@@ -350,6 +363,9 @@ class SettingsRepository(
 
         const val KEY_BLUETOOTH_DEVICES_BATTERY = "bluetooth_devices_battery"
         const val KEY_SHOW_BLUETOOTH_DEVICES = "show_bluetooth_devices"
+        const val KEY_BATTERY_SEPARATE_CHANNELS = "battery_separate_channels"
+        const val KEY_BATTERY_SHOW_PERCENTAGE = "battery_show_percentage"
+        const val KEY_BATTERY_WIDGET_CENTER_ITEMS = "battery_widget_center_items"
         const val KEY_BATTERY_WIDGET_MAX_DEVICES = "battery_widget_max_devices"
         const val KEY_BATTERY_WIDGET_BACKGROUND_ENABLED = "battery_widget_background_enabled"
 
@@ -508,6 +524,11 @@ class SettingsRepository(
         const val KEY_ISLAND_SUPPRESS_SYSTEM_HEADS_UP = "island_suppress_system_heads_up"
         const val KEY_ISLAND_DYNAMIC_HIDE_STATUS_BAR = "island_dynamic_hide_status_bar"
         const val KEY_ISLAND_COMPACT_HIDE_STATUS_BAR = "island_compact_hide_status_bar"
+        const val KEY_ISLAND_HIDE_ICONS_ENABLED = "island_hide_icons_enabled"
+        const val KEY_ISLAND_HIDE_ICONS = "island_hide_icons"
+        const val ISLAND_HIDE_ICON_SYSTEM = "system"
+        const val ISLAND_HIDE_ICON_NOTIFICATIONS = "notifications"
+        const val ISLAND_HIDE_ICON_CLOCK = "clock"
         const val KEY_ISLAND_HIDE_WHEN_SCREEN_OFF = "island_hide_when_screen_off"
         const val KEY_ISLAND_SHOW_WHEN = "island_show_when"
         const val ISLAND_SHOW_WHEN_UNLOCKED = "unlocked"
@@ -610,8 +631,10 @@ class SettingsRepository(
         const val KEY_ISLAND_CALENDAR_LAUNCHER_ONLY = "island_calendar_launcher_only"
         const val KEY_ISLAND_ALARM_LAUNCHER_ONLY = "island_alarm_launcher_only"
         const val KEY_ISLAND_ALARM_WINDOW_HOURS = "island_alarm_window_hours"
+        const val KEY_ISLAND_ALARM_HIDE_TIME = "island_alarm_hide_time"
         const val KEY_ISLAND_SHOW_TRAVEL = "island_show_travel"
         const val KEY_ISLAND_SHOW_CAFFEINATE = "island_show_caffeinate"
+        const val KEY_ISLAND_CAFFEINATE_SHOW_TIME = "island_caffeinate_show_time"
         const val KEY_ISLAND_SHOW_DEVICES = "island_show_devices"
         const val KEY_ISLAND_SHOW_NAVIGATION = "island_show_navigation"
         const val KEY_ISLAND_NAVIGATION_ON_NEW = "island_navigation_on_new"
@@ -723,6 +746,13 @@ class SettingsRepository(
         const val KEY_WIRELESS_DISPLAY_CERTIFICATION = "wireless_display_certification"
         const val KEY_PREFER_GPU_COMPOSING = "prefer_gpu_composing"
         const val KEY_TRANSPARENT_NAVIGATION_BAR = "transparent_navigation_bar"
+        const val KEY_SPLIT_SCREEN_GESTURE = "split_screen_gesture"
+        const val SECURE_BACK_GESTURE_INSET_SCALE_LEFT = "back_gesture_inset_scale_left"
+        const val SECURE_BACK_GESTURE_INSET_SCALE_RIGHT = "back_gesture_inset_scale_right"
+        const val KEY_BACK_GESTURE_OVERRIDE_OWNER = "back_gesture_override_owner"
+        const val KEY_BACK_GESTURE_RESTORE_LEFT_SCALE = "back_gesture_restore_left_scale"
+        const val KEY_BACK_GESTURE_RESTORE_RIGHT_SCALE = "back_gesture_restore_right_scale"
+        const val KEY_BACK_GESTURE_APP_CONFIGS = "back_gesture_app_configs"
         const val KEY_STANDBY_APPS = "standby_apps"
         const val KEY_PIXEL_SEARCHBAR = "pixel_searchbar"
         const val KEY_PIXEL_SEARCHBAR_TYPE = "pixel_searchbar_type"
@@ -751,6 +781,7 @@ class SettingsRepository(
         const val KEY_RECENT_SEARCHES = "recent_searches"
         const val KEY_POCKET_MODE_ENABLED = "pocket_mode_enabled"
         const val KEY_FACE_UNLOCK_BRIGHTNESS_ENABLED = "face_unlock_brightness_enabled"
+        const val KEY_SCREENSHOT_SHARE_CLEANUP_ENABLED = "screenshot_share_cleanup_enabled"
         const val KEY_FACE_UNLOCK_MAX_BRIGHTNESS = "face_unlock_max_brightness"
         const val KEY_FACE_UNLOCK_TRIGGER_UNLOCK = "face_unlock_trigger_unlock"
         const val KEY_FACE_UNLOCK_AUTO_ILLUMINATE = "face_unlock_auto_illuminate"
@@ -1985,6 +2016,14 @@ class SettingsRepository(
      * Executes the is bluetooth devices enabled operation.
      * @return The resulting Boolean data.
      */
+    fun isBatteryShowPercentageEnabled(): Boolean = getBoolean(KEY_BATTERY_SHOW_PERCENTAGE, false)
+
+    fun setBatteryShowPercentageEnabled(enabled: Boolean) = putBoolean(KEY_BATTERY_SHOW_PERCENTAGE, enabled)
+
+    fun isBatterySeparateChannelsEnabled(): Boolean = getBoolean(KEY_BATTERY_SEPARATE_CHANNELS, false)
+
+    fun setBatterySeparateChannelsEnabled(enabled: Boolean) = putBoolean(KEY_BATTERY_SEPARATE_CHANNELS, enabled)
+
     fun isBluetoothDevicesEnabled(): Boolean = getBoolean(KEY_SHOW_BLUETOOTH_DEVICES, false)
 
     /**
@@ -2577,9 +2616,26 @@ class SettingsRepository(
      * @param enabled [Boolean] Target enabled.
      */
     fun setEnableUnsupportedFeatures(enabled: Boolean) {
-        com.sameerasw.essentials.utils.DeviceUtils.torchRestrictionLifted = enabled
         putBoolean(KEY_ENABLE_UNSUPPORTED_FEATURES, enabled)
+        syncTorchRestriction()
     }
+
+    fun isForceFlashlightControls(): Boolean = getBoolean(KEY_FORCE_FLASHLIGHT_CONTROLS, false)
+
+    fun setForceFlashlightControls(enabled: Boolean) {
+        putBoolean(KEY_FORCE_FLASHLIGHT_CONTROLS, enabled)
+        syncTorchRestriction()
+    }
+
+    fun syncTorchRestriction() {
+        com.sameerasw.essentials.utils.DeviceUtils.torchRestrictionLifted =
+            isEnableUnsupportedFeatures() && isForceFlashlightControls()
+    }
+
+    fun getIslandHideIcons(): Set<String> =
+        getString(KEY_ISLAND_HIDE_ICONS, "")?.split(",")?.filter { it.isNotBlank() }?.toSet().orEmpty()
+
+    fun setIslandHideIcons(icons: Set<String>) = putString(KEY_ISLAND_HIDE_ICONS, icons.joinToString(","))
 
     fun isShowLegacyFeatures(): Boolean = getBoolean(KEY_SHOW_LEGACY_FEATURES, true)
 
@@ -2791,6 +2847,69 @@ class SettingsRepository(
             e.printStackTrace()
         }
     }
+
+    val backGesture by lazy {
+        BackGestureController(
+            object : BackGestureStore {
+                override fun readSystemScale(left: Boolean): Float =
+                    try {
+                        Settings.Secure.getFloat(context.contentResolver, secureBackGestureKey(left), 1f)
+                    } catch (_: Exception) {
+                        1f
+                    }
+
+                override fun writeSystemScale(
+                    left: Boolean,
+                    scale: Float,
+                ): Boolean {
+                    val key = secureBackGestureKey(left)
+                    try {
+                        return Settings.Secure.putFloat(context.contentResolver, key, scale)
+                    } catch (_: SecurityException) {
+                        ShellUtils.runCommand(context, "settings put secure $key $scale", notifyOnError = false)
+                    } catch (e: Exception) {
+                        Log.w("BackGesture", "Failed to write $key", e)
+                        return false
+                    }
+                    val written = readSystemScale(left)
+                    if (abs(written - scale) >= 0.001f) {
+                        Log.w("BackGesture", "Failed to write $key over shell, still $written")
+                        return false
+                    }
+                    return true
+                }
+
+                override fun getOverrideOwner(): String? = getString(KEY_BACK_GESTURE_OVERRIDE_OWNER)
+
+                override fun setOverrideOwner(owner: String?) {
+                    if (owner == null) remove(KEY_BACK_GESTURE_OVERRIDE_OWNER) else putString(KEY_BACK_GESTURE_OVERRIDE_OWNER, owner)
+                }
+
+                override fun getRestoreScale(left: Boolean): Float = getFloat(restoreBackGestureKey(left), 1f)
+
+                override fun setRestoreScale(
+                    left: Boolean,
+                    scale: Float,
+                ) = putFloat(restoreBackGestureKey(left), scale)
+            },
+        )
+    }
+
+    private fun secureBackGestureKey(left: Boolean) =
+        if (left) SECURE_BACK_GESTURE_INSET_SCALE_LEFT else SECURE_BACK_GESTURE_INSET_SCALE_RIGHT
+
+    private fun restoreBackGestureKey(left: Boolean) =
+        if (left) KEY_BACK_GESTURE_RESTORE_LEFT_SCALE else KEY_BACK_GESTURE_RESTORE_RIGHT_SCALE
+
+    fun loadBackGestureAppConfigs(): List<BackGestureAppConfig> =
+        try {
+            gson.fromJson(getString(KEY_BACK_GESTURE_APP_CONFIGS), Array<BackGestureAppConfig>::class.java)?.toList()
+                ?: emptyList()
+        } catch (_: Exception) {
+            emptyList()
+        }
+
+    fun saveBackGestureAppConfigs(configs: List<BackGestureAppConfig>) = putString(KEY_BACK_GESTURE_APP_CONFIGS, gson.toJson(configs))
 
     /**
      * Executes the get smallest width operation.
@@ -4066,6 +4185,8 @@ class SettingsRepository(
 
     fun isIslandShowCaffeinateEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_CAFFEINATE, true)
     fun setIslandShowCaffeinateEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_CAFFEINATE, enabled)
+    fun isIslandCaffeinateShowTimeEnabled(): Boolean = getBoolean(KEY_ISLAND_CAFFEINATE_SHOW_TIME, false)
+    fun setIslandCaffeinateShowTimeEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_CAFFEINATE_SHOW_TIME, enabled)
 
     fun isIslandShowDevicesEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_DEVICES, true)
     fun setIslandShowDevicesEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_DEVICES, enabled)
@@ -4192,6 +4313,9 @@ class SettingsRepository(
 
     fun isFaceUnlockBrightnessEnabled(): Boolean = getBoolean(KEY_FACE_UNLOCK_BRIGHTNESS_ENABLED, false)
     fun setFaceUnlockBrightnessEnabled(enabled: Boolean) = putBoolean(KEY_FACE_UNLOCK_BRIGHTNESS_ENABLED, enabled)
+
+    fun isScreenshotShareCleanupEnabled(): Boolean = getBoolean(KEY_SCREENSHOT_SHARE_CLEANUP_ENABLED, false)
+    fun setScreenshotShareCleanupEnabled(enabled: Boolean) = putBoolean(KEY_SCREENSHOT_SHARE_CLEANUP_ENABLED, enabled)
 
     fun getFaceUnlockMaxBrightness(): Int = getInt(KEY_FACE_UNLOCK_MAX_BRIGHTNESS, 100)
     fun setFaceUnlockMaxBrightness(value: Int) = putInt(KEY_FACE_UNLOCK_MAX_BRIGHTNESS, value)
@@ -4375,4 +4499,31 @@ class SettingsRepository(
 
     fun setLockscreenSystemShortcutsState(state: SystemShortcutsState) =
         putString(KEY_LOCKSCREEN_SYSTEM_SHORTCUTS_STATE, state.name)
+
+    fun isVolumeStepsEnabled(): Boolean = getBoolean(KEY_VOLUME_STEPS_ENABLED, false)
+
+    fun setVolumeStepsEnabled(enabled: Boolean) = putBoolean(KEY_VOLUME_STEPS_ENABLED, enabled)
+
+    fun getVolumeStepsPerPress(): Int = getInt(KEY_VOLUME_STEPS_PER_PRESS, 2)
+
+    fun setVolumeStepsPerPress(steps: Int) = putInt(KEY_VOLUME_STEPS_PER_PRESS, steps)
+
+    fun isAppVolumeEnabled(): Boolean = getBoolean(KEY_APP_VOLUME_ENABLED, false)
+
+    fun setAppVolumeEnabled(enabled: Boolean) = putBoolean(KEY_APP_VOLUME_ENABLED, enabled)
+
+    fun isAppVolumeOverlayEnabled(): Boolean = getBoolean(KEY_APP_VOLUME_OVERLAY_ENABLED, false)
+
+    fun setAppVolumeOverlayEnabled(enabled: Boolean) = putBoolean(KEY_APP_VOLUME_OVERLAY_ENABLED, enabled)
+
+    fun getAppVolumeLevels(): Map<String, Float> =
+        getString(KEY_APP_VOLUME_LEVELS)?.let {
+            try {
+                gson.fromJson<Map<String, Float>>(it, object : TypeToken<Map<String, Float>>() {}.type)
+            } catch (_: Exception) {
+                null
+            }
+        } ?: emptyMap()
+
+    fun setAppVolumeLevels(levels: Map<String, Float>) = putString(KEY_APP_VOLUME_LEVELS, gson.toJson(levels))
 }
