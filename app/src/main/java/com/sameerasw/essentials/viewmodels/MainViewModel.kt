@@ -148,6 +148,8 @@ class MainViewModel : ViewModel() {
     val isLockscreenShortcutsEnabled = mutableStateOf(false)
     val lockscreenShortcutActions = mutableStateMapOf<LockscreenShortcutSide, List<Action>>()
     val lockscreenSystemShortcutsState = mutableStateOf(SystemShortcutsState.UNKNOWN)
+    val isVolumeStepsEnabled = mutableStateOf(false)
+    val volumeStepsPerPress = mutableIntStateOf(2)
     val remapHapticType = mutableStateOf(HapticFeedbackType.DOUBLE)
     val isDynamicNightLightEnabled = mutableStateOf(false)
     val isSmartPixelsEnabled = mutableStateOf(false)
@@ -544,6 +546,7 @@ class MainViewModel : ViewModel() {
     val isLocationReachedFullScreenAlarmEnabled = mutableStateOf(true)
 
     val isEnableUnsupportedFeatures = mutableStateOf(false)
+    val isForceFlashlightControls = mutableStateOf(false)
     val isShowLegacyFeatures = mutableStateOf(true)
     val isSecureSensitiveTilesEnabled = mutableStateOf(true)
     val isBlurEnabled = mutableStateOf(true)
@@ -2308,6 +2311,8 @@ class MainViewModel : ViewModel() {
         hilightAppEffects.clear()
         hilightAppEffects.putAll(settingsRepository.getHilightAppEffects())
         isLockscreenShortcutsEnabled.value = settingsRepository.isLockscreenShortcutsEnabled()
+        isVolumeStepsEnabled.value = settingsRepository.isVolumeStepsEnabled()
+        volumeStepsPerPress.intValue = settingsRepository.getVolumeStepsPerPress()
         LockscreenShortcutSide.entries.forEach { side ->
             lockscreenShortcutActions[side] = settingsRepository.getRemapActions(side.prefKey)
         }
@@ -2570,6 +2575,7 @@ class MainViewModel : ViewModel() {
         isLocationReachedFullScreenAlarmEnabled.value =
             settingsRepository.getLocationReachedFullScreenAlarmEnabled()
         isEnableUnsupportedFeatures.value = settingsRepository.isEnableUnsupportedFeatures()
+        isForceFlashlightControls.value = settingsRepository.isForceFlashlightControls()
         isShowLegacyFeatures.value = settingsRepository.isShowLegacyFeatures()
         isSecureSensitiveTilesEnabled.value = settingsRepository.isSecureSensitiveTilesEnabled()
 
@@ -2887,6 +2893,11 @@ class MainViewModel : ViewModel() {
         if (searchQuery.value.isNotBlank()) {
             onSearchQueryChanged(searchQuery.value, context)
         }
+    }
+
+    fun setForceFlashlightControls(enabled: Boolean) {
+        isForceFlashlightControls.value = enabled
+        settingsRepository.setForceFlashlightControls(enabled)
     }
 
     fun setShowLegacyFeatures(
@@ -5101,6 +5112,16 @@ class MainViewModel : ViewModel() {
     ) {
         remapActions[slot] = actions
         settingsRepository.setRemapActions(slot.prefKey, actions)
+    }
+
+    fun setVolumeStepsEnabled(enabled: Boolean) {
+        isVolumeStepsEnabled.value = enabled
+        settingsRepository.setVolumeStepsEnabled(enabled)
+    }
+
+    fun setVolumeStepsPerPress(steps: Int) {
+        volumeStepsPerPress.intValue = steps
+        settingsRepository.setVolumeStepsPerPress(steps)
     }
 
     fun setLockscreenShortcutsEnabled(enabled: Boolean) {

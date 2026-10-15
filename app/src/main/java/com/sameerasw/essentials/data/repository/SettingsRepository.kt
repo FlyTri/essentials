@@ -250,6 +250,8 @@ class SettingsRepository(
         const val KEY_LOCKSCREEN_SHORTCUT_LEFT_ACTIONS = "lockscreen_shortcut_left_actions"
         const val KEY_LOCKSCREEN_SHORTCUT_RIGHT_ACTIONS = "lockscreen_shortcut_right_actions"
         const val KEY_LOCKSCREEN_SYSTEM_SHORTCUTS_STATE = "lockscreen_system_shortcuts_state"
+        const val KEY_VOLUME_STEPS_ENABLED = "volume_steps_enabled"
+        const val KEY_VOLUME_STEPS_PER_PRESS = "volume_steps_per_press"
 
         const val KEY_DYNAMIC_NIGHT_LIGHT_ENABLED = "dynamic_night_light_enabled"
         const val KEY_DYNAMIC_NIGHT_LIGHT_SELECTED_APPS = "dynamic_night_light_selected_apps"
@@ -324,6 +326,7 @@ class SettingsRepository(
         const val KEY_PRIVILEGED_MODE = "privileged_mode"
         const val KEY_PITCH_BLACK_THEME_ENABLED = "pitch_black_theme_enabled"
         const val KEY_ENABLE_UNSUPPORTED_FEATURES = "enable_unsupported_features"
+        const val KEY_FORCE_FLASHLIGHT_CONTROLS = "force_flashlight_controls"
         const val KEY_SHOW_LEGACY_FEATURES = "show_legacy_features"
 
         const val KEY_KEYBOARD_HEIGHT = "keyboard_height"
@@ -612,6 +615,7 @@ class SettingsRepository(
         const val KEY_ISLAND_ALARM_WINDOW_HOURS = "island_alarm_window_hours"
         const val KEY_ISLAND_SHOW_TRAVEL = "island_show_travel"
         const val KEY_ISLAND_SHOW_CAFFEINATE = "island_show_caffeinate"
+        const val KEY_ISLAND_CAFFEINATE_SHOW_TIME = "island_caffeinate_show_time"
         const val KEY_ISLAND_SHOW_DEVICES = "island_show_devices"
         const val KEY_ISLAND_SHOW_HOTSPOT = "island_show_hotspot"
         const val KEY_ISLAND_BRIEF_ENABLED = "island_brief_enabled"
@@ -2571,8 +2575,20 @@ class SettingsRepository(
      * @param enabled [Boolean] Target enabled.
      */
     fun setEnableUnsupportedFeatures(enabled: Boolean) {
-        com.sameerasw.essentials.utils.DeviceUtils.torchRestrictionLifted = enabled
         putBoolean(KEY_ENABLE_UNSUPPORTED_FEATURES, enabled)
+        syncTorchRestriction()
+    }
+
+    fun isForceFlashlightControls(): Boolean = getBoolean(KEY_FORCE_FLASHLIGHT_CONTROLS, false)
+
+    fun setForceFlashlightControls(enabled: Boolean) {
+        putBoolean(KEY_FORCE_FLASHLIGHT_CONTROLS, enabled)
+        syncTorchRestriction()
+    }
+
+    fun syncTorchRestriction() {
+        com.sameerasw.essentials.utils.DeviceUtils.torchRestrictionLifted =
+            isEnableUnsupportedFeatures() && isForceFlashlightControls()
     }
 
     fun isShowLegacyFeatures(): Boolean = getBoolean(KEY_SHOW_LEGACY_FEATURES, true)
@@ -4060,6 +4076,8 @@ class SettingsRepository(
 
     fun isIslandShowCaffeinateEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_CAFFEINATE, true)
     fun setIslandShowCaffeinateEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_CAFFEINATE, enabled)
+    fun isIslandCaffeinateShowTimeEnabled(): Boolean = getBoolean(KEY_ISLAND_CAFFEINATE_SHOW_TIME, false)
+    fun setIslandCaffeinateShowTimeEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_CAFFEINATE_SHOW_TIME, enabled)
 
     fun isIslandShowDevicesEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_DEVICES, true)
     fun setIslandShowDevicesEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_DEVICES, enabled)
@@ -4356,4 +4374,12 @@ class SettingsRepository(
 
     fun setLockscreenSystemShortcutsState(state: SystemShortcutsState) =
         putString(KEY_LOCKSCREEN_SYSTEM_SHORTCUTS_STATE, state.name)
+
+    fun isVolumeStepsEnabled(): Boolean = getBoolean(KEY_VOLUME_STEPS_ENABLED, false)
+
+    fun setVolumeStepsEnabled(enabled: Boolean) = putBoolean(KEY_VOLUME_STEPS_ENABLED, enabled)
+
+    fun getVolumeStepsPerPress(): Int = getInt(KEY_VOLUME_STEPS_PER_PRESS, 2)
+
+    fun setVolumeStepsPerPress(steps: Int) = putInt(KEY_VOLUME_STEPS_PER_PRESS, steps)
 }
