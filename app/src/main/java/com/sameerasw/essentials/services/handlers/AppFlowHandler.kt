@@ -49,7 +49,8 @@ class AppFlowHandler(
     private val handler = Handler(Looper.getMainLooper())
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    private val authenticatedPackages = mutableSetOf<String>()
+    private var appLockSessionActive = false
+    private var appLockLeftAt = 0L
     private val lastLeaveTimes = mutableMapOf<String, Long>()
     private val activeCountdowns = mutableMapOf<String, Job>()
 
@@ -219,7 +220,8 @@ class AppFlowHandler(
     }
 
     fun onAuthenticated(packageName: String) {
-        authenticatedPackages.add(packageName)
+        appLockSessionActive = true
+        appLockLeftAt = 0L
         if (packageName == lockingPackage) {
             lockingPackage = null
         }
@@ -227,7 +229,8 @@ class AppFlowHandler(
     }
 
     fun clearAuthenticated() {
-        authenticatedPackages.clear()
+        appLockSessionActive = false
+        appLockLeftAt = 0L
     }
 
     fun clearConsciousGate() {
@@ -273,10 +276,11 @@ class AppFlowHandler(
 
         val isLocked = selectedApps.find { it.packageName == packageName }?.isEnabled ?: false
 
-        if (isLocked && authenticatedPackages.contains(packageName)) {
-            val delayIndex = prefs.getInt("app_lock_auto_lock_delay_index", 0)
+        if (!isLocked) {
+            if (appLockSessionActive && appLockLeftAt == 0L) appLockLeftAt = System.currentTimeMillis()
+        } else if (appLockSessionActive) {
             val delayMinutes =
-                when (delayIndex) {
+                when (prefs.getInt("app_lock_auto_lock_delay_index", 0)) {
                     1 -> 1
                     2 -> 5
                     3 -> 10
@@ -284,25 +288,15 @@ class AppFlowHandler(
                     5 -> 30
                     else -> 0
                 }
-
-            val lastLeaveTime = lastLeaveTimes[packageName] ?: 0L
-            if (delayIndex == 0) {
-                if (lastLeaveTime > 0) {
-                    authenticatedPackages.remove(packageName)
-                    lastLeaveTimes.remove(packageName)
+            if (appLockLeftAt > 0L) {
+                if (System.currentTimeMillis() - appLockLeftAt > delayMinutes * 60 * 1000L) {
+                    appLockSessionActive = false
                 }
-            } else if (lastLeaveTime > 0) {
-                val now = System.currentTimeMillis()
-                if (now - lastLeaveTime > delayMinutes * 60 * 1000L) {
-                    authenticatedPackages.remove(packageName)
-                    lastLeaveTimes.remove(packageName)
-                } else {
-                    lastLeaveTimes.remove(packageName)
-                }
+                appLockLeftAt = 0L
             }
         }
 
-        if (isLocked && !authenticatedPackages.contains(packageName)) {
+        if (isLocked && !appLockSessionActive) {
             // Skip if we already requested a lock for this package very recently
             val now = System.currentTimeMillis()
             if (packageName == lockingPackage && now - lastLockRequestTime < 1500) {
