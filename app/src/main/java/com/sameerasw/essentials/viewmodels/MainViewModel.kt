@@ -544,6 +544,7 @@ class MainViewModel : ViewModel() {
     val isLocationReachedFullScreenAlarmEnabled = mutableStateOf(true)
 
     val isEnableUnsupportedFeatures = mutableStateOf(false)
+    val isForceFlashlightControls = mutableStateOf(false)
     val isShowLegacyFeatures = mutableStateOf(true)
     val isSecureSensitiveTilesEnabled = mutableStateOf(true)
     val isBlurEnabled = mutableStateOf(true)
@@ -2570,6 +2571,7 @@ class MainViewModel : ViewModel() {
         isLocationReachedFullScreenAlarmEnabled.value =
             settingsRepository.getLocationReachedFullScreenAlarmEnabled()
         isEnableUnsupportedFeatures.value = settingsRepository.isEnableUnsupportedFeatures()
+        isForceFlashlightControls.value = settingsRepository.isForceFlashlightControls()
         isShowLegacyFeatures.value = settingsRepository.isShowLegacyFeatures()
         isSecureSensitiveTilesEnabled.value = settingsRepository.isSecureSensitiveTilesEnabled()
 
@@ -2887,6 +2889,11 @@ class MainViewModel : ViewModel() {
         if (searchQuery.value.isNotBlank()) {
             onSearchQueryChanged(searchQuery.value, context)
         }
+    }
+
+    fun setForceFlashlightControls(enabled: Boolean) {
+        isForceFlashlightControls.value = enabled
+        settingsRepository.setForceFlashlightControls(enabled)
     }
 
     fun setShowLegacyFeatures(

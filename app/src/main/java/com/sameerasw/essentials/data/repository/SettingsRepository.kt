@@ -326,6 +326,7 @@ class SettingsRepository(
         const val KEY_PRIVILEGED_MODE = "privileged_mode"
         const val KEY_PITCH_BLACK_THEME_ENABLED = "pitch_black_theme_enabled"
         const val KEY_ENABLE_UNSUPPORTED_FEATURES = "enable_unsupported_features"
+        const val KEY_FORCE_FLASHLIGHT_CONTROLS = "force_flashlight_controls"
         const val KEY_SHOW_LEGACY_FEATURES = "show_legacy_features"
 
         const val KEY_KEYBOARD_HEIGHT = "keyboard_height"
@@ -2573,8 +2574,20 @@ class SettingsRepository(
      * @param enabled [Boolean] Target enabled.
      */
     fun setEnableUnsupportedFeatures(enabled: Boolean) {
-        com.sameerasw.essentials.utils.DeviceUtils.torchRestrictionLifted = enabled
         putBoolean(KEY_ENABLE_UNSUPPORTED_FEATURES, enabled)
+        syncTorchRestriction()
+    }
+
+    fun isForceFlashlightControls(): Boolean = getBoolean(KEY_FORCE_FLASHLIGHT_CONTROLS, false)
+
+    fun setForceFlashlightControls(enabled: Boolean) {
+        putBoolean(KEY_FORCE_FLASHLIGHT_CONTROLS, enabled)
+        syncTorchRestriction()
+    }
+
+    fun syncTorchRestriction() {
+        com.sameerasw.essentials.utils.DeviceUtils.torchRestrictionLifted =
+            isEnableUnsupportedFeatures() && isForceFlashlightControls()
     }
 
     fun isShowLegacyFeatures(): Boolean = getBoolean(KEY_SHOW_LEGACY_FEATURES, true)
