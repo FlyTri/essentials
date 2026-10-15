@@ -323,7 +323,7 @@ object StackHost {
             val current = positions[stackWidgetId] ?: 0
             positions[stackWidgetId] = Math.floorMod(current + delta, count)
         }
-        StackWidgetProvider.render(appContext, stackWidgetId, animate = true)
+        StackWidgetProvider.render(appContext, stackWidgetId, animate = true, reverse = delta < 0)
         scheduleTimer(stackWidgetId)
     }
 
