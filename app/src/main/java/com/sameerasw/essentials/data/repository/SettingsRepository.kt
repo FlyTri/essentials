@@ -629,8 +629,16 @@ class SettingsRepository(
         const val KEY_ISLAND_MEDIA_SHOW_LIKE = "island_media_show_like"
         const val KEY_ISLAND_NOTIF_COMPACT_HEADS_UP = "island_notif_compact_heads_up"
         const val KEY_ISLAND_NOTIF_CONDENSED_INFO = "island_notif_condensed_info"
+        const val KEY_ISLAND_NOTIF_PEEK_STYLE = "island_notif_peek_style"
+        const val ISLAND_NOTIF_PEEK_STYLE_FULL = "full"
+        const val ISLAND_NOTIF_PEEK_STYLE_COMPACT = "compact"
+        const val ISLAND_NOTIF_PEEK_STYLE_MINIMAL = "minimal"
         const val KEY_ISLAND_NOTIF_KEEP_PROGRESS = "island_notif_keep_progress"
         const val KEY_ISLAND_NOTIF_QUEUE = "island_notif_queue"
+        const val KEY_ISLAND_NOTIF_QUEUE_STYLE = "island_notif_queue_style"
+        const val ISLAND_NOTIF_QUEUE_STYLE_STACK = "stack"
+        const val ISLAND_NOTIF_QUEUE_STYLE_OVERLAP = "overlap"
+        const val KEY_ISLAND_NOTIF_QUEUE_INLINE = "island_notif_queue_inline"
         const val KEY_ISLAND_NOTIF_SKIP_SILENT = "island_notif_skip_silent"
         const val KEY_ISLAND_NOTIF_FOLLOW_DND = "island_notif_follow_dnd"
         const val KEY_ISLAND_NOTIF_FILTER_APPS = "island_notif_filter_apps"
@@ -4154,6 +4162,14 @@ class SettingsRepository(
     fun isIslandNotifQueueEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_QUEUE, true)
     fun setIslandNotifQueueEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_QUEUE, enabled)
 
+    fun getIslandNotifQueueStyle(): String =
+        if (getString(KEY_ISLAND_NOTIF_QUEUE_STYLE, null) == ISLAND_NOTIF_QUEUE_STYLE_OVERLAP) ISLAND_NOTIF_QUEUE_STYLE_OVERLAP
+        else ISLAND_NOTIF_QUEUE_STYLE_STACK
+    fun setIslandNotifQueueStyle(style: String) = putString(KEY_ISLAND_NOTIF_QUEUE_STYLE, style)
+
+    fun isIslandNotifQueueInlineEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_QUEUE_INLINE, false)
+    fun setIslandNotifQueueInlineEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_QUEUE_INLINE, enabled)
+
     fun isFaceUnlockBrightnessEnabled(): Boolean = getBoolean(KEY_FACE_UNLOCK_BRIGHTNESS_ENABLED, false)
     fun setFaceUnlockBrightnessEnabled(enabled: Boolean) = putBoolean(KEY_FACE_UNLOCK_BRIGHTNESS_ENABLED, enabled)
 
@@ -4190,8 +4206,10 @@ class SettingsRepository(
     fun isIslandNotifCompactHeadsUpEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_COMPACT_HEADS_UP, true)
     fun setIslandNotifCompactHeadsUpEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_COMPACT_HEADS_UP, enabled)
 
-    fun isIslandNotifCondensedInfoEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_CONDENSED_INFO, false)
-    fun setIslandNotifCondensedInfoEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_CONDENSED_INFO, enabled)
+    fun getIslandNotifPeekStyle(): String =
+        getString(KEY_ISLAND_NOTIF_PEEK_STYLE, null)
+            ?: if (getBoolean(KEY_ISLAND_NOTIF_CONDENSED_INFO, false)) ISLAND_NOTIF_PEEK_STYLE_COMPACT else ISLAND_NOTIF_PEEK_STYLE_FULL
+    fun setIslandNotifPeekStyle(style: String) = putString(KEY_ISLAND_NOTIF_PEEK_STYLE, style)
 
     fun isIslandNotifKeepProgressEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_KEEP_PROGRESS, true)
     fun setIslandNotifKeepProgressEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_KEEP_PROGRESS, enabled)
