@@ -4,7 +4,7 @@
  *
  * Feature Module: UI Feature - Hardware
  * File: VolumeStepsSettingsUI.kt
- * Description: UI component and settings composable for Hardware feature domain.
+ * Description: Settings page for volume steps with the enable toggle and steps per press.
  */
 
 package com.sameerasw.essentials.ui.features.system

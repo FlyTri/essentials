@@ -1799,7 +1799,7 @@ object FeatureRegistry {
                 contributors = listOf("jawzf"),
                 title = R.string.feat_volume_steps_title,
                 iconRes = R.drawable.rounded_volume_up_24,
-                category = R.string.cat_interaction,
+                category = R.string.cat_system,
                 description = R.string.feat_volume_steps_desc,
                 aboutDescription = R.string.about_desc_volume_steps,
                 permissionKeys = listOf("ACCESSIBILITY"),
@@ -1818,7 +1818,7 @@ object FeatureRegistry {
                             "volume_steps_per_press",
                         ),
                     ),
-                parentFeatureId = "Input",
+                parentFeatureId = "Sound",
             ) {
                 override fun isEnabled(viewModel: MainViewModel) = viewModel.isVolumeStepsEnabled.value
 

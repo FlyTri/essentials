@@ -4,16 +4,18 @@
  *
  * Feature Module: Background Services & Receivers
  * File: VolumeStepsHandler.kt
- * Description: Background service component for VolumeStepsHandler.kt.
+ * Description: Moves media volume by several steps per volume key press and while a key is held.
  */
 
 package com.sameerasw.essentials.services.handlers
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.AudioManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.view.KeyEvent
 import android.view.ViewConfiguration
 import com.sameerasw.essentials.data.repository.SettingsRepository
@@ -25,12 +27,14 @@ class VolumeStepsHandler(
     private val audioManager = context.getSystemService(AudioManager::class.java)
     private val handler = Handler(Looper.getMainLooper())
     private var repeatRaise = true
+    private var holdStartedAt = 0L
 
     private val repeatRunnable =
         object : Runnable {
             override fun run() {
-                stepMediaVolume(repeatRaise)
-                handler.postDelayed(this, REPEAT_INTERVAL_MS)
+                val held = SystemClock.uptimeMillis() - holdStartedAt
+                if (!isActive() || held > MAX_HOLD_MS || !stepMediaVolume(repeatRaise)) return
+                handler.postDelayed(this, VolumeStepMath.repeatIntervalMs(settingsRepository.getVolumeStepsPerPress()))
             }
         }
 
@@ -40,18 +44,18 @@ class VolumeStepsHandler(
             return false
         }
         if (!isActive()) {
-            handler.removeCallbacks(repeatRunnable)
+            stop()
             return false
         }
 
-        // Key repeats are generated after the accessibility filter, so a consumed press never repeats on its own
         if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
             repeatRaise = keyCode == KeyEvent.KEYCODE_VOLUME_UP
+            holdStartedAt = SystemClock.uptimeMillis()
             stepMediaVolume(repeatRaise)
             handler.removeCallbacks(repeatRunnable)
             handler.postDelayed(repeatRunnable, ViewConfiguration.getKeyRepeatTimeout().toLong())
         } else if (event.action == KeyEvent.ACTION_UP) {
-            handler.removeCallbacks(repeatRunnable)
+            stop()
         }
         return true
     }
@@ -62,13 +66,20 @@ class VolumeStepsHandler(
         return true
     }
 
-    // Calls and ringing keep the system's own volume handling
+    fun stop() {
+        handler.removeCallbacks(repeatRunnable)
+    }
+
     private fun isActive(): Boolean =
         settingsRepository.isVolumeStepsEnabled() &&
             !audioManager.isVolumeFixed &&
-            audioManager.mode == AudioManager.MODE_NORMAL
+            audioManager.mode == AudioManager.MODE_NORMAL &&
+            !isAlarmPlaying()
 
-    private fun stepMediaVolume(raise: Boolean) {
+    private fun isAlarmPlaying(): Boolean =
+        audioManager.activePlaybackConfigurations.any { it.audioAttributes.usage == AudioAttributes.USAGE_ALARM }
+
+    private fun stepMediaVolume(raise: Boolean): Boolean {
         val steps = settingsRepository.getVolumeStepsPerPress()
         val current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
         val min =
@@ -78,11 +89,12 @@ class VolumeStepsHandler(
                 0
             }
         val max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        val target = (current + if (raise) steps else -steps).coerceIn(min, max)
+        val target = VolumeStepMath.target(current, min, max, steps, raise)
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, target, AudioManager.FLAG_SHOW_UI)
+        return target != current
     }
 
     private companion object {
-        const val REPEAT_INTERVAL_MS = 150L
+        const val MAX_HOLD_MS = 10_000L
     }
 }

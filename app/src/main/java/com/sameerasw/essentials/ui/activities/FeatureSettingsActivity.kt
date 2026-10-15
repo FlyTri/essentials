@@ -728,7 +728,6 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                             "Flashlight",
                                                             "Activity launcher",
                                                             "Lock screen shortcuts",
-                                                            "Volume steps",
                                                         ),
                                                         listOf(
                                                             "Navigation",

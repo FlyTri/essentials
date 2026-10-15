@@ -371,6 +371,7 @@ class ScreenOffAccessibilityService :
 
                         Intent.ACTION_SCREEN_OFF -> {
                             isScreenOn = false
+                            volumeStepsHandler.stop()
                             statusGlanceHandler.setShadeExpanded(false)
                             islandOverlayHandler.setShadeExpanded(false)
                             duoOverlayHandler.setShadeExpanded(false)
@@ -529,6 +530,7 @@ class ScreenOffAccessibilityService :
         } catch (_: Exception) {
         }
         LiveUpdateSnoozer.release()
+        volumeStepsHandler.stop()
         flashlightHandler.unregister()
         notificationLightingHandler.removeOverlay()
         ambientGlanceHandler.removeOverlay()
@@ -693,7 +695,9 @@ class ScreenOffAccessibilityService :
         }
     }
 
-    override fun onInterrupt() {}
+    override fun onInterrupt() {
+        if (::volumeStepsHandler.isInitialized) volumeStepsHandler.stop()
+    }
 
     private fun updatePocketModeSensors() {
         val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
