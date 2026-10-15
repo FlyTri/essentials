@@ -32,6 +32,7 @@ import com.sameerasw.essentials.ui.activities.BatteryDetailsActivity
 import com.sameerasw.essentials.utils.BatteryRingDrawer
 import com.sameerasw.essentials.utils.BluetoothBatteryUtils
 import com.sameerasw.essentials.utils.BluetoothDeviceIcons
+import com.sameerasw.essentials.utils.BluetoothDeviceOrder
 
 class BatteryNotificationService : Service() {
     private lateinit var settingsRepository: SettingsRepository
@@ -223,7 +224,7 @@ class BatteryNotificationService : Service() {
                             bluetoothJson,
                             Array<BluetoothBatteryUtils.BluetoothDeviceBattery>::class.java,
                         ).toList()
-                devices.forEach { device ->
+                BluetoothDeviceOrder.apply(this, devices) { it.address }.forEach { device ->
                     if (device.hasParts) {
                         listOf(
                             Triple(device.left, R.drawable.rounded_earbud_left_24, " L"),

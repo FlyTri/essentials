@@ -11,6 +11,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.key
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalView
+import com.sameerasw.essentials.utils.BluetoothDeviceOrder
+import com.sameerasw.essentials.utils.HapticUtil
+import sh.calvin.reorderable.ReorderableColumn
+import sh.calvin.reorderable.ReorderableItem
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -62,39 +70,90 @@ private fun pairedDevices(context: Context): List<PairedDevice> =
 @Composable
 fun BluetoothDeviceIconsSection() {
     val context = LocalContext.current
+    val view = LocalView.current
     val devices = remember { pairedDevices(context) }
     var version by remember { mutableIntStateOf(0) }
     var editing by remember { mutableStateOf<PairedDevice?>(null) }
+    var order by remember { mutableStateOf(BluetoothDeviceOrder.load(context, devices.map { it.address })) }
     if (devices.isEmpty()) return
+    val byAddress = remember(devices) { devices.associateBy { it.address } }
+    val separatorAt = order.indexOf(BluetoothDeviceOrder.SEPARATOR)
 
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        devices.forEachIndexed { index, device ->
-            val top = if (index == 0) 24.dp else 4.dp
-            val bottom = if (index == devices.size - 1) 24.dp else 4.dp
-            val iconRes = remember(version, device.address) { BluetoothDeviceIcons.resolve(context, device.address, device.name) }
-            val custom = remember(version, device.address) { BluetoothDeviceIcons.getOverrideId(context, device.address) != null }
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .background(
-                            MaterialTheme.colorScheme.surfaceBright,
-                            RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom),
-                        ).clickable { editing = device }
-                        .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(painterResource(iconRes), contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                Text(
-                    text = device.name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(1f).padding(start = 16.dp),
-                )
-                Text(
-                    text = if (custom) stringResource(R.string.bt_icon_custom) else stringResource(R.string.bt_icon_auto),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+    ReorderableColumn(
+        list = order,
+        onSettle = { from, to ->
+            order = order.toMutableList().apply { add(to, removeAt(from)) }
+            BluetoothDeviceOrder.save(context, order)
+            context.sendBroadcast(
+                Intent(context, BatteriesWidgetReceiver::class.java).apply {
+                    action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                },
+            )
+        },
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+        onMove = { HapticUtil.performVirtualKeyHaptic(view) },
+    ) { index, entry, _ ->
+        key(entry) {
+            ReorderableItem {
+                val top = if (index == 0) 24.dp else 4.dp
+                val bottom = if (index == order.size - 1) 24.dp else 4.dp
+                val shape = RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom)
+                val hidden = separatorAt in 0 until index
+                val handle: @Composable () -> Unit = {
+                    IconButton(modifier = Modifier.draggableHandle(), onClick = {}) {
+                        Icon(
+                            painter = painterResource(R.drawable.rounded_drag_handle_24),
+                            contentDescription = stringResource(R.string.content_desc_drag_reorder),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+                if (entry == BluetoothDeviceOrder.SEPARATOR) {
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.secondaryContainer, shape)
+                                .padding(start = 16.dp, top = 4.dp, bottom = 4.dp, end = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.bt_order_separator),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.weight(1f),
+                        )
+                        handle()
+                    }
+                } else {
+                    val device = byAddress[entry] ?: return@ReorderableItem
+                    val iconRes = remember(version, device.address) { BluetoothDeviceIcons.resolve(context, device.address, device.name) }
+                    val custom = remember(version, device.address) { BluetoothDeviceIcons.getOverrideId(context, device.address) != null }
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .alpha(if (hidden) 0.4f else 1f)
+                                .background(MaterialTheme.colorScheme.surfaceBright, shape)
+                                .clickable { editing = device }
+                                .padding(start = 16.dp, top = 4.dp, bottom = 4.dp, end = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(painterResource(iconRes), contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Text(
+                            text = device.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f).padding(start = 16.dp),
+                        )
+                        Text(
+                            text = if (custom) stringResource(R.string.bt_icon_custom) else stringResource(R.string.bt_icon_auto),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        handle()
+                    }
+                }
             }
         }
     }

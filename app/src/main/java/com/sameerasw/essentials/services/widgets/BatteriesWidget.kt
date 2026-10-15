@@ -54,6 +54,7 @@ import com.sameerasw.essentials.ui.activities.BatteryDetailsActivity
 import com.sameerasw.essentials.utils.BatteryRingDrawer
 import com.sameerasw.essentials.utils.BluetoothBatteryUtils
 import com.sameerasw.essentials.utils.BluetoothDeviceIcons
+import com.sameerasw.essentials.utils.BluetoothDeviceOrder
 
 class BatteriesWidget : GlanceAppWidget() {
     override val sizeMode = SizeMode.Exact
@@ -121,7 +122,7 @@ class BatteriesWidget : GlanceAppWidget() {
                 } catch (_: Exception) {
                     emptyList()
                 }
-            devices.forEach { device ->
+            BluetoothDeviceOrder.apply(context, devices) { it.address }.forEach { device ->
                 if (device.hasParts) {
                     device.left?.let { items += Item(it, R.drawable.rounded_earbud_left_24, statusIcon(it, false)) }
                     device.right?.let { items += Item(it, R.drawable.rounded_earbud_right_24, statusIcon(it, false)) }

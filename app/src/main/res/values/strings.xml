@@ -604,6 +604,8 @@
     <string name="bt_device_icons_title">Device icons</string>
     <string name="island_alarm_hide_time_title">Hide time</string>
     <string name="battery_separate_channels_title">Separate battery channels</string>
+    <string name="bt_order_separator">Entries below are hidden</string>
+    <string name="battery_separate_channels_desc">Separate LR channels</string>
     <string name="tile_default_launcher">Default launcher</string>
     <string name="tile_default_launcher_cycle_title">Launchers to cycle between</string>
     <string name="subtitle_default_launcher">Choose home app</string>

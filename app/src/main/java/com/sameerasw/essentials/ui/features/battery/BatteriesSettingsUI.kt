@@ -195,6 +195,7 @@ fun BatteriesSettingsUI(
                 IconToggleItem(
                     iconRes = R.drawable.rounded_earbuds_2_24,
                     title = stringResource(R.string.battery_separate_channels_title),
+                    description = stringResource(R.string.battery_separate_channels_desc),
                     isChecked = separateChannels,
                     onCheckedChange = { enabled ->
                         separateChannels = enabled
