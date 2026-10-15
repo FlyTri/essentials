@@ -13,6 +13,7 @@ import android.content.ComponentName
 import android.content.Context
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.services.SplitScreenShortcutService
+import com.sameerasw.essentials.utils.ui.HapticUtil
 
 object SplitScreenUtil {
     private const val GESTURE_TARGETS = "accessibility_gesture_targets"
@@ -28,6 +29,7 @@ object SplitScreenUtil {
             "else $WM_SHELL splitscreen moveToSideStage \$t 0; fi >/dev/null 2>&1"
 
     fun toggle(context: Context) {
+        HapticUtil.performStrongDoubleHaptic(context)
         ShellUtils.runCommand(context, TOGGLE_SCRIPT, context.getString(R.string.diy_action_split_screen))
     }
 
