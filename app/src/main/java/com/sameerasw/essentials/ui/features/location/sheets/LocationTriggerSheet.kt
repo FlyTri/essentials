@@ -113,13 +113,11 @@ fun LocationTriggerSheet(
         }
     }
 
-    // The clipboard is only readable once the app is focused again
     LifecycleResumeEffect(Unit) {
         isAccuracyOff = !isNetworkLocationEnabled(context)
         val job =
             scope.launch {
                 delay(CLIPBOARD_READ_DELAY_MS)
-                // An old copied link shouldn't replace a place chosen before this visit to Maps
                 if ((latitude != 0.0 || longitude != 0.0) && !wentToMaps) return@launch
                 readClipboard(context)?.takeIf { MapsLinkParser.findUrl(it)?.let(::isMapsLink) == true }?.let {
                     applyLink(it, fromClipboard = true)
@@ -147,7 +145,6 @@ fun LocationTriggerSheet(
                 color = MaterialTheme.colorScheme.onSurface,
             )
 
-            // Play services accepts geofences without it but never fires them
             if (isAccuracyOff) {
                 RoundedCardContainer {
                     Text(
@@ -311,7 +308,6 @@ fun LocationTriggerSheet(
     }
 }
 
-// Google Location Accuracy is what enables the network provider
 private fun isNetworkLocationEnabled(context: Context): Boolean =
     runCatching {
         context.getSystemService(LocationManager::class.java)?.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == true
@@ -346,7 +342,6 @@ private fun openGoogleMaps(
     try {
         context.startActivity(maps)
     } catch (_: Exception) {
-        // Without the Maps app, the web version still gives a copyable link
         runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) }
     }
 }

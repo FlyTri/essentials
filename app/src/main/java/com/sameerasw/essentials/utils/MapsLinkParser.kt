@@ -25,7 +25,6 @@ object MapsLinkParser {
         val address: String? = null,
     )
 
-    // The !3d!4d pair is the place's own pin; the @ pair is only the map's viewport centre
     private val pinRegex = Regex("!3d(-?\\d+\\.\\d+)!4d(-?\\d+\\.\\d+)")
     private val coordinatesRegex = Regex("(?<![@\\d.-])(-?\\d+\\.\\d+)\\s*,\\s*(-?\\d+\\.\\d+)")
     private val viewportRegex = Regex("@(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)")
@@ -52,7 +51,6 @@ object MapsLinkParser {
         return Place(latitude, longitude, placeName(text), isApproximate)
     }
 
-    // Shared text from Maps puts the place name on the first line, before the link
     fun placeName(text: String): String? {
         val firstLine =
             text
@@ -72,7 +70,6 @@ object MapsLinkParser {
         val link = findUrl(text) ?: text
         val resolved = if (isShortLink(link)) resolveShortLink(link) else link
         parse(resolved)?.let { return it }
-        // Current Maps links name the place and its address but leave out the coordinates
         val address = placeName(resolved)
         val located = address?.let { geocode(context, it) }
         if (located != null) return located.copy(name = placeName(text) ?: address.substringBefore(','))

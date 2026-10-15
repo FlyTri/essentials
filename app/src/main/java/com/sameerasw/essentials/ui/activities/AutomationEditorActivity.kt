@@ -1097,7 +1097,13 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                     iconRes = trigger.icon,
                                                                     isSelected = isSelected,
                                                                     isConfigurable = trigger.isConfigurable,
-                                                                    onClick = { selectedTrigger = trigger },
+                                                                    onClick = {
+                                                                        if (trigger is Trigger.ArriveAtLocation || trigger is Trigger.LeaveLocation) {
+                                                                            editingLocationTrigger = trigger
+                                                                        } else {
+                                                                            selectedTrigger = trigger
+                                                                        }
+                                                                    },
                                                                     onSettingsClick = {
                                                                         when (trigger) {
                                                                             is Trigger.Schedule -> showTimeSettings = true

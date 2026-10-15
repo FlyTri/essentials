@@ -37,7 +37,6 @@ class LocationModule : AutomationModule {
     private var wanted: Set<LocationTrigger> = emptySet()
     private var registered: Set<LocationTrigger> = emptySet()
 
-    // Play services drops every geofence when location is turned off
     private val locationToggleReceiver =
         object : BroadcastReceiver() {
             override fun onReceive(
@@ -91,7 +90,6 @@ class LocationModule : AutomationModule {
         val request =
             GeofencingRequest
                 .Builder()
-                // Being inside already shouldn't fire every time the service restarts
                 .setInitialTrigger(0)
                 .addGeofences(triggers.map { it.toGeofence() })
                 .build()
@@ -140,7 +138,6 @@ class LocationModule : AutomationModule {
             context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED
         }
 
-    // Geofencing fills in the event extras, so the intent must be mutable
     private fun pendingIntent(context: Context): PendingIntent =
         PendingIntent.getBroadcast(
             context,
