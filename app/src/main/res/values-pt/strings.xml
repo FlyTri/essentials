@@ -64,7 +64,7 @@
     <string name="like_song_settings_desc">Este recurso requer acesso à notificação para detectar a mídia atualmente sendo reproduzida e acionar a ação semelhante. Ative-o abaixo.</string>
     <string name="like_song_toast_enabled">Mostrar mensagem de brinde</string>
     <string name="like_song_aod_overlay_title">Mostrar sobreposição no AOD</string>
-    <string name="feat_essentials_on_display_title">Essentials em Exibição</string>
+    <string name="feat_essentials_on_display_title">Essentials em Exibição no AOD</string>
     <string name="feat_essentials_on_display_desc">Visualize mídias e informações no Always On Display</string>
     <string name="essentials_on_display_docked_mode_title">Modo acoplado (carregando)</string>
     <string name="essentials_on_display_docked_mode_desc">Mantenha a sobreposição visível indefinidamente enquanto a música estiver tocando no AOD.</string>
@@ -1626,7 +1626,7 @@
     <string name="island_section_visuals">Visual</string>
     <string name="island_section_duration">Duração </string>
     <string name="island_section_behavior">Comportamento</string>
-    <string name="island_call_options_title">chamadas</string>
+    <string name="island_call_options_title">chamadas telefônicas</string>
     <string name="island_section_notifications">notificações </string>
     <string name="island_show_timers_title">Temporizadores e cronômetros</string>
     <string name="diy_volume_channel_alarm">Alarme</string>
@@ -1663,4 +1663,11 @@
     <string name="hilight_cooldown_desc">Aguarda esse tempo antes de acender novamente o mesmo aplicativo.</string>
     <string name="feat_activity_launcher_title">atividade do launcher </string>
     <string name="feat_activity_launcher_desc">Abra ou fixe qualquer tela de aplicativo</string>
+    <string name="hilight_progress_title">progresso ao vivo dos download</string>
+    <string name="feat_hilight_progress_desc">Exibe o progresso do download e das atualizações em tempo real nos LEDs.</string>
+    <string name="feat_lockscreen_shortcuts_title">atalhos da tela de bloqueio </string>
+    <string name="feat_lockscreen_shortcuts_desc">rode suas atividades pela tela de bloqueio</string>
+    <string name="island_max_items_title">maximo de itens para mostrar </string>
+    <string name="island_always_gestures_title">Gestos sempre disponíveis</string>
+    <string name="island_always_gestures_desc">Mantenha a área de gestos disponível mesmo quando a ilha estiver oculta</string>
 </resources>
