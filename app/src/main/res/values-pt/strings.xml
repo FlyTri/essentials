@@ -1663,4 +1663,11 @@
     <string name="hilight_cooldown_desc">Aguarda esse tempo antes de acender novamente o mesmo aplicativo.</string>
     <string name="feat_activity_launcher_title">atividade do launcher </string>
     <string name="feat_activity_launcher_desc">Abra ou fixe qualquer tela de aplicativo</string>
+    <string name="hilight_progress_title">progresso ao vivo dos download</string>
+    <string name="feat_hilight_progress_desc">Exibe o progresso do download e das atualizações em tempo real nos LEDs.</string>
+    <string name="feat_lockscreen_shortcuts_title">atalhos da tela de bloqueio </string>
+    <string name="feat_lockscreen_shortcuts_desc">rode suas atividades pela tela de bloqueio</string>
+    <string name="island_max_items_title">maximo de itens para mostrar </string>
+    <string name="island_always_gestures_title">Gestos sempre disponíveis</string>
+    <string name="island_always_gestures_desc">Mantenha a área de gestos disponível mesmo quando a ilha estiver oculta</string>
 </resources>
