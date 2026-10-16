@@ -1828,6 +1828,8 @@
     <string name="face_unlock_light_tint_title">Светлый оттенок </string>
     <string name="face_unlock_trigger_unlock_title">Реакция на разблокировку</string>
     <string name="island_hide_live_updates_title">Скрыыать live updates Динамично</string>
-    <string name="feat_activity_launcher_title">Запускаешь Activity</string>
+    <string name="feat_activity_launcher_title">Запуск Activity</string>
     <string name="feat_activity_launcher_desc">Откройте или закрепите любой экран приложения</string>
+    <string name="feat_navigation_desc">Панель навигации, жесты навигации и настройки панели навигации</string>
+    <string name="feat_back_gesture_title">Движение назад</string>
 </resources>
