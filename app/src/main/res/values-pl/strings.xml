@@ -146,8 +146,8 @@
     <string name="action_import_freeze">Importuj listę zamrożonych aplikacji</string>
     <string name="freeze_pick_apps_title">Wybierz aplikacje do zamrożenia</string>
     <string name="freeze_pick_apps_desc">Wybierz, które aplikacje można zablokować</string>
-    <string name="freeze_show_in_launcher_title">Show in launcher</string>
-    <string name="freeze_show_in_launcher_desc">Add a launcher shortcut for easier access</string>
+    <string name="freeze_show_in_launcher_title">Pokaż w programie uruchamiającym</string>
+    <string name="freeze_show_in_launcher_desc">Dodaj skrót launchera dla łatwiejszego dostępu</string>
     <string name="settings_section_automation">Automatyzacja</string>
     <string name="freeze_when_locked_title">Zamroź, gdy jest zamknięty</string>
     <string name="freeze_delay_title">Zamrożenie opóźnienia</string>
@@ -167,7 +167,7 @@
     <string name="perm_notif_listener_desc_freeze">Wymagane do wykrywania odtwarzanych multimediów i aktywnych powiadomień, aby uniknąć ich zablokowania</string>
     <string name="freeze_mode_title">Freeze mode</string>
     <string name="freeze_mode_freeze">Freezing</string>
-    <string name="freeze_mode_suspend">App suspension</string>
+    <string name="freeze_mode_suspend">Zawieszania aplikacji </string>
     <string name="freeze_mode_warning_desc">Can not switch mode while apps are frozen. Please unfreeze all and try again.</string>
     <!-- Notification Lighting -->
     <string name="notification_lighting_screen_off_title">Pokazuj tylko przy wyłączonym ekranie</string>
@@ -832,8 +832,8 @@ Jeśli Twoje urządzenie nie obsługuje nakładek w trybie AOD, możesz wybrać 
     <string name="diy_effect_dim_wallpaper">Ciemna tapeta</string>
     <string name="diy_effect_night_mode">Tryb nocny</string>
     <string name="diy_device_effects_android_15_warning">Ta funkcja wymaga systemu Android 15 lub nowszego.</string>
-    <string name="diy_device_effects_enabled">Włączony</string>
-    <string name="diy_device_effects_disabled">Wyłączony</string>
+    <string name="diy_device_effects_enabled">Włączone</string>
+    <string name="diy_device_effects_disabled">Wyłączone</string>
     <string name="diy_action_sound_mode">Tryb dźwięku</string>
     <string name="diy_sound_mode_desc">Ta akcja umożliwia przełączanie między trybami dźwięku, wibracji i ciszy w oparciu o wyzwalacze. Wymaga dostępu do trybu Nie przeszkadzać.</string>
     <!-- About Section -->
@@ -1566,4 +1566,7 @@ Aby ustawienie zadziałało, może być konieczne wielokrotne zastosowanie.</str
     <string name="label_device_battery">Bateria</string>
     <string name="feat_sim_names_title">Nazwy kart SIM</string>
     <string name="feat_sim_names_desc">Zarządzaj nazwami operatów dla aktywnych kart SIM</string>
+    <string name="label_motion_blur_amount">Ilość</string>
+    <string name="haptic_mode_stronger">Mocniejsze</string>
+    <string name="setting_hidden_debugging_title">Ukryta obsługa debuggowania</string>
 </resources>
