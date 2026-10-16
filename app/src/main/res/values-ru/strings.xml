@@ -1852,4 +1852,8 @@
     <string name="label_battery_current_avg">Средний ток </string>
     <string name="tile_default_launcher">Лаунчер по умолчанию</string>
     <string name="about_desc_duo_tile">Включите или выключите кольцо камеры Duo. </string>
+    <string name="action_lock_auto_freeze">Никогда не замораживается </string>
+    <string name="freeze_tag_never_auto_freeze_desc">Приложения в этой метке будут заблокированы от автоматического замораживания </string>
+    <string name="freeze_tag_color_coded_title">Тег цветовая кодировка</string>
+    <string name="freeze_tag_color_coded_desc">Показать цвета тегов в сетке приложения </string>
 </resources>
