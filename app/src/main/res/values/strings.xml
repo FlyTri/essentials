@@ -2981,6 +2981,8 @@
     <string name="settings_section_more">More</string>
     <string name="action_show_granted">Show granted</string>
     <string name="action_hide_granted">Hide granted</string>
+    <string name="perm_local_network_title">Local network access</string>
+    <string name="perm_local_network_desc">Android 17 blocks apps from talking to devices on your Wi-Fi network unless you allow it. Essentials needs this to work with your watch over the local network.</string>
     <string name="perm_bubbles_title">Floating Bubbles</string>
     <string name="perm_sensitive_notifications_title">Read sensitive notifications</string>
     <string name="perm_sensitive_notifications_desc">Android hides one-time codes from notification listeners. Essentials needs this access to show codes on the island.</string>

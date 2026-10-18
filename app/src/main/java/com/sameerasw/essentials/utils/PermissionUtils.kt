@@ -150,6 +150,38 @@ object PermissionUtils {
             false
         }
 
+    const val LOCAL_NETWORK_PERMISSION = "android.permission.ACCESS_LOCAL_NETWORK"
+
+    fun hasLocalNetworkPermission(context: Context): Boolean =
+        Build.VERSION.SDK_INT < 37 ||
+            androidx.core.content.ContextCompat.checkSelfPermission(context, LOCAL_NETWORK_PERMISSION) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+
+    fun requestLocalNetwork(
+        context: Context,
+        activity: android.app.Activity? = null,
+    ) {
+        val target = activity ?: generateSequence(context) { (it as? android.content.ContextWrapper)?.baseContext }
+            .filterIsInstance<android.app.Activity>()
+            .firstOrNull()
+        val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+        val askedBefore = prefs.getBoolean("local_network_requested", false)
+        if (target == null ||
+            (askedBefore && !androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(target, LOCAL_NETWORK_PERMISSION))
+        ) {
+            context.startActivity(
+                android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    .setData(android.net.Uri.fromParts("package", context.packageName, null))
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+            return
+        }
+        prefs.edit().putBoolean("local_network_requested", true).apply()
+        androidx.core.app.ActivityCompat.requestPermissions(target, arrayOf(LOCAL_NETWORK_PERMISSION), LOCAL_NETWORK_REQUEST_CODE)
+    }
+
+    private const val LOCAL_NETWORK_REQUEST_CODE = 137
+
     fun hasBubblePermission(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager ?: return false

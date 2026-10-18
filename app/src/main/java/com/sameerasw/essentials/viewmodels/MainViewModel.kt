@@ -607,6 +607,7 @@ class MainViewModel : ViewModel() {
     val isCalendarPermissionGranted = mutableStateOf(false)
     val isBubblePermissionGranted = mutableStateOf(false)
     val isSensitiveNotificationsGranted = mutableStateOf(true)
+    val isLocalNetworkGranted = mutableStateOf(true)
     val isUserDictionaryEnabled = mutableStateOf(false)
     val userDictionaryWords = mutableStateOf<Map<String, Long>>(emptyMap())
     val isUserDictionarySheetVisible = mutableStateOf(false)
@@ -1872,6 +1873,7 @@ class MainViewModel : ViewModel() {
         isWriteSecureSettingsEnabled.value = PermissionUtils.canWriteSecureSettings(context)
         isBubblePermissionGranted.value = PermissionUtils.hasBubblePermission(context)
         isSensitiveNotificationsGranted.value = PermissionGrantUtil.hasSensitiveNotifications(context)
+        isLocalNetworkGranted.value = PermissionUtils.hasLocalNetworkPermission(context)
         isShizukuAvailable.value = ShizukuUtils.isShizukuAvailable()
         isShizukuPermissionGranted.value = ShizukuUtils.hasPermission()
         if (cachedIsUpdateAvailable) {

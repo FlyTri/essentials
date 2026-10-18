@@ -2640,6 +2640,7 @@ object FeatureRegistry {
                 iconRes = R.drawable.rounded_adb_24,
                 category = R.string.cat_tools,
                 description = R.string.feat_watch_wireless_debugging_desc,
+                permissionKeys = listOf("LOCAL_NETWORK"),
                 parentFeatureId = "Watch",
                 hasMoreSettings = true,
                 showToggle = true,
