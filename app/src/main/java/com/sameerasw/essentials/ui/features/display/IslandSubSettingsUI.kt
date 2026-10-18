@@ -31,11 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -72,14 +68,10 @@ import com.sameerasw.essentials.ui.features.display.sheets.StatusGlanceCalendarO
 import com.sameerasw.essentials.ui.features.display.sheets.rememberIslandShowsWhileLocked
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.HapticUtil
-import com.sameerasw.essentials.utils.PermissionGrantUtil
 import com.sameerasw.essentials.utils.PermissionUIHelper
 import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.viewmodels.MainViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 const val ISLAND_PLACEMENT_FEATURE_ID = "Island placement"
 const val ISLAND_VISUALS_FEATURE_ID = "Island visuals"
@@ -902,16 +894,7 @@ fun IslandNotificationSettingsUI(
     val context = LocalContext.current
     val view = LocalView.current
     var showFilterAppsSheet by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    var otpReadable by remember { mutableStateOf(PermissionGrantUtil.hasSensitiveNotifications(context)) }
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) otpReadable = PermissionGrantUtil.hasSensitiveNotifications(context)
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
+    var showOtpPermissions by remember { mutableStateOf(false) }
     var showQueueSheet by remember {
         mutableStateOf(
             viewModel.isIslandNotifQueue.value &&
@@ -1165,6 +1148,17 @@ fun IslandNotificationSettingsUI(
             }
         }
 
+        if (showOtpPermissions) {
+            PermissionsBottomSheet(
+                onDismissRequest = {
+                    showOtpPermissions = false
+                    viewModel.check(context)
+                },
+                featureTitle = stringResource(R.string.island_otp_section),
+                permissions = PermissionUIHelper.getPermissionItems(listOf("SENSITIVE_NOTIFICATIONS"), context, viewModel),
+            )
+        }
+
         IslandSettingsSection(R.string.island_otp_section) {
             val otpEnabled = viewModel.isIslandOtpEnabled.value
             IconToggleItem(
@@ -1173,31 +1167,14 @@ fun IslandNotificationSettingsUI(
                 isChecked = otpEnabled,
                 onCheckedChange = { checked ->
                     HapticUtil.performVirtualKeyHaptic(view)
-                    viewModel.setIslandOtpEnabled(checked)
+                    if (checked && !viewModel.isSensitiveNotificationsGranted.value) {
+                        showOtpPermissions = true
+                    } else {
+                        viewModel.setIslandOtpEnabled(checked)
+                    }
                 },
                 modifier = Modifier.highlight(highlightSetting == "island_otp_enabled"),
             )
-            AnimatedVisibility(
-                visible = otpEnabled && !otpReadable,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically(),
-            ) {
-                val featureName = stringResource(R.string.island_otp_section)
-                IconToggleItem(
-                    iconRes = R.drawable.rounded_vpn_key_24,
-                    title = stringResource(R.string.island_otp_grant_title),
-                    showToggle = false,
-                    onClick = {
-                        HapticUtil.performVirtualKeyHaptic(view)
-                        scope.launch {
-                            otpReadable = withContext(Dispatchers.IO) {
-                                PermissionGrantUtil.grantSensitiveNotifications(context, featureName)
-                                PermissionGrantUtil.hasSensitiveNotifications(context)
-                            }
-                        }
-                    },
-                )
-            }
             AnimatedVisibility(
                 visible = otpEnabled,
                 enter = fadeIn() + expandVertically(),
