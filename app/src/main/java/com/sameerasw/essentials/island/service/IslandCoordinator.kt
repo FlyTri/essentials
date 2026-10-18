@@ -722,8 +722,15 @@ class IslandCoordinator(
         applyPreviewRing()
     }
 
+    private var lastContentSuppressed = false
+
     private fun applySuppression() {
-        controller.setSuppressed(isContentSuppressed || revealing || hiding)
+        val contentSuppressed = isContentSuppressed
+        if (contentSuppressed != lastContentSuppressed) {
+            lastContentSuppressed = contentSuppressed
+            plugins.forEach { it.onSuppressionChanged(contentSuppressed) }
+        }
+        controller.setSuppressed(contentSuppressed || revealing || hiding)
         windowHost.setInteractionsDisabled(
             isFullscreenApp && settings.isIslandKeepInFullscreenEnabled() && settings.isIslandDisableInteractionsInFullscreenEnabled(),
         )

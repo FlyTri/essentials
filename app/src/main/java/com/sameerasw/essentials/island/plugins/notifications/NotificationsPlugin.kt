@@ -153,9 +153,12 @@ class NotificationsPlugin : BaseIslandPlugin() {
     private var autoExpanded = false
 
     private val timeoutRunnable = Runnable { onTimeout() }
-    private val catchUpRunnable = Runnable { clearAll() }
+    private val catchUpRunnable = Runnable {
+        if (ctx?.isContentSuppressed?.invoke() == true) catchUpPaused = true else clearAll()
+    }
 
     private val replied = HashMap<String, Long>()
+    private var catchUpPaused = false
     private var copiedKey: String? = null
     private var postedWhileCopied = false
     private val copiedRunnable = Runnable { finishCopy() }
@@ -190,6 +193,21 @@ class NotificationsPlugin : BaseIslandPlugin() {
     override fun refresh() {
         if (ctx == null) return
         if (!settings.isIslandShowNotificationsEnabled()) clearAll() else render()
+    }
+
+    override fun onSuppressionChanged(suppressed: Boolean) {
+        val c = ctx ?: return
+        if (suppressed) {
+            if (catchingUp) {
+                c.mainHandler.removeCallbacks(catchUpRunnable)
+                catchUpPaused = true
+            }
+        } else if (catchUpPaused) {
+            catchUpPaused = false
+            if (alerts.isNotEmpty() && catchingUp && !settings.isIslandCatchUpInfinite()) {
+                c.mainHandler.postDelayed(catchUpRunnable, settings.getIslandCatchUpTimeoutMs())
+            }
+        }
     }
 
     override fun onUserInteraction(focusedKey: String?) {
@@ -363,6 +381,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private fun clearAll() {
         catchingUp = false
+        catchUpPaused = false
         copiedKey = null
         postedWhileCopied = false
         cancelTimers()
