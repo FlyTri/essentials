@@ -87,6 +87,7 @@ import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.RefreshRateUtils
 import com.sameerasw.essentials.utils.RootUtils
+import com.sameerasw.essentials.utils.ScreenshotCleaner
 import com.sameerasw.essentials.utils.PrivilegedMode
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.ShizukuUtils
@@ -248,6 +249,10 @@ class MainViewModel : ViewModel() {
     val islandAlarmWindowHours = mutableIntStateOf(12)
     val isIslandShowTravel = mutableStateOf(true)
     val isIslandShowCaffeinate = mutableStateOf(true)
+    val isIslandShowNavigation = mutableStateOf(true)
+    val islandNavigationOnNew = mutableStateOf(SettingsRepository.ISLAND_NAVIGATION_ON_NEW_PEEK)
+    val islandNavigationExpandDistance = mutableIntStateOf(200)
+    val isIslandNavigationPeekAfterExpand = mutableStateOf(false)
     val isIslandShowHotspot = mutableStateOf(false)
     val isIslandShowDevices = mutableStateOf(true)
     val isIslandBriefEnabled = mutableStateOf(false)
@@ -399,6 +404,11 @@ class MainViewModel : ViewModel() {
     val isPocketModeEnabled = mutableStateOf(false)
     val isFaceUnlockBrightnessEnabled = mutableStateOf(false)
     val isScreenshotShareCleanupEnabled = mutableStateOf(false)
+    val screenshotShareCleanupDelayMinutes = mutableIntStateOf(0)
+    val isScreenshotAutoCleanEnabled = mutableStateOf(false)
+    val screenshotAutoCleanDays = mutableIntStateOf(7)
+    val screenshotsCleanedCount = mutableIntStateOf(0)
+    val screenshotsCleanedBytes = mutableLongStateOf(0L)
     val faceUnlockMaxBrightness = mutableIntStateOf(100)
     val faceUnlockAmbientThreshold = mutableFloatStateOf(10f)
     val isFaceUnlockTriggerUnlock = mutableStateOf(true)
@@ -960,6 +970,18 @@ class MainViewModel : ViewModel() {
                     SettingsRepository.KEY_ISLAND_NOTIF_TAP_TO_OPEN ->
                         isIslandNotifTapToOpen.value = settingsRepository.isIslandNotifTapToOpenEnabled()
 
+                    SettingsRepository.KEY_ISLAND_SHOW_NAVIGATION ->
+                        isIslandShowNavigation.value = settingsRepository.isIslandShowNavigationEnabled()
+
+                    SettingsRepository.KEY_ISLAND_NAVIGATION_ON_NEW ->
+                        islandNavigationOnNew.value = settingsRepository.getIslandNavigationOnNew()
+
+                    SettingsRepository.KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE ->
+                        islandNavigationExpandDistance.intValue = settingsRepository.getIslandNavigationExpandDistance()
+
+                    SettingsRepository.KEY_ISLAND_NAVIGATION_PEEK_AFTER_EXPAND ->
+                        isIslandNavigationPeekAfterExpand.value = settingsRepository.isIslandNavigationPeekAfterExpandEnabled()
+
                     SettingsRepository.KEY_ISLAND_CATCH_UP_ENABLED ->
                         isIslandCatchUpEnabled.value = settingsRepository.isIslandCatchUpEnabled()
 
@@ -1387,6 +1409,21 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_SCREENSHOT_SHARE_CLEANUP_ENABLED ->
                         isScreenshotShareCleanupEnabled.value = settingsRepository.isScreenshotShareCleanupEnabled()
+
+                    SettingsRepository.KEY_SCREENSHOT_SHARE_CLEANUP_DELAY ->
+                        screenshotShareCleanupDelayMinutes.intValue = settingsRepository.getScreenshotShareCleanupDelayMinutes()
+
+                    SettingsRepository.KEY_SCREENSHOT_AUTO_CLEAN_ENABLED ->
+                        isScreenshotAutoCleanEnabled.value = settingsRepository.isScreenshotAutoCleanEnabled()
+
+                    SettingsRepository.KEY_SCREENSHOT_AUTO_CLEAN_DAYS ->
+                        screenshotAutoCleanDays.intValue = settingsRepository.getScreenshotAutoCleanDays()
+
+                    SettingsRepository.KEY_SCREENSHOTS_CLEANED_COUNT ->
+                        screenshotsCleanedCount.intValue = settingsRepository.getScreenshotsCleanedCount()
+
+                    SettingsRepository.KEY_SCREENSHOTS_CLEANED_BYTES ->
+                        screenshotsCleanedBytes.longValue = settingsRepository.getScreenshotsCleanedBytes()
 
                     SettingsRepository.KEY_FACE_UNLOCK_MAX_BRIGHTNESS ->
                         faceUnlockMaxBrightness.intValue = settingsRepository.getFaceUnlockMaxBrightness()
@@ -2439,6 +2476,10 @@ class MainViewModel : ViewModel() {
         isDuoKeepInFullscreen.value = settingsRepository.isDuoKeepInFullscreenEnabled()
         isDuoDisableInteractionsInFullscreen.value = settingsRepository.isDuoDisableInteractionsInFullscreenEnabled()
         isIslandShowCaffeinate.value = settingsRepository.isIslandShowCaffeinateEnabled()
+        isIslandShowNavigation.value = settingsRepository.isIslandShowNavigationEnabled()
+        islandNavigationOnNew.value = settingsRepository.getIslandNavigationOnNew()
+        islandNavigationExpandDistance.intValue = settingsRepository.getIslandNavigationExpandDistance()
+        isIslandNavigationPeekAfterExpand.value = settingsRepository.isIslandNavigationPeekAfterExpandEnabled()
         isIslandShowHotspot.value = settingsRepository.isIslandShowHotspotEnabled()
         isIslandShowDevices.value = settingsRepository.isIslandShowDevicesEnabled()
         isIslandBriefEnabled.value = settingsRepository.isIslandBriefEnabled()
@@ -2828,6 +2869,11 @@ class MainViewModel : ViewModel() {
             settingsRepository.getBoolean(SettingsRepository.KEY_POCKET_MODE_ENABLED)
         isFaceUnlockBrightnessEnabled.value = settingsRepository.isFaceUnlockBrightnessEnabled()
         isScreenshotShareCleanupEnabled.value = settingsRepository.isScreenshotShareCleanupEnabled()
+        screenshotShareCleanupDelayMinutes.intValue = settingsRepository.getScreenshotShareCleanupDelayMinutes()
+        isScreenshotAutoCleanEnabled.value = settingsRepository.isScreenshotAutoCleanEnabled()
+        screenshotAutoCleanDays.intValue = settingsRepository.getScreenshotAutoCleanDays()
+        screenshotsCleanedCount.intValue = settingsRepository.getScreenshotsCleanedCount()
+        screenshotsCleanedBytes.longValue = settingsRepository.getScreenshotsCleanedBytes()
         faceUnlockMaxBrightness.intValue = settingsRepository.getFaceUnlockMaxBrightness()
         faceUnlockAmbientThreshold.floatValue = settingsRepository.getFaceUnlockAmbientThreshold()
         isFaceUnlockTriggerUnlock.value = settingsRepository.isFaceUnlockTriggerUnlockEnabled()
@@ -5631,6 +5677,26 @@ class MainViewModel : ViewModel() {
     fun setIslandShowDevices(enabled: Boolean) {
         isIslandShowDevices.value = enabled
         settingsRepository.setIslandShowDevicesEnabled(enabled)
+    }
+
+    fun setIslandShowNavigation(enabled: Boolean) {
+        isIslandShowNavigation.value = enabled
+        settingsRepository.setIslandShowNavigationEnabled(enabled)
+    }
+
+    fun setIslandNavigationOnNew(mode: String) {
+        islandNavigationOnNew.value = mode
+        settingsRepository.setIslandNavigationOnNew(mode)
+    }
+
+    fun setIslandNavigationExpandDistance(meters: Int) {
+        islandNavigationExpandDistance.intValue = meters
+        settingsRepository.setIslandNavigationExpandDistance(meters)
+    }
+
+    fun setIslandNavigationPeekAfterExpand(enabled: Boolean) {
+        isIslandNavigationPeekAfterExpand.value = enabled
+        settingsRepository.setIslandNavigationPeekAfterExpandEnabled(enabled)
     }
 
     fun setIslandShowHotspot(enabled: Boolean) {
@@ -9615,6 +9681,34 @@ class MainViewModel : ViewModel() {
     fun setScreenshotShareCleanupEnabled(enabled: Boolean) {
         settingsRepository.setScreenshotShareCleanupEnabled(enabled)
         isScreenshotShareCleanupEnabled.value = enabled
+        if (!enabled) appContext?.let { ScreenshotCleaner.cancelAll(it, ScreenshotCleaner.TAG_SHARED) }
+    }
+
+    fun setScreenshotShareCleanupDelayMinutes(minutes: Int) {
+        settingsRepository.setScreenshotShareCleanupDelayMinutes(minutes)
+        screenshotShareCleanupDelayMinutes.intValue = minutes
+    }
+
+    fun setScreenshotAutoCleanEnabled(enabled: Boolean) {
+        isScreenshotAutoCleanEnabled.value = enabled
+        val context = appContext
+        if (context == null) {
+            settingsRepository.setScreenshotAutoCleanEnabled(enabled)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            if (enabled) {
+                settingsRepository.setScreenshotAutoCleanLastId(ScreenshotCleaner.latestScreenshotId(context))
+            } else {
+                ScreenshotCleaner.cancelAll(context, ScreenshotCleaner.TAG_AUTO_CLEAN)
+            }
+            settingsRepository.setScreenshotAutoCleanEnabled(enabled)
+        }
+    }
+
+    fun setScreenshotAutoCleanDays(days: Int) {
+        settingsRepository.setScreenshotAutoCleanDays(days)
+        screenshotAutoCleanDays.intValue = days
     }
 
     fun setFaceUnlockAmbientThreshold(value: Float) {
