@@ -1008,6 +1008,11 @@ object FeatureRegistry {
                             R.string.island_line_peek_desc,
                             "island_line_stage_enabled",
                         ),
+                        SearchSetting(
+                            R.string.island_balance_compact_title,
+                            R.string.island_section_behavior,
+                            "island_balance_compact",
+                        ),
                     ),
             ) {
                 override fun isEnabled(viewModel: MainViewModel) = true

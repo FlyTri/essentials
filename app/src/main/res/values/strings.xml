@@ -3020,8 +3020,10 @@
     <string name="island_battery_idle_color_title">Idle color</string>
     <string name="duo_battery_charging_color_auto">Auto charging speed</string>
     <string name="duo_battery_power_save_color_title">Battery saver</string>
-    <string name="duo_battery_low_color_title">Low battery (&lt;20%)</string>
-    <string name="duo_battery_critical_color_title">Critically low battery (&lt;10%)</string>
+    <string name="duo_battery_low_color_title">Low battery</string>
+    <string name="duo_battery_low_level_title">Low battery level</string>
+    <string name="duo_battery_critical_color_title">Critically low battery</string>
+    <string name="duo_battery_critical_level_title">Critical battery level</string>
     <string name="island_media_config_title">Configuration</string>
     <string name="duo_media_skip_apps_title">Select apps to skip</string>
     <string name="duo_show_networks_title">Networks</string>
@@ -3144,6 +3146,7 @@
     <string name="island_keep_on_landscape_title">Keep on landscape</string>
     <string name="island_landscape_top_spacing_title">Landscape top spacing</string>
     <string name="island_bond_edge_title">Bond with notch when inactive</string>
+    <string name="island_balance_compact_title">Visually balance compact island</string>
     <string name="island_max_items_title">Max items to show</string>
     <string name="island_always_gestures_title">Always available gestures</string>
     <string name="island_always_gestures_desc">Keep the gesture area available even while island is hidden</string>
