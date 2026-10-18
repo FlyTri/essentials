@@ -239,6 +239,17 @@ fun IslandSettingsUI(
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
+
+            IconToggleItem(
+                iconRes = R.drawable.rounded_format_align_center_24,
+                title = stringResource(R.string.island_balance_compact_title),
+                isChecked = viewModel.isIslandBalanceCompact.value,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    viewModel.setIslandBalanceCompact(checked)
+                },
+                modifier = Modifier.highlight(highlightSetting == "island_balance_compact"),
+            )
         }
 
         RoundedCardContainer(

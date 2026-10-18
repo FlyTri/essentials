@@ -822,6 +822,11 @@ object FeatureRegistry {
                             R.array.keywords_battery,
                         ),
                         SearchSetting(
+                            R.string.island_balance_compact_title,
+                            R.string.island_max_items_title,
+                            "island_balance_compact",
+                        ),
+                        SearchSetting(
                             R.string.island_show_timers_title,
                             R.string.island_stopwatch_default,
                             "island_show_timers",

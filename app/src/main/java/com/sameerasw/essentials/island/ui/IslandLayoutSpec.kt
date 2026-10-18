@@ -26,6 +26,7 @@ data class IslandLayoutSpec(
     val maxExpandedHeight: Dp = Dp.Unspecified,
     val cameraPresence: Float = 1f,
     val bondEdge: Boolean = false,
+    val balanceCompact: Boolean = true,
     val landscape: Boolean = false,
     val cameraAnchor: CameraAnchor = CameraAnchor.Center,
     val outlineColor: Color? = null,

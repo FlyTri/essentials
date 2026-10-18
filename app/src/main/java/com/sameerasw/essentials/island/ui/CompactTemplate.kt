@@ -39,6 +39,7 @@ fun CompactTemplate(
     onCellTap: (String) -> Unit,
     onCellLongPress: (String) -> Unit,
     sideBubble: () -> Float = { 0f },
+    bubbleExtent: () -> Int = { 0 },
     onSlack: (Int) -> Unit = {},
 ) {
     val cells = buildMap {
@@ -161,9 +162,12 @@ fun CompactTemplate(
         val needRight = content(right) + rightInset + edge
         val t = if (hasCells) sideBubble().coerceIn(0f, 1f) else 0f
         val mirrored = maxOf(needLeft, needRight)
-        onSlack(needRight - needLeft)
-        val leftSide = (mirrored + (needLeft - mirrored) * t).roundToInt()
-        val rightSide = (mirrored + (needRight - mirrored) * t).roundToInt()
+        val extent = if (spec.balanceCompact) bubbleExtent().coerceAtLeast(0) else 0
+        val balancedLeft = if (spec.balanceCompact) maxOf(needLeft, needRight - extent) else needLeft
+        val balancedRight = if (spec.balanceCompact) balancedLeft + extent else needRight
+        onSlack(if (spec.balanceCompact) extent else needRight - needLeft)
+        val leftSide = (mirrored + (balancedLeft - mirrored) * t).roundToInt()
+        val rightSide = (mirrored + (balancedRight - mirrored) * t).roundToInt()
         val width = leftSide + rightSide + cameraSlot
         layout(width, height) {
             var x = spacing + leftInset

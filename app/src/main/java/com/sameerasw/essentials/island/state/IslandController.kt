@@ -36,6 +36,7 @@ class IslandController(
     val state: StateFlow<IslandUiState> = _state.asStateFlow()
 
     var maxCells: Int = CompactLayoutEngine.MAX_CELLS
+    var balanceCompact: Boolean = true
     private var feedbackActive = false
 
     fun setFeedbackActive(active: Boolean) {
@@ -297,6 +298,7 @@ class IslandController(
             anchorProvider(),
             maxCells = maxCells,
             leftExtra = if (bubbleOwner != null) 1 else 0,
+            balance = balanceCompact,
         )
         val focusedKey = expandedKey ?: peekKey
         val stage = when {

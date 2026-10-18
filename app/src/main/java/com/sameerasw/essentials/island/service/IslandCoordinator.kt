@@ -690,6 +690,7 @@ class IslandCoordinator(
             cameraPresence = if (geo.hasCamera) 1f else 0f,
             landscape = isLandscape,
             bondEdge = !geo.hasCamera && settings.isIslandBondEdgeEnabled(),
+            balanceCompact = settings.isIslandBalanceCompactEnabled(),
             maxExpandedHeight = if (isLandscape) ((geo.screenHeight - geo.surfaceTop) / density - 12f).dp else Dp.Unspecified,
             outlineColor = if (settings.isIslandBorderOutlineEnabled()) {
                 runCatching { Color(AndroidColor.parseColor(settings.getIslandBorderOutlineColor())) }
@@ -715,6 +716,7 @@ class IslandCoordinator(
         windowHost.updateGeometry(geo)
         controller.lineStageEnabled = settings.isIslandLineStageEnabled()
         controller.maxCells = settings.getIslandMaxItems() * 2
+        controller.balanceCompact = settings.isIslandBalanceCompactEnabled()
         controller.relayout()
         controller.expandedTimeoutMs = settings.getIslandExpandedTimeoutMs()
         applyPreviewRing()
@@ -834,6 +836,7 @@ class IslandCoordinator(
             SettingsRepository.KEY_ISLAND_HIDE_LANDSCAPE,
             SettingsRepository.KEY_ISLAND_LANDSCAPE_TOP_SPACING,
             SettingsRepository.KEY_ISLAND_BOND_EDGE,
+            SettingsRepository.KEY_ISLAND_BALANCE_COMPACT,
             SettingsRepository.KEY_ISLAND_MAX_ITEMS,
         )
     }

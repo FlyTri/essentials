@@ -3146,6 +3146,7 @@
     <string name="island_keep_on_landscape_title">Keep on landscape</string>
     <string name="island_landscape_top_spacing_title">Landscape top spacing</string>
     <string name="island_bond_edge_title">Bond with notch when inactive</string>
+    <string name="island_balance_compact_title">Visually balance compact island</string>
     <string name="island_max_items_title">Max items to show</string>
     <string name="island_always_gestures_title">Always available gestures</string>
     <string name="island_always_gestures_desc">Keep the gesture area available even while island is hidden</string>
