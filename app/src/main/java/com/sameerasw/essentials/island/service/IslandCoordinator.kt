@@ -717,6 +717,7 @@ class IslandCoordinator(
         controller.lineStageEnabled = settings.isIslandLineStageEnabled()
         controller.maxCells = settings.getIslandMaxItems() * 2
         controller.balanceCompact = settings.isIslandBalanceCompactEnabled()
+        controller.secondaryBubbleEnabled = settings.isIslandSecondaryBubbleEnabled()
         controller.relayout()
         controller.expandedTimeoutMs = settings.getIslandExpandedTimeoutMs()
         applyPreviewRing()
@@ -844,6 +845,7 @@ class IslandCoordinator(
             SettingsRepository.KEY_ISLAND_LANDSCAPE_TOP_SPACING,
             SettingsRepository.KEY_ISLAND_BOND_EDGE,
             SettingsRepository.KEY_ISLAND_BALANCE_COMPACT,
+            SettingsRepository.KEY_ISLAND_SECONDARY_BUBBLE,
             SettingsRepository.KEY_ISLAND_MAX_ITEMS,
         )
     }

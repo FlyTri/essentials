@@ -1009,6 +1009,11 @@ object FeatureRegistry {
                             "island_line_stage_enabled",
                         ),
                         SearchSetting(
+                            R.string.island_secondary_bubble_title,
+                            R.string.island_section_behavior,
+                            "island_secondary_bubble",
+                        ),
+                        SearchSetting(
                             R.string.island_balance_compact_title,
                             R.string.island_section_behavior,
                             "island_balance_compact",
