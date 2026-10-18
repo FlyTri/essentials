@@ -822,11 +822,6 @@ object FeatureRegistry {
                             R.array.keywords_battery,
                         ),
                         SearchSetting(
-                            R.string.island_balance_compact_title,
-                            R.string.island_max_items_title,
-                            "island_balance_compact",
-                        ),
-                        SearchSetting(
                             R.string.island_show_timers_title,
                             R.string.island_stopwatch_default,
                             "island_show_timers",
@@ -1012,6 +1007,11 @@ object FeatureRegistry {
                             R.string.island_line_peek_title,
                             R.string.island_line_peek_desc,
                             "island_line_stage_enabled",
+                        ),
+                        SearchSetting(
+                            R.string.island_balance_compact_title,
+                            R.string.island_section_behavior,
+                            "island_balance_compact",
                         ),
                     ),
             ) {

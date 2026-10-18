@@ -605,6 +605,17 @@ fun IslandBehaviorSettingsUI(
                 modifier = Modifier.highlight(highlightSetting == "island_line_stage_enabled"),
             )
 
+            IconToggleItem(
+                iconRes = R.drawable.rounded_format_align_center_24,
+                title = stringResource(R.string.island_balance_compact_title),
+                isChecked = viewModel.isIslandBalanceCompact.value,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    viewModel.setIslandBalanceCompact(checked)
+                },
+                modifier = Modifier.highlight(highlightSetting == "island_balance_compact"),
+            )
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
