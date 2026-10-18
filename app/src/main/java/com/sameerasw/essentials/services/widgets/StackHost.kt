@@ -107,9 +107,7 @@ object StackHost {
                         repository.savePositions(positions)
                     }
 
-                    Intent.ACTION_SCREEN_ON -> {
-                        repository.getAll().forEach { scheduleTimer(it.stackWidgetId) }
-                    }
+                    Intent.ACTION_SCREEN_ON -> repository.getAll().forEach { scheduleTimer(it.stackWidgetId) }
                 }
             }
         }
@@ -124,7 +122,6 @@ object StackHost {
             override fun onLowMemory() {}
 
             override fun onTrimMemory(level: Int) {
-                // Cached apps get frozen and miss SCREEN_OFF, so save before that happens.
                 if (level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND) repository.savePositions(positions)
             }
         }
