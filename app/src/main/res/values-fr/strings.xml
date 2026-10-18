@@ -1727,4 +1727,5 @@ Les effets de la LED HiLight peuvent être aussi utilisés comme une action dans
     <string name="screenshot_auto_clean_note">Chaque nouvelle capture d\'écran ont une notification pour choisir de les conserver ou non. Les captures d\'écran mis en favori sont toujours à garder.</string>
     <string name="screenshots_cleaned_count_title">Captures d\'écran supprimées</string>
     <string name="screenshots_storage_saved_title">Stockage économisé</string>
+    <string name="feat_aod_wallpaper_desc">En utilisant un overlay</string>
 </resources>
