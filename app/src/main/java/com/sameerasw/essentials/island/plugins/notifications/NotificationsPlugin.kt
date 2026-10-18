@@ -62,6 +62,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
     )
 
     private val alerts = ArrayDeque<ActiveNotificationAlert>()
+    private val seen = HashSet<String>()
     private var currentIndex = 0
     
     private var manualPick = false
@@ -106,9 +107,28 @@ class NotificationsPlugin : BaseIslandPlugin() {
         return alerts.drop(index + 1) + alerts.take(index).asReversed()
     }
 
+    private fun markSeen() {
+        currentAlert()?.let { seen.add(it.key) }
+    }
+
     private fun advanceCurrent() {
         if (alerts.size < 2) return
         currentIndex = (currentIndex.coerceIn(0, alerts.size - 1) + 1) % alerts.size
+        markSeen()
+    }
+
+    private fun advanceToUnseen(): Boolean {
+        if (alerts.size < 2) return false
+        val start = currentIndex.coerceIn(0, alerts.size - 1)
+        for (offset in 1 until alerts.size) {
+            val index = (start + offset) % alerts.size
+            if (alerts[index].key !in seen) {
+                currentIndex = index
+                markSeen()
+                return true
+            }
+        }
+        return false
     }
 
     private fun select(key: String) {
@@ -119,6 +139,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         val here = showingHere()
         if (here && index == currentIndex) return
         currentIndex = index
+        markSeen()
         manualPick = true
         pendingPopUp = false
         scheduleTimeout()
@@ -162,6 +183,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         }
         cancelTimers()
         alerts.clear()
+        seen.clear()
     }
 
     override fun refresh() {
@@ -258,6 +280,9 @@ class NotificationsPlugin : BaseIslandPlugin() {
         if (minimal()) return
         val otpNeedsExpand = currentAlert()?.let(::isOtp) == true && !settings.isIslandOtpTapToCopyEnabled()
         val lineAvailable = settings.isIslandLineStageEnabled() && settings.isIslandNotifCompactHeadsUpEnabled() && !otpNeedsExpand
+      
+        markSeen()
+   
         c.request(
             if (lineAvailable) PluginRequest.Peek(ITEM_KEY, timeoutMs(), sticky = true)
             else PluginRequest.Expand(ITEM_KEY).also { autoExpanded = true },
@@ -267,7 +292,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
     private fun onRemoved(key: String) {
         val index = alerts.indexOfFirst { it.key == key }
         if (index < 0) return
-        alerts.removeAt(index)
+        alerts.removeAt(index).also { seen.remove(it.key) }
         if (index < currentIndex) currentIndex--
         currentIndex = currentIndex.coerceIn(0, (alerts.size - 1).coerceAtLeast(0))
         if (alerts.isEmpty()) clearAll() else render()
@@ -276,8 +301,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
     private fun onTimeout() {
         val c = ctx ?: return
         if (pendingPopUp) return
-        if (showingHere() && alerts.size > 1 && !manualPick) {
-            advanceCurrent()
+        if (showingHere() && alerts.size > 1 && !manualPick && advanceToUnseen()) {
             scheduleTimeout()
             render()
             if (c.currentStage() == IslandStage.Line) popUp()
@@ -335,6 +359,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         copiedKey = null
         cancelTimers()
         alerts.clear()
+        seen.clear()
         currentIndex = 0
         manualPick = false
         pendingPopUp = false
@@ -424,6 +449,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
     private fun clearWaiting() {
         val current = currentAlert() ?: return
         alerts.removeAll { it !== current }
+        seen.retainAll { it == current.key }
         currentIndex = 0
         render()
     }
