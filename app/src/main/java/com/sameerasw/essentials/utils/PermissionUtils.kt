@@ -163,20 +163,9 @@ object PermissionUtils {
     ) {
         val target = activity ?: generateSequence(context) { (it as? android.content.ContextWrapper)?.baseContext }
             .filterIsInstance<android.app.Activity>()
-            .firstOrNull()
-        val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-        val askedBefore = prefs.getBoolean("local_network_requested", false)
-        if (target == null ||
-            (askedBefore && !androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(target, LOCAL_NETWORK_PERMISSION))
-        ) {
-            context.startActivity(
-                android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    .setData(android.net.Uri.fromParts("package", context.packageName, null))
-                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK),
-            )
-            return
-        }
-        prefs.edit().putBoolean("local_network_requested", true).apply()
+            .firstOrNull() ?: return
+        context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+            .edit().putBoolean("local_network_requested", true).apply()
         androidx.core.app.ActivityCompat.requestPermissions(target, arrayOf(LOCAL_NETWORK_PERMISSION), LOCAL_NETWORK_REQUEST_CODE)
     }
 
