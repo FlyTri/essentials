@@ -3303,7 +3303,6 @@
     <string name="island_navigation_on_new_expand">Expand</string>
     <string name="island_navigation_on_new_peek">Line peek</string>
     <string name="island_navigation_expand_title">Expand before a turn</string>
-    <string name="island_navigation_expand_desc">Expands with the direction when you get this close to the turn</string>
     <string name="island_navigation_expand_off">Off</string>
     <string name="island_navigation_expand_meters">%d m</string>
     <string name="island_navigation_peek_after_expand_title">Line peek after expanding</string>

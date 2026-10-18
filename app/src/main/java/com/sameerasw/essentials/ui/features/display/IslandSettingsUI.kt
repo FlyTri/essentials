@@ -437,7 +437,6 @@ fun IslandSettingsUI(
                         dragHandle = handle,
                         iconRes = R.drawable.round_navigation_24,
                         title = stringResource(R.string.island_show_navigation_title),
-                        description = stringResource(R.string.island_navigation_desc),
                         isChecked = viewModel.isIslandShowNavigation.value,
                         onCheckedChange = { checked ->
                             HapticUtil.performVirtualKeyHaptic(view)

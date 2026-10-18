@@ -89,7 +89,6 @@ fun IslandNavigationOptionsBottomSheet(
 
                 ConfigPickerItem(
                     title = stringResource(R.string.island_navigation_expand_title),
-                    description = stringResource(R.string.island_navigation_expand_desc),
                     selectedValue = distanceLabel(viewModel.islandNavigationExpandDistance.intValue),
                     iconRes = R.drawable.rounded_magnify_fullscreen_24,
                     modifier = Modifier.fillMaxWidth(),

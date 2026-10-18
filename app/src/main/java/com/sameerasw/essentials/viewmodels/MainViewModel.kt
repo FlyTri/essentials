@@ -249,7 +249,7 @@ class MainViewModel : ViewModel() {
     val isIslandShowTravel = mutableStateOf(true)
     val isIslandShowCaffeinate = mutableStateOf(true)
     val isIslandShowNavigation = mutableStateOf(true)
-    val islandNavigationOnNew = mutableStateOf(SettingsRepository.ISLAND_NAVIGATION_ON_NEW_EXPAND)
+    val islandNavigationOnNew = mutableStateOf(SettingsRepository.ISLAND_NAVIGATION_ON_NEW_PEEK)
     val islandNavigationExpandDistance = mutableIntStateOf(200)
     val isIslandNavigationPeekAfterExpand = mutableStateOf(false)
     val isIslandShowHotspot = mutableStateOf(false)
