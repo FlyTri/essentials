@@ -2981,7 +2981,12 @@
     <string name="settings_section_more">More</string>
     <string name="action_show_granted">Show granted</string>
     <string name="action_hide_granted">Hide granted</string>
+    <string name="perm_local_network_title">Local network access</string>
+    <string name="perm_local_network_desc">Android 17 blocks apps from talking to devices on your Wi-Fi network unless you allow it. Essentials needs this to work with your watch over the local network.</string>
     <string name="perm_bubbles_title">Floating Bubbles</string>
+    <string name="perm_sensitive_notifications_title">Read sensitive notifications</string>
+    <string name="perm_sensitive_notifications_desc">Android hides one-time codes from notification listeners. Essentials needs this access to show codes on the island.</string>
+    <string name="perm_sensitive_notifications_instructions">Grant it with Shizuku or root, or run the command over ADB.</string>
     <string name="perm_bubbles_desc">Allow web previews to open in floating conversation bubbles above other apps</string>
     <string name="perm_bubbles_instructions">Set to "All conversations can bubble" in app notification settings, or grant via Shizuku / Root.</string>
     <string name="label_frozen_apps">Frozen Apps</string>
@@ -3020,8 +3025,10 @@
     <string name="island_battery_idle_color_title">Idle color</string>
     <string name="duo_battery_charging_color_auto">Auto charging speed</string>
     <string name="duo_battery_power_save_color_title">Battery saver</string>
-    <string name="duo_battery_low_color_title">Low battery (&lt;20%)</string>
-    <string name="duo_battery_critical_color_title">Critically low battery (&lt;10%)</string>
+    <string name="duo_battery_low_color_title">Low battery</string>
+    <string name="duo_battery_low_level_title">Low battery level</string>
+    <string name="duo_battery_critical_color_title">Critically low battery</string>
+    <string name="duo_battery_critical_level_title">Critical battery level</string>
     <string name="island_media_config_title">Configuration</string>
     <string name="duo_media_skip_apps_title">Select apps to skip</string>
     <string name="duo_show_networks_title">Networks</string>
@@ -3144,6 +3151,8 @@
     <string name="island_keep_on_landscape_title">Keep on landscape</string>
     <string name="island_landscape_top_spacing_title">Landscape top spacing</string>
     <string name="island_bond_edge_title">Bond with notch when inactive</string>
+    <string name="island_secondary_bubble_title">Secondary bubble</string>
+    <string name="island_balance_compact_title">Visually balance compact island</string>
     <string name="island_max_items_title">Max items to show</string>
     <string name="island_always_gestures_title">Always available gestures</string>
     <string name="island_always_gestures_desc">Keep the gesture area available even while island is hidden</string>
@@ -3439,6 +3448,22 @@
     <string name="island_notif_section_heads_up">Heads up</string>
     <string name="island_notif_section_in_island">In the island</string>
     <string name="island_notif_section_lock_screen">Lock screen</string>
+    <string name="island_otp_section">OTP codes</string>
+    <string name="island_otp_enabled_title">Detect OTP codes</string>
+    <string name="island_otp_enabled_desc">Show one-time codes from notifications with a copy button</string>
+    <string name="island_otp_tap_to_copy_title">Tap to copy</string>
+    <string name="island_otp_tap_to_copy_desc">Tapping the peek copies the code</string>
+    <string name="island_otp_dismiss_after_copy_title">Dismiss notification after copy</string>
+    <string name="island_otp_bypass_filter_title">Show codes from any app</string>
+    <string name="island_otp_bypass_filter_desc">Codes appear even from apps outside the notification filter</string>
+    <string name="island_otp_timeout_title">Show codes for</string>
+    <string name="island_otp_label">OTP code</string>
+    <string name="island_otp_copy">Copy code</string>
+    <string name="island_otp_dismiss">Dismiss</string>
+    <string name="island_otp_copied">Code copied</string>
+    <string name="island_otp_show_message">Show message</string>
+    <string name="island_otp_clip_label">One-time code</string>
+    <string name="island_otp_grant_title">Allow reading codes</string>
     <string name="island_notif_filter_apps_desc">Only show notifications from the apps you pick</string>
     <string name="island_notif_skip_silent_desc">Ignore notifications that arrive without sound</string>
     <string name="island_notif_follow_dnd_title">Follow Do Not Disturb</string>
@@ -3472,19 +3497,15 @@
     <string name="action_expand_settings">Expand settings</string>
     <string name="action_collapse_status_bar">Collapse status bar</string>
 
-    <!-- Watchface Promotion & Testing -->
+    <!-- Watchface Promotion -->
     <string name="whats_new_watchface_title">New: Essentials Watchface</string>
     <string name="whats_new_watchface_desc">Install the Essentials watchface on your Wear OS watch straight from Google Play.</string>
     <string name="whats_new_watchface_summary">Now on Google Play for Wear OS</string>
-    <string name="watchface_promo_step1_title">1. Join Google Group</string>
-    <string name="watchface_promo_step1_desc">Join the testing group using the Gmail account associated with your watch</string>
-    <string name="watchface_promo_step1_action">Join Google Group</string>
-    <string name="watchface_promo_step2_title">2. Join Beta Program</string>
-    <string name="watchface_promo_step2_desc">Opt-in to the internal testing program on Google Play</string>
-    <string name="watchface_promo_step2_action">Join Beta Program</string>
-    <string name="watchface_promo_step3_title">3. Install on Watch</string>
+    <string name="watchface_promo_step3_title">Install on Watch</string>
     <string name="watchface_promo_step3_desc">Open the Play Store listing directly on your watch to install</string>
     <string name="watchface_promo_step3_action">Open on Watch</string>
+
+    <string name="whats_new_previous_updates">From previous updates</string>
 
     <!-- Overcast Separation What's New -->
     <string name="whats_new_overcast_section_title">Weather is Now Separate</string>
