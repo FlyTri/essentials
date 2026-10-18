@@ -26,6 +26,7 @@ import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.BackGestureAppConfig
 import com.sameerasw.essentials.domain.model.AppTag
 import com.sameerasw.essentials.domain.model.DnsPreset
+import com.sameerasw.essentials.utils.DuoBatteryLevels
 import com.sameerasw.essentials.domain.model.HilightEffect
 import com.sameerasw.essentials.domain.model.HilightProgressColorMode
 import com.sameerasw.essentials.domain.model.NotificationLightingColorMode
@@ -493,6 +494,8 @@ class SettingsRepository(
         const val KEY_ISLAND_BATTERY_IDLE_COLOR = "island_battery_idle_color"
         const val KEY_DUO_BATTERY_CRITICAL_COLOR_ENABLED = "duo_battery_critical_color_enabled"
         const val KEY_DUO_BATTERY_CRITICAL_COLOR = "duo_battery_critical_color"
+        const val KEY_DUO_BATTERY_LOW_LEVEL = "duo_battery_low_level"
+        const val KEY_DUO_BATTERY_CRITICAL_LEVEL = "duo_battery_critical_level"
         const val KEY_DUO_SHOW_NETWORKS = "duo_show_networks"
         const val KEY_DUO_DIFFERENTIATE_WIFI = "duo_differentiate_wifi"
         const val KEY_DUO_SHOW_TIME = "duo_show_time"
@@ -3902,6 +3905,14 @@ class SettingsRepository(
 
     fun getDuoBatteryCriticalColor(): String = getString(KEY_DUO_BATTERY_CRITICAL_COLOR, "#F44336") ?: "#F44336"
     fun setDuoBatteryCriticalColor(colorHex: String) = putString(KEY_DUO_BATTERY_CRITICAL_COLOR, colorHex)
+
+    fun getDuoBatteryLowLevel(): Int = getInt(KEY_DUO_BATTERY_LOW_LEVEL, DuoBatteryLevels.DEFAULT_LOW)
+    fun getDuoBatteryCriticalLevel(): Int = getInt(KEY_DUO_BATTERY_CRITICAL_LEVEL, DuoBatteryLevels.DEFAULT_CRITICAL)
+
+    fun setDuoBatteryLevels(low: Int, critical: Int) {
+        putInt(KEY_DUO_BATTERY_LOW_LEVEL, low)
+        putInt(KEY_DUO_BATTERY_CRITICAL_LEVEL, critical)
+    }
 
     fun isDuoShowNetworksEnabled(): Boolean = getBoolean(KEY_DUO_SHOW_NETWORKS, true)
     fun setDuoShowNetworksEnabled(enabled: Boolean) = putBoolean(KEY_DUO_SHOW_NETWORKS, enabled)

@@ -84,6 +84,7 @@ import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 import com.sameerasw.essentials.utils.AppIconUtil
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.DeviceUtils
+import com.sameerasw.essentials.utils.DuoBatteryLevels
 import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.RefreshRateUtils
 import com.sameerasw.essentials.utils.RootUtils
@@ -188,6 +189,8 @@ class MainViewModel : ViewModel() {
     val duoBatteryPowerSaveColor = mutableStateOf("#FF9800")
     val isDuoBatteryLowColorEnabled = mutableStateOf(true)
     val duoBatteryLowColor = mutableStateOf("#FFEB3B")
+    val duoBatteryLowLevel = mutableIntStateOf(DuoBatteryLevels.DEFAULT_LOW)
+    val duoBatteryCriticalLevel = mutableIntStateOf(DuoBatteryLevels.DEFAULT_CRITICAL)
     val isIslandBatteryIdleColorEnabled = mutableStateOf(false)
     val islandBatteryIdleColor = mutableStateOf("#FFFFFF")
     val isDuoBatteryCriticalColorEnabled = mutableStateOf(true)
@@ -833,6 +836,12 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_DUO_BATTERY_CRITICAL_COLOR ->
                         duoBatteryCriticalColor.value = settingsRepository.getDuoBatteryCriticalColor()
+
+                    SettingsRepository.KEY_DUO_BATTERY_LOW_LEVEL ->
+                        duoBatteryLowLevel.intValue = settingsRepository.getDuoBatteryLowLevel()
+
+                    SettingsRepository.KEY_DUO_BATTERY_CRITICAL_LEVEL ->
+                        duoBatteryCriticalLevel.intValue = settingsRepository.getDuoBatteryCriticalLevel()
 
                     SettingsRepository.KEY_DUO_SHOW_NETWORKS ->
                         isDuoShowNetworks.value = settingsRepository.isDuoShowNetworksEnabled()
@@ -2417,6 +2426,8 @@ class MainViewModel : ViewModel() {
         islandBatteryIdleColor.value = settingsRepository.getIslandBatteryIdleColor()
         isDuoBatteryCriticalColorEnabled.value = settingsRepository.isDuoBatteryCriticalColorEnabled()
         duoBatteryCriticalColor.value = settingsRepository.getDuoBatteryCriticalColor()
+        duoBatteryLowLevel.intValue = settingsRepository.getDuoBatteryLowLevel()
+        duoBatteryCriticalLevel.intValue = settingsRepository.getDuoBatteryCriticalLevel()
         isDuoShowNetworks.value = settingsRepository.isDuoShowNetworksEnabled()
         isDuoDifferentiateWifi.value = settingsRepository.isDuoDifferentiateWifiEnabled()
         isDuoShowTime.value = settingsRepository.isDuoShowTimeEnabled()
@@ -5493,6 +5504,22 @@ class MainViewModel : ViewModel() {
     fun setDuoBatteryCriticalColor(colorHex: String) {
         duoBatteryCriticalColor.value = colorHex
         settingsRepository.setDuoBatteryCriticalColor(colorHex)
+    }
+
+    fun setDuoBatteryLowLevel(level: Int) {
+        val (low, critical) = DuoBatteryLevels.withLow(level, duoBatteryCriticalLevel.intValue)
+        applyDuoBatteryLevels(low, critical)
+    }
+
+    fun setDuoBatteryCriticalLevel(level: Int) {
+        val (low, critical) = DuoBatteryLevels.withCritical(level, duoBatteryLowLevel.intValue)
+        applyDuoBatteryLevels(low, critical)
+    }
+
+    private fun applyDuoBatteryLevels(low: Int, critical: Int) {
+        duoBatteryLowLevel.intValue = low
+        duoBatteryCriticalLevel.intValue = critical
+        settingsRepository.setDuoBatteryLevels(low, critical)
     }
 
     fun setDuoShowNetworks(enabled: Boolean) {
