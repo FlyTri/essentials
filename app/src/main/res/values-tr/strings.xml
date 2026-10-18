@@ -1845,8 +1845,6 @@ Düğme yeniden eşleme bir ses seviyesi tuşu için uzun basma eylemi varsa, o 
     <string name="island_section_placement">Adanın Yeri</string>
     <string name="island_section_visuals">Görseller</string>
     <string name="island_preview_ring_title">Hizalama ipucunu göster</string>
-    <string name="island_battery_alert_icon_position_left">Sol</string>
-    <string name="island_battery_alert_icon_position_right">Sağ</string>
     <string name="island_camera_position_center">Orta</string>
     <string name="icon_network_speed">İnternet Hızı</string>
 </resources>

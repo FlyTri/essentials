@@ -1928,11 +1928,6 @@ Eingeschränkt – Niedrigste Priorität (Android 12+); etwa einmal täglich geb
     <string name="battery_show_percentage_title">Prozentanzeige</string>
     <string name="island_battery_percentage_conditional_title">% nur unter folgenden Bedingungen</string>
     <string name="island_battery_idle_color_title">Leerlauffarbe</string>
-    <string name="island_battery_alerts_title">Akkuwarnungen</string>
-    <string name="island_battery_alert_charging_title">Laden angeschlossen</string>
-    <string name="island_battery_alert_low_title">Niedriger Akkustand (11-20)</string>
-    <string name="island_battery_alert_critical_title">Kritischer Akkustand (0-10%)</string>
-    <string name="island_battery_alert_icon_position_title">Symbolposition</string>
     <string name="island_time_show_seconds_title">Sekunden anzeigen</string>
     <string name="island_launcher_only_title">Nur im Launcher anzeigen</string>
     <string name="island_launcher_only_desc">Ausblenden, solange eine App geöffnet ist</string>

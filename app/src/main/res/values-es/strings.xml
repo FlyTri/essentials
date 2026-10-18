@@ -1850,8 +1850,6 @@ Requiere permiso de administrador del dispositivo si se utiliza el bloqueo.</str
     <string name="feat_lockscreen_shortcuts_desc">Ejecuta tus propias acciones desde la pantalla de bloqueo</string>
     <string name="feat_navigation_desc">Barra de gestos, gestos y ajustes en la barra de navegación</string>
     <string name="lockscreen_shortcuts_enable_title">Activar atajos de pantalla de bloqueo</string>
-    <string name="island_battery_alert_icon_position_right">Derecha</string>
-    <string name="island_battery_alert_icon_position_left">Izquierda</string>
     <string name="batteries_notification_title">Notificación de baterías</string>
     <string name="battery_show_percentage_title">Mostrar porcentaje</string>
     <string name="battery_separate_channels_title">Separar canales de batería</string>

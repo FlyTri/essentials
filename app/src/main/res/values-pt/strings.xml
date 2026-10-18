@@ -1720,11 +1720,6 @@
     <string name="island_hide_icons_title">Ocultar dinamicamente os ícones da barra de status</string>
     <string name="island_dynamic_hide_status_bar_title">Ocultar tudo quando expandido</string>
     <string name="island_dismiss_on_outside_title">Dispensar atividades externas</string>
-    <string name="island_battery_alert_icon_position_title">Posição do ícone</string>
-    <string name="island_battery_alert_critical_title">Bateria crítica (0-10%)</string>
-    <string name="island_battery_alert_low_title">Bateria fraca (11-20%)</string>
-    <string name="island_battery_alert_charging_title">Carregador conectado</string>
-    <string name="island_battery_alerts_title">Alertas de bateria</string>
     <string name="status_glance_calendar_show_all_day_title">Mostrar todos os eventos do dia</string>
     <string name="island_calendar_priority_title">Prioridade ao fechar</string>
     <string name="status_glance_calendar_timeframe_title">Mostrar os próximos eventos em</string>
