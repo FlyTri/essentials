@@ -1719,4 +1719,12 @@ Les effets de la LED HiLight peuvent être aussi utilisés comme une action dans
     <string name="hilight_progress_mode_sequential">Séquentiel</string>
     <string name="about_desc_hilight_progress">Affiche la progression des téléchargements et les mises à jour en direct sur les LED Hilight, allumant une LED supplémentaire à chaque huitième de progression et faisant clignoter les huit LED une fois le téléchargement terminé. Nécessite Shizuku.</string>
     <string name="keep_in_full_screen_title">Garder en plein écran</string>
+    <string name="feat_face_unlock_brightness_title">Illumination de la tête</string>
+    <string name="feat_face_unlock_brightness_desc">Augmenter la luminosité quand la luminosité est faible</string>
+    <string name="feat_screenshot_share_cleanup_title">Supprimer les captures d\'écran partagées</string>
+    <string name="feat_screenshot_share_cleanup_desc">Supprimer les captures d\'écran quand elles ont étés partagées</string>
+    <string name="screenshot_auto_clean_title">Supprimer automatiquement les captures d\'écran</string>
+    <string name="screenshot_auto_clean_note">Chaque nouvelle capture d\'écran ont une notification pour choisir de les conserver ou non. Les captures d\'écran mis en favori sont toujours à garder.</string>
+    <string name="screenshots_cleaned_count_title">Captures d\'écran supprimées</string>
+    <string name="screenshots_storage_saved_title">Stockage économisé</string>
 </resources>
