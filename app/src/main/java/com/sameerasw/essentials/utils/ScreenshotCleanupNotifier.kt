@@ -29,9 +29,11 @@ import com.sameerasw.essentials.receivers.ScreenshotCleanupActionReceiver
 
 object ScreenshotCleanupNotifier {
     private const val CHANNEL_ID = "screenshot_cleanup"
+    private const val RESULT_CHANNEL_ID = "screenshot_cleanup_result"
     private const val NOTIFICATION_TAG = "screenshot_cleanup"
     private const val GROUP_KEY = "com.sameerasw.essentials.SCREENSHOT_CLEANUP"
     private const val TIMEOUT_MILLIS = 60 * 60 * 1000L
+    private const val RESULT_TIMEOUT_MILLIS = 5_000L
 
     fun show(
         context: Context,
@@ -43,7 +45,7 @@ object ScreenshotCleanupNotifier {
         ) {
             return
         }
-        createChannel(context)
+        createChannels(context)
 
         val uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mediaId)
         val openIntent =
@@ -64,11 +66,11 @@ object ScreenshotCleanupNotifier {
                 ).addAction(
                     R.drawable.rounded_bookmark_24,
                     context.getString(R.string.screenshot_action_keep),
-                    actionIntent(context, mediaId, ScreenshotCleanupActionReceiver.ACTION_KEEP, 1),
+                    actionIntent(context, mediaId, ScreenshotCleanupActionReceiver.ACTION_KEEP, 1, days),
                 ).addAction(
                     R.drawable.rounded_delete_24,
                     context.getString(R.string.screenshot_action_trash_now),
-                    actionIntent(context, mediaId, ScreenshotCleanupActionReceiver.ACTION_TRASH_NOW, 2),
+                    actionIntent(context, mediaId, ScreenshotCleanupActionReceiver.ACTION_TRASH_NOW, 2, days),
                 ).setSilent(true)
                 .setAutoCancel(true)
                 .setGroup(GROUP_KEY)
@@ -82,6 +84,36 @@ object ScreenshotCleanupNotifier {
         NotificationManagerCompat.from(context).notify(NOTIFICATION_TAG, mediaId.toInt(), builder.build())
     }
 
+    fun showResult(
+        context: Context,
+        mediaId: Long,
+        message: Int,
+        days: Int,
+        trashedBytes: Long,
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        createChannels(context)
+        val undo =
+            actionIntent(context, mediaId, ScreenshotCleanupActionReceiver.ACTION_UNDO, 3, days) { putExtra(ScreenshotCleanupActionReceiver.EXTRA_TRASHED_BYTES, trashedBytes) }
+        val notification =
+            NotificationCompat
+                .Builder(context, RESULT_CHANNEL_ID)
+                .setSmallIcon(R.drawable.rounded_screenshot_region_24)
+                .setContentTitle(context.getString(message))
+                .addAction(R.drawable.ic_undo, context.getString(R.string.screenshot_action_undo), undo)
+                .setSilent(true)
+                .setOnlyAlertOnce(true)
+                .setAutoCancel(true)
+                .setTimeoutAfter(RESULT_TIMEOUT_MILLIS)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build()
+        NotificationManagerCompat.from(context).notify(NOTIFICATION_TAG, mediaId.toInt(), notification)
+    }
+
     fun dismiss(
         context: Context,
         mediaId: Long,
@@ -89,15 +121,23 @@ object ScreenshotCleanupNotifier {
         NotificationManagerCompat.from(context).cancel(NOTIFICATION_TAG, mediaId.toInt())
     }
 
-    private fun createChannel(context: Context) {
+    private fun createChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-        val channel =
+        val manager = context.getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_ID,
                 context.getString(R.string.screenshot_cleanup_channel_name),
                 NotificationManager.IMPORTANCE_LOW,
-            ).apply { setShowBadge(false) }
-        context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+            ).apply { setShowBadge(false) },
+        )
+        manager.createNotificationChannel(
+            NotificationChannel(
+                RESULT_CHANNEL_ID,
+                context.getString(R.string.screenshot_cleanup_result_channel_name),
+                NotificationManager.IMPORTANCE_LOW,
+            ).apply { setShowBadge(false) },
+        )
     }
 
     private fun actionIntent(
@@ -105,11 +145,15 @@ object ScreenshotCleanupNotifier {
         mediaId: Long,
         action: String,
         slot: Int,
+        days: Int,
+        extras: Intent.() -> Unit = {},
     ): PendingIntent {
         val intent =
             Intent(context, ScreenshotCleanupActionReceiver::class.java).apply {
                 this.action = action
                 putExtra(ScreenshotCleanupActionReceiver.EXTRA_MEDIA_ID, mediaId)
+                putExtra(ScreenshotCleanupActionReceiver.EXTRA_DAYS, days)
+                extras()
             }
         return PendingIntent.getBroadcast(
             context,
@@ -122,7 +166,7 @@ object ScreenshotCleanupNotifier {
     private fun requestCode(
         mediaId: Long,
         slot: Int,
-    ) = (mediaId * 3 + slot).toInt()
+    ) = (mediaId * 4 + slot).toInt()
 
     private fun loadThumbnail(
         context: Context,

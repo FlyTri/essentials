@@ -9690,9 +9690,20 @@ class MainViewModel : ViewModel() {
     }
 
     fun setScreenshotAutoCleanEnabled(enabled: Boolean) {
-        settingsRepository.setScreenshotAutoCleanEnabled(enabled)
         isScreenshotAutoCleanEnabled.value = enabled
-        if (!enabled) appContext?.let { ScreenshotCleaner.cancelAll(it, ScreenshotCleaner.TAG_AUTO_CLEAN) }
+        val context = appContext
+        if (context == null) {
+            settingsRepository.setScreenshotAutoCleanEnabled(enabled)
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            if (enabled) {
+                settingsRepository.setScreenshotAutoCleanLastId(ScreenshotCleaner.latestScreenshotId(context))
+            } else {
+                ScreenshotCleaner.cancelAll(context, ScreenshotCleaner.TAG_AUTO_CLEAN)
+            }
+            settingsRepository.setScreenshotAutoCleanEnabled(enabled)
+        }
     }
 
     fun setScreenshotAutoCleanDays(days: Int) {

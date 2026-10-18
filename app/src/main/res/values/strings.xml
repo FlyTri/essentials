@@ -3373,7 +3373,6 @@
     <string name="feat_face_unlock_brightness_desc">Bump brightness in low light</string>
     <string name="feat_screenshot_share_cleanup_title">Delete shared screenshots</string>
     <string name="feat_screenshot_share_cleanup_desc">Trash screenshots after sharing</string>
-    <string name="about_desc_screenshot_share_cleanup">After you share a screenshot from the screenshot preview, it is moved to the trash a minute after you leave the app you shared it to. Trashed screenshots can be restored from Files or Photos for 30 days.</string>
     <string name="screenshot_share_cleanup_trashed">Shared screenshot moved to trash</string>
     <string name="screenshot_share_cleanup_scheduled">Shared screenshot will be moved to trash later</string>
     <string name="feat_screenshots_title">Screenshots</string>
@@ -3396,6 +3395,9 @@
     <string name="screenshot_action_trash_now">Trash now</string>
     <string name="screenshot_kept">Screenshot kept</string>
     <string name="screenshot_moved_to_trash">Screenshot moved to trash</string>
+    <string name="screenshot_trash_failed">Couldn\'t move the screenshot to trash</string>
+    <string name="screenshot_action_undo">Undo</string>
+    <string name="screenshot_cleanup_result_channel_name">Screenshot cleanup results</string>
     <string name="screenshot_cleanup_channel_name">Screenshot cleanup</string>
     <plurals name="screenshot_days">
         <item quantity="one">%d day</item>

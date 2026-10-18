@@ -30,18 +30,25 @@ class ScreenshotAutoCleanHandler(
     private val settings = SettingsRepository(context)
     private val mutex = Mutex()
 
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val scan = Runnable { scope.launch(Dispatchers.IO) { scheduleNewScreenshots() } }
+
     private val observer =
-        object : ContentObserver(Handler(Looper.getMainLooper())) {
+        object : ContentObserver(handler) {
             override fun onChange(selfChange: Boolean) {
-                scope.launch(Dispatchers.IO) { scheduleNewScreenshots() }
+                handler.removeCallbacks(scan)
+                handler.postDelayed(scan, SCAN_DEBOUNCE_MS)
             }
         }
 
     fun register() {
+        handler.post(scan)
         context.contentResolver.registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true, observer)
     }
 
     fun unregister() {
+        handler.removeCallbacks(scan)
         context.contentResolver.unregisterContentObserver(observer)
     }
 
@@ -60,6 +67,7 @@ class ScreenshotAutoCleanHandler(
 
     companion object {
         private const val MINUTES_PER_DAY = 24 * 60L
-        private const val NEW_SCREENSHOT_WINDOW_SECONDS = 60L
+        private const val NEW_SCREENSHOT_WINDOW_SECONDS = 6 * 60 * 60L
+        private const val SCAN_DEBOUNCE_MS = 1_000L
     }
 }

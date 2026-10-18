@@ -4338,10 +4338,17 @@ class SettingsRepository(
     fun getScreenshotsCleanedCount(): Int = getInt(KEY_SCREENSHOTS_CLEANED_COUNT, 0)
     fun getScreenshotsCleanedBytes(): Long = getLong(KEY_SCREENSHOTS_CLEANED_BYTES, 0L)
 
-    fun recordScreenshotCleaned(bytes: Long) {
-        putInt(KEY_SCREENSHOTS_CLEANED_COUNT, getScreenshotsCleanedCount() + 1)
-        putLong(KEY_SCREENSHOTS_CLEANED_BYTES, getScreenshotsCleanedBytes() + bytes)
-    }
+    fun recordScreenshotCleaned(bytes: Long) =
+        synchronized(SettingsRepository::class.java) {
+            putInt(KEY_SCREENSHOTS_CLEANED_COUNT, getScreenshotsCleanedCount() + 1)
+            putLong(KEY_SCREENSHOTS_CLEANED_BYTES, getScreenshotsCleanedBytes() + bytes)
+        }
+
+    fun recordScreenshotRestored(bytes: Long) =
+        synchronized(SettingsRepository::class.java) {
+            putInt(KEY_SCREENSHOTS_CLEANED_COUNT, (getScreenshotsCleanedCount() - 1).coerceAtLeast(0))
+            putLong(KEY_SCREENSHOTS_CLEANED_BYTES, (getScreenshotsCleanedBytes() - bytes).coerceAtLeast(0L))
+        }
 
     fun getFaceUnlockMaxBrightness(): Int = getInt(KEY_FACE_UNLOCK_MAX_BRIGHTNESS, 100)
     fun setFaceUnlockMaxBrightness(value: Int) = putInt(KEY_FACE_UNLOCK_MAX_BRIGHTNESS, value)

@@ -74,7 +74,7 @@ class ScreenshotShareCleanupHandler(
                         return@withContext R.string.screenshot_share_cleanup_scheduled
                     }
                     ScreenshotCleaner.cancel(service, mediaId)
-                    if (ScreenshotCleaner.trash(service, mediaId)) R.string.screenshot_share_cleanup_trashed else null
+                    if (ScreenshotCleaner.trash(service, mediaId, keepStarred = false)) R.string.screenshot_share_cleanup_trashed else null
                 }
             outcome?.let { Toast.makeText(service, it, Toast.LENGTH_SHORT).show() }
         }
