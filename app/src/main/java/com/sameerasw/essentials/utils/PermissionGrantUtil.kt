@@ -74,6 +74,9 @@ object PermissionGrantUtil {
                 "cmd notification disallow_listener $listener; cmd notification allow_listener $listener",
             featureName = featureName,
         )
+        if (!PermissionUtils.hasNotificationListenerPermission(context)) {
+            ShellUtils.runCommandWithOutput(context, "cmd notification allow_listener $listener", featureName = featureName)
+        }
     }
 
     private fun requestedPermissions(context: Context): List<String> = try {

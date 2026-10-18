@@ -661,11 +661,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         copiedKey = null
         if (settings.isIslandOtpDismissAfterCopyEnabled()) NotificationListener.dismissNotification(key)
         val index = alerts.indexOfFirst { it.key == key }
-        if (index >= 0) {
-            alerts.removeAt(index)
-            if (index < currentIndex) currentIndex--
-            currentIndex = currentIndex.coerceIn(0, (alerts.size - 1).coerceAtLeast(0))
-        }
+        if (index >= 0) currentIndex = alerts.removeKeepingCurrent(index, currentIndex)
         if (alerts.isEmpty()) {
             clearAll()
             return

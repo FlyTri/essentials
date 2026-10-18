@@ -1100,6 +1100,16 @@ object FeatureRegistry {
                             "island_otp_tap_to_copy",
                         ),
                         SearchSetting(
+                            R.string.island_otp_dismiss_after_copy_title,
+                            R.string.island_otp_section,
+                            "island_otp_dismiss_after_copy",
+                        ),
+                        SearchSetting(
+                            R.string.island_otp_timeout_title,
+                            R.string.island_otp_section,
+                            "island_otp_timeout_ms",
+                        ),
+                        SearchSetting(
                             R.string.island_otp_bypass_filter_title,
                             R.string.island_otp_bypass_filter_desc,
                             "island_otp_bypass_filter",
