@@ -637,6 +637,13 @@ class SettingsRepository(
         const val KEY_ISLAND_SHOW_CAFFEINATE = "island_show_caffeinate"
         const val KEY_ISLAND_CAFFEINATE_SHOW_TIME = "island_caffeinate_show_time"
         const val KEY_ISLAND_SHOW_DEVICES = "island_show_devices"
+        const val KEY_ISLAND_SHOW_NAVIGATION = "island_show_navigation"
+        const val KEY_ISLAND_NAVIGATION_ON_NEW = "island_navigation_on_new"
+        const val KEY_ISLAND_NAVIGATION_PEEK_AFTER_EXPAND = "island_navigation_peek_after_expand"
+        const val ISLAND_NAVIGATION_ON_NEW_EXPAND = "expand"
+        const val ISLAND_NAVIGATION_ON_NEW_PEEK = "peek"
+        const val ISLAND_NAVIGATION_ON_NEW_OFF = "off"
+        const val KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE = "island_navigation_expand_distance"
         const val KEY_ISLAND_SHOW_HOTSPOT = "island_show_hotspot"
         const val KEY_ISLAND_BRIEF_ENABLED = "island_brief_enabled"
         const val KEY_ISLAND_BRIEF_SHOW_ALARM = "island_brief_show_alarm"
@@ -781,6 +788,12 @@ class SettingsRepository(
         const val KEY_POCKET_MODE_ENABLED = "pocket_mode_enabled"
         const val KEY_FACE_UNLOCK_BRIGHTNESS_ENABLED = "face_unlock_brightness_enabled"
         const val KEY_SCREENSHOT_SHARE_CLEANUP_ENABLED = "screenshot_share_cleanup_enabled"
+        const val KEY_SCREENSHOT_SHARE_CLEANUP_DELAY = "screenshot_share_cleanup_delay"
+        const val KEY_SCREENSHOT_AUTO_CLEAN_ENABLED = "screenshot_auto_clean_enabled"
+        const val KEY_SCREENSHOT_AUTO_CLEAN_DAYS = "screenshot_auto_clean_days"
+        const val KEY_SCREENSHOT_AUTO_CLEAN_LAST_ID = "screenshot_auto_clean_last_id"
+        const val KEY_SCREENSHOTS_CLEANED_COUNT = "screenshots_cleaned_count"
+        const val KEY_SCREENSHOTS_CLEANED_BYTES = "screenshots_cleaned_bytes"
         const val KEY_FACE_UNLOCK_MAX_BRIGHTNESS = "face_unlock_max_brightness"
         const val KEY_FACE_UNLOCK_TRIGGER_UNLOCK = "face_unlock_trigger_unlock"
         const val KEY_FACE_UNLOCK_AUTO_ILLUMINATE = "face_unlock_auto_illuminate"
@@ -4194,6 +4207,19 @@ class SettingsRepository(
     fun isIslandShowDevicesEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_DEVICES, true)
     fun setIslandShowDevicesEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_DEVICES, enabled)
 
+    fun isIslandShowNavigationEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_NAVIGATION, true)
+    fun setIslandShowNavigationEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_NAVIGATION, enabled)
+
+    fun getIslandNavigationOnNew(): String =
+        getString(KEY_ISLAND_NAVIGATION_ON_NEW, ISLAND_NAVIGATION_ON_NEW_PEEK) ?: ISLAND_NAVIGATION_ON_NEW_PEEK
+    fun setIslandNavigationOnNew(mode: String) = putString(KEY_ISLAND_NAVIGATION_ON_NEW, mode)
+
+    fun isIslandNavigationPeekAfterExpandEnabled(): Boolean = getBoolean(KEY_ISLAND_NAVIGATION_PEEK_AFTER_EXPAND, false)
+    fun setIslandNavigationPeekAfterExpandEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NAVIGATION_PEEK_AFTER_EXPAND, enabled)
+
+    fun getIslandNavigationExpandDistance(): Int = getInt(KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE, 200)
+    fun setIslandNavigationExpandDistance(meters: Int) = putInt(KEY_ISLAND_NAVIGATION_EXPAND_DISTANCE, meters)
+
     fun isIslandShowHotspotEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_HOTSPOT, false)
     fun setIslandShowHotspotEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_HOTSPOT, enabled)
 
@@ -4306,6 +4332,28 @@ class SettingsRepository(
 
     fun isScreenshotShareCleanupEnabled(): Boolean = getBoolean(KEY_SCREENSHOT_SHARE_CLEANUP_ENABLED, false)
     fun setScreenshotShareCleanupEnabled(enabled: Boolean) = putBoolean(KEY_SCREENSHOT_SHARE_CLEANUP_ENABLED, enabled)
+    fun getScreenshotShareCleanupDelayMinutes(): Int = getInt(KEY_SCREENSHOT_SHARE_CLEANUP_DELAY, 0)
+    fun setScreenshotShareCleanupDelayMinutes(minutes: Int) = putInt(KEY_SCREENSHOT_SHARE_CLEANUP_DELAY, minutes)
+    fun isScreenshotAutoCleanEnabled(): Boolean = getBoolean(KEY_SCREENSHOT_AUTO_CLEAN_ENABLED, false)
+    fun setScreenshotAutoCleanEnabled(enabled: Boolean) = putBoolean(KEY_SCREENSHOT_AUTO_CLEAN_ENABLED, enabled)
+    fun getScreenshotAutoCleanDays(): Int = getInt(KEY_SCREENSHOT_AUTO_CLEAN_DAYS, 7)
+    fun setScreenshotAutoCleanDays(days: Int) = putInt(KEY_SCREENSHOT_AUTO_CLEAN_DAYS, days)
+    fun getScreenshotAutoCleanLastId(): Long = getLong(KEY_SCREENSHOT_AUTO_CLEAN_LAST_ID, 0L)
+    fun setScreenshotAutoCleanLastId(id: Long) = putLong(KEY_SCREENSHOT_AUTO_CLEAN_LAST_ID, id)
+    fun getScreenshotsCleanedCount(): Int = getInt(KEY_SCREENSHOTS_CLEANED_COUNT, 0)
+    fun getScreenshotsCleanedBytes(): Long = getLong(KEY_SCREENSHOTS_CLEANED_BYTES, 0L)
+
+    fun recordScreenshotCleaned(bytes: Long) =
+        synchronized(SettingsRepository::class.java) {
+            putInt(KEY_SCREENSHOTS_CLEANED_COUNT, getScreenshotsCleanedCount() + 1)
+            putLong(KEY_SCREENSHOTS_CLEANED_BYTES, getScreenshotsCleanedBytes() + bytes)
+        }
+
+    fun recordScreenshotRestored(bytes: Long) =
+        synchronized(SettingsRepository::class.java) {
+            putInt(KEY_SCREENSHOTS_CLEANED_COUNT, (getScreenshotsCleanedCount() - 1).coerceAtLeast(0))
+            putLong(KEY_SCREENSHOTS_CLEANED_BYTES, (getScreenshotsCleanedBytes() - bytes).coerceAtLeast(0L))
+        }
 
     fun getFaceUnlockMaxBrightness(): Int = getInt(KEY_FACE_UNLOCK_MAX_BRIGHTNESS, 100)
     fun setFaceUnlockMaxBrightness(value: Int) = putInt(KEY_FACE_UNLOCK_MAX_BRIGHTNESS, value)
