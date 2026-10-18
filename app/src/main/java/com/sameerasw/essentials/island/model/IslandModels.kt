@@ -77,7 +77,6 @@ class InteractionOverrides(
     val onTap: (() -> Boolean)? = null,
     val onLongPress: (() -> Unit)? = null,
     val onExpandedTap: (() -> Boolean)? = null,
-    // Return true to consume a tap on the line peek instead of expanding
     val onLineTap: (() -> Boolean)? = null,
 ) {
     companion object {

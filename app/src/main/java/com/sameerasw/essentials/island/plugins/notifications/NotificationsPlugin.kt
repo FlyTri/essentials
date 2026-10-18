@@ -155,8 +155,8 @@ class NotificationsPlugin : BaseIslandPlugin() {
     private val timeoutRunnable = Runnable { onTimeout() }
     private val catchUpRunnable = Runnable { clearAll() }
 
-    // Key of the alert whose code was just copied; shows the confirmation until copiedRunnable runs
     private var copiedKey: String? = null
+    private var postedWhileCopied = false
     private val copiedRunnable = Runnable { finishCopy() }
 
     private val listener = object : NotificationListener.NotificationAlertListener {
@@ -219,7 +219,6 @@ class NotificationsPlugin : BaseIslandPlugin() {
         return if (currentAlert()?.let(::otpCodeOf) != null) settings.getIslandOtpTimeoutMs() else base
     }
 
-    // Same length and grouping as the code: 482 913 -> ••• •••
     private fun maskOtp(code: String) = formatOtp(code).map { if (it == ' ') ' ' else '•' }.joinToString("")
 
     private fun concealed(): Boolean =
@@ -233,6 +232,12 @@ class NotificationsPlugin : BaseIslandPlugin() {
         if (existing >= 0) {
             alerts[existing] = alert
             render()
+            return
+        }
+        if (copiedKey != null) {
+            alerts.addLast(alert)
+            while (alerts.size > MAX_QUEUE) alerts.removeFirst()
+            postedWhileCopied = true
             return
         }
         c.mainHandler.removeCallbacks(catchUpRunnable)
@@ -280,9 +285,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         if (minimal()) return
         val otpNeedsExpand = currentAlert()?.let(::isOtp) == true && !settings.isIslandOtpTapToCopyEnabled()
         val lineAvailable = settings.isIslandLineStageEnabled() && settings.isIslandNotifCompactHeadsUpEnabled() && !otpNeedsExpand
-      
         markSeen()
-   
         c.request(
             if (lineAvailable) PluginRequest.Peek(ITEM_KEY, timeoutMs(), sticky = true)
             else PluginRequest.Expand(ITEM_KEY).also { autoExpanded = true },
@@ -357,6 +360,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
     private fun clearAll() {
         catchingUp = false
         copiedKey = null
+        postedWhileCopied = false
         cancelTimers()
         alerts.clear()
         seen.clear()
@@ -664,6 +668,16 @@ class NotificationsPlugin : BaseIslandPlugin() {
         }
         if (alerts.isEmpty()) {
             clearAll()
+            return
+        }
+        if (postedWhileCopied) {
+            postedWhileCopied = false
+            if (!queueEnabled()) while (alerts.size > 1) alerts.removeFirst()
+            currentIndex = alerts.lastIndex
+            manualPick = false
+            scheduleTimeout()
+            render()
+            popUp()
             return
         }
         scheduleTimeout()

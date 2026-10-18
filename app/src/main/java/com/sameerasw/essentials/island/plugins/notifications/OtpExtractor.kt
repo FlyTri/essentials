@@ -1,7 +1,5 @@
 package com.sameerasw.essentials.island.plugins.notifications
 
-// Finds a one-time code in notification text. Returns null when unsure.
-// A missed code beats a wrong one.
 object OtpExtractor {
     private val KEYWORD = Regex(
         "\\b(otp|code|codes|passcode|pin|2fa|mfa|verification|verify|one[- ]time|" +
@@ -11,20 +9,22 @@ object OtpExtractor {
     )
 
     private val CANDIDATES = listOf(
-        // G-482913
         Regex("\\b[A-Z]{1,3}-(\\d{4,8})\\b"),
-        // 482 913 / 482-913
         Regex("(?<![\\d-])(\\d{3,4}[ -]\\d{3,4})(?![\\d-])"),
         Regex("\\b(\\d{4,8})\\b"),
-        // AB12CD, and 4-5 character ones like Steam Guard's FR4NC
         Regex("\\b((?=[A-Z0-9]*\\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{4,8})\\b"),
     )
 
-    // Domain-bound codes (Apple, Google): "@example.com #123456", optionally followed by "%iframe.example"
-    private val DOMAIN_BOUND = Regex("@[\\w.-]+\\.[a-z]{2,}\\s+#([A-Za-z0-9]{4,10})\\b", RegexOption.IGNORE_CASE)
+    private val DOMAIN_BOUND =
+        Regex("@[\\w.-]+\\.[a-z]{2,}\\s+#((?=[A-Za-z0-9]*\\d)[A-Za-z0-9]{4,10})\\b", RegexOption.IGNORE_CASE)
 
     private val CURRENCY_BEFORE = Regex(
         "([$€£¥₹#]|\\b(usd|mxn|eur|gbp|cop|ars|clp|pen|brl|rs|inr|no|nr|num)\\.?)\\s*$",
+        RegexOption.IGNORE_CASE,
+    )
+
+    private val CURRENCY_AFTER = Regex(
+        "^\\s*([$€£¥₹]|(usd|mxn|eur|gbp|cop|ars|clp|pen|brl|rs|inr|pesos|dollars|d[oó]lares|reais)\\b)",
         RegexOption.IGNORE_CASE,
     )
 
@@ -65,6 +65,7 @@ object OtpExtractor {
         val before = text.substring(maxOf(0, range.first - 24), range.first)
         val after = text.substring(range.last + 1, minOf(text.length, range.last + 4))
         if (CURRENCY_BEFORE.containsMatchIn(before)) return false
+        if (CURRENCY_AFTER.containsMatchIn(text.substring(range.last + 1, minOf(text.length, range.last + 12)))) return false
         if (NOT_A_CODE_BEFORE.containsMatchIn(before)) return false
         if (after.matches(Regex("^[.,:/]\\d.*", RegexOption.DOT_MATCHES_ALL))) return false
         if (after.startsWith("%")) return false

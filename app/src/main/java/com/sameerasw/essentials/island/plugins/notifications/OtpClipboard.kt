@@ -12,7 +12,6 @@ object OtpClipboard {
     fun copy(context: Context, code: String): Boolean {
         val clipboard = context.getSystemService(ClipboardManager::class.java) ?: return false
         val clip = ClipData.newPlainText(context.getString(R.string.island_otp_clip_label), code)
-        // Keeps keyboards and the system clipboard preview from showing the code
         clip.description.extras = PersistableBundle().apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)

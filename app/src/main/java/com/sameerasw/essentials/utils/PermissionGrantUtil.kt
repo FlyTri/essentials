@@ -50,13 +50,11 @@ object PermissionGrantUtil {
         }
 
         ShellUtils.runCommandWithOutput(context, commands.joinToString("; ") { "$it >/dev/null 2>&1" }, notifyOnError = false)
-        if (!hasSensitiveNotifications(context)) grantSensitiveNotifications(context)
         return true
     }
 
     private const val OP_SENSITIVE_NOTIFICATIONS = "android:receive_sensitive_notifications"
 
-    // Android 15+ redacts OTP notifications for listeners without this op
     fun hasSensitiveNotifications(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) return true
         return try {
@@ -67,7 +65,6 @@ object PermissionGrantUtil {
         }
     }
 
-    // Trust is resolved when the listener binds, so rebind after granting
     fun grantSensitiveNotifications(context: Context, featureName: String? = null) {
         val pkg = context.packageName
         val listener = "$pkg/${NotificationListener::class.java.name}"

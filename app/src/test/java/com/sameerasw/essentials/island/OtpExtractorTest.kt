@@ -48,7 +48,6 @@ class OtpExtractorTest {
 
     @Test
     fun findsCodesInEmailNotifications() {
-        // Gmail-style: subject, then the snippet
         assertEquals("639201", code("Your Slack confirmation code\nConfirm your email address. Your confirmation code is below — enter it in your browser window. 639201"))
         assertEquals("481920", code("481920 is your Microsoft account verification code"))
         assertEquals("773810", code("Verify your sign-in\nHi Isaac, use this code to finish signing in: 773810. It expires in 10 minutes. © 2026 Example Inc."))
@@ -72,5 +71,13 @@ class OtpExtractorTest {
         assertNull(code("Promo code applied: you saved 1,500.00"))
         assertNull(code("Verification of payment MXN 4500 completed"))
         assertNull(code("Your code discount is 15%"))
+        assertNull(code("Do not share your OTP. Txn of 4500 INR on card XX12 at Amazon"))
+        assertNull(code("Your code: pay 4500 pesos before Friday"))
+        assertEquals("739104", code("OTP 739104 for txn of 4500 INR on card XX12"))
+    }
+
+    @Test
+    fun domainBoundNeedsADigit() {
+        assertNull(code("Ping alex@acme.com #engineering before the code freeze"))
     }
 }

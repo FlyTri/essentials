@@ -9,7 +9,6 @@
 
 package com.sameerasw.essentials.services
 
-import com.sameerasw.essentials.island.plugins.notifications.OtpExtractor
 import android.graphics.drawable.Icon
 import android.content.pm.LauncherApps
 import com.sameerasw.essentials.domain.controller.HilightController
@@ -52,6 +51,7 @@ import com.sameerasw.essentials.domain.model.NavigationNotificationData
 import com.sameerasw.essentials.domain.model.NavigationParser
 import com.sameerasw.essentials.domain.model.ProgressNotificationData
 import com.sameerasw.essentials.domain.model.RippleConfig
+import com.sameerasw.essentials.island.plugins.notifications.OtpExtractor
 import com.sameerasw.essentials.services.receivers.FlashlightActionReceiver
 import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 import com.sameerasw.essentials.services.widgets.PixelSearchbarWidget
@@ -307,7 +307,6 @@ class NotificationListener : NotificationListenerService() {
         return !ranking.matchesInterruptionFilter() || peekSuppressed
     }
 
-    // Every text field that can carry a code
     private fun otpSourceText(sbn: StatusBarNotification): String {
         val extras = sbn.notification.extras ?: return ""
         return listOf(

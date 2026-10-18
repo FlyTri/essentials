@@ -1084,6 +1084,21 @@ object FeatureRegistry {
                             R.string.island_catch_up_desc,
                             "island_catch_up",
                         ),
+                        SearchSetting(
+                            R.string.island_otp_enabled_title,
+                            R.string.island_otp_enabled_desc,
+                            "island_otp_enabled",
+                        ),
+                        SearchSetting(
+                            R.string.island_otp_tap_to_copy_title,
+                            R.string.island_otp_tap_to_copy_desc,
+                            "island_otp_tap_to_copy",
+                        ),
+                        SearchSetting(
+                            R.string.island_otp_bypass_filter_title,
+                            R.string.island_otp_bypass_filter_desc,
+                            "island_otp_bypass_filter",
+                        ),
                     ),
             ) {
                 override fun isEnabled(viewModel: MainViewModel) = viewModel.isIslandEnabled.value

@@ -37,7 +37,6 @@ import com.sameerasw.essentials.island.ui.components.MarqueeText
 import com.sameerasw.essentials.island.ui.components.accentGlow
 import com.sameerasw.essentials.island.ui.components.cameraClearance
 
-// Groups a code for reading: 1234 -> 1234, 482913 -> 482 913, 48291374 -> 4829 1374
 fun formatOtp(code: String): String = when {
     code.length <= 5 -> code
     code.length == 6 -> "${code.take(3)} ${code.drop(3)}"

@@ -43,7 +43,6 @@ fun IslandPrefToggle(
     iconRes: Int,
     title: String,
     modifier: Modifier = Modifier,
-    description: String? = null,
     defaultValue: Boolean = false,
     onChanged: (Boolean) -> Unit = {}
 ) {
@@ -54,7 +53,6 @@ fun IslandPrefToggle(
     IconToggleItem(
         iconRes = iconRes,
         title = title,
-        description = description,
         isChecked = checked,
         onCheckedChange = {
             HapticUtil.performVirtualKeyHaptic(view)

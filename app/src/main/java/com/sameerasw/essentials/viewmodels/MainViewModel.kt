@@ -285,6 +285,8 @@ class MainViewModel : ViewModel() {
     val isIslandNotifTapToOpen = mutableStateOf(false)
     val isIslandCatchUpEnabled = mutableStateOf(true)
     val islandCatchUpTimeoutMs = mutableLongStateOf(10000L)
+    val isIslandOtpEnabled = mutableStateOf(true)
+    val islandOtpTimeoutMs = mutableLongStateOf(60_000L)
     val isIslandShowGlow = mutableStateOf(true)
     val isIslandBorderOutline = mutableStateOf(false)
     val islandBorderOutlineColor = mutableStateOf(SettingsRepository.ISLAND_BORDER_OUTLINE_DEFAULT_COLOR)
@@ -987,6 +989,12 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_ISLAND_CATCH_UP_TIMEOUT_MS ->
                         islandCatchUpTimeoutMs.longValue = settingsRepository.getIslandCatchUpTimeoutMs()
+
+                    SettingsRepository.KEY_ISLAND_OTP_ENABLED ->
+                        isIslandOtpEnabled.value = settingsRepository.isIslandOtpEnabled()
+
+                    SettingsRepository.KEY_ISLAND_OTP_TIMEOUT_MS ->
+                        islandOtpTimeoutMs.longValue = settingsRepository.getIslandOtpTimeoutMs()
 
                     SettingsRepository.KEY_STATUS_GLANCE_ENABLED ->
                         isStatusGlanceEnabled.value = settingsRepository.isStatusGlanceEnabled()
@@ -2520,6 +2528,8 @@ class MainViewModel : ViewModel() {
         isIslandNotifTapToOpen.value = settingsRepository.isIslandNotifTapToOpenEnabled()
         isIslandCatchUpEnabled.value = settingsRepository.isIslandCatchUpEnabled()
         islandCatchUpTimeoutMs.longValue = settingsRepository.getIslandCatchUpTimeoutMs()
+        isIslandOtpEnabled.value = settingsRepository.isIslandOtpEnabled()
+        islandOtpTimeoutMs.longValue = settingsRepository.getIslandOtpTimeoutMs()
         isIslandShowGlow.value = settingsRepository.isIslandShowGlowEnabled()
         isIslandBorderOutline.value = settingsRepository.isIslandBorderOutlineEnabled()
         islandBorderOutlineColor.value = settingsRepository.getIslandBorderOutlineColor()
@@ -6014,6 +6024,16 @@ class MainViewModel : ViewModel() {
     fun setIslandCatchUpTimeoutMs(value: Long) {
         islandCatchUpTimeoutMs.longValue = value
         settingsRepository.setIslandCatchUpTimeoutMs(value)
+    }
+
+    fun setIslandOtpEnabled(enabled: Boolean) {
+        isIslandOtpEnabled.value = enabled
+        settingsRepository.setIslandOtpEnabled(enabled)
+    }
+
+    fun setIslandOtpTimeoutMs(value: Long) {
+        islandOtpTimeoutMs.longValue = value
+        settingsRepository.setIslandOtpTimeoutMs(value)
     }
 
     fun setIslandShowGlow(enabled: Boolean) {
