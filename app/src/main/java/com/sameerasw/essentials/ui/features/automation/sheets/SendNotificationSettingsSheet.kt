@@ -90,7 +90,6 @@ fun SendNotificationSettingsSheet(
                     value = label,
                     onValueChange = { label = it },
                     label = { Text(stringResource(R.string.diy_send_notification_label)) },
-                    supportingText = { Text(stringResource(R.string.diy_send_notification_label_desc)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
