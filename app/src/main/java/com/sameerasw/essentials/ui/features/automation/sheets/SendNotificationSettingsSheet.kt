@@ -9,19 +9,23 @@
 
 package com.sameerasw.essentials.ui.core.sheets
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +37,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.diy.Action
@@ -51,10 +56,7 @@ fun SendNotificationSettingsSheet(
     var body by remember { mutableStateOf(initialAction.body) }
     var label by remember { mutableStateOf(initialAction.label) }
 
-    EssentialsBottomSheet(
-        onDismissRequest = onDismiss,
-        dragHandle = null,
-    ) {
+    EssentialsBottomSheet(onDismissRequest = onDismiss) {
         Column(
             modifier =
                 Modifier
@@ -64,34 +66,30 @@ fun SendNotificationSettingsSheet(
         ) {
             Text(
                 text = stringResource(R.string.diy_action_send_notification),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
             )
 
-            RoundedCardContainer(spacing = 8.dp) {
-                OutlinedTextField(
+            RoundedCardContainer(spacing = 2.dp, cornerRadius = 24.dp) {
+                NotificationField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text(stringResource(R.string.diy_send_notification_title)) },
+                    label = stringResource(R.string.diy_send_notification_title),
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
                 )
-
-                OutlinedTextField(
+                NotificationField(
                     value = body,
                     onValueChange = { body = it },
-                    label = { Text(stringResource(R.string.diy_send_notification_body)) },
-                    maxLines = 4,
-                    modifier = Modifier.fillMaxWidth(),
+                    label = stringResource(R.string.diy_send_notification_body),
+                    minLines = 3,
+                    maxLines = 6,
                 )
-
-                OutlinedTextField(
+                NotificationField(
                     value = label,
                     onValueChange = { label = it },
-                    label = { Text(stringResource(R.string.diy_send_notification_label)) },
+                    label = stringResource(R.string.diy_send_notification_label),
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
                 )
             }
 
@@ -144,5 +142,40 @@ fun SendNotificationSettingsSheet(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun NotificationField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    singleLine: Boolean = false,
+    minLines: Int = 1,
+    maxLines: Int = Int.MAX_VALUE,
+) {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceBright, MaterialTheme.shapes.extraSmall)
+                .padding(12.dp),
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            singleLine = singleLine,
+            minLines = minLines,
+            maxLines = if (singleLine) 1 else maxLines,
+            shape = MaterialTheme.shapes.medium,
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
