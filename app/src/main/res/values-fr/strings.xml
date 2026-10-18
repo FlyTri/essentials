@@ -1664,7 +1664,7 @@ Réinitialiser permet d\'effacer les valeurs personnalisées et le système gér
     <string name="app_icon_default">Par défaut</string>
     <string name="haptic_mode_stronger">Très fort</string>
     <string name="conscious_gate_enable_title">Activer la barrière de conscience</string>
-    <string name="conscious_gate_select_apps_title">Sélectionnez les applications à accès restreint</string>
+    <string name="conscious_gate_select_apps_title">Sélectionnez les applications</string>
     <string name="conscious_gate_select_apps_desc">Choisissez quels applications vont devoir afficher un écran d\'une barrière de conscience avant leurs ouvertures.</string>
     <string name="conscious_gate_preview_button">Prévisualiser l\'écran de la barrière de conscience</string>
     <string name="conscious_gate_delay_title">Délai de pause</string>
@@ -1728,4 +1728,7 @@ Les effets de la LED HiLight peuvent être aussi utilisés comme une action dans
     <string name="screenshots_cleaned_count_title">Captures d\'écran supprimées</string>
     <string name="screenshots_storage_saved_title">Stockage économisé</string>
     <string name="feat_aod_wallpaper_desc">En utilisant un overlay</string>
+    <string name="feat_activity_launcher_title">Lanceur d\'activité</string>
+    <string name="feat_activity_launcher_desc">Ouvre/Épingle chaque activité d\'une application</string>
+    <string name="feat_lockscreen_shortcuts_title">Racc. de l\'écran de verrouillage</string>
 </resources>
