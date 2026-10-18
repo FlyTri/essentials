@@ -41,7 +41,7 @@ data class IslandLayoutSpec(
     val queueInline: Boolean = false,
 ) {
     val compactHeight: Dp get() = cameraDiameter + verticalGap * 2
-    val cameraSlotWidth: Dp get() = cameraDiameter * cameraPresence + cameraGap * 2
+    val cameraSlotWidth: Dp get() = (cameraDiameter + cameraGap * 2) * cameraPresence
     val cellSize: Dp get() = cameraDiameter
     val cellSpacing: Dp get() = cameraGap
 

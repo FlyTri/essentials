@@ -123,6 +123,22 @@ fun CompactTemplate(
         val squareCell = spec.cellSize.roundToPx()
         val opticalInset = (height * OPTICAL_INSET_RATIO).toInt()
         fun edgeInset(outer: Placeable?) = if (outer != null && outer.width > squareCell) opticalInset else 0
+        if (cameraSlot == 0) {
+            val cells = left + right
+            onSlack(0)
+            if (cells.isEmpty()) return@Layout layout(0, height) {}
+            val pad = ((height - squareCell) / 2).coerceAtLeast(0)
+            val startInset = edgeInset(cells.first())
+            val endInset = edgeInset(cells.last())
+            val width = pad * 2 + startInset + endInset + content(cells)
+            return@Layout layout(width, height) {
+                var x = pad + startInset
+                cells.forEach {
+                    it.place(x, (height - it.height) / 2)
+                    x += it.width + spacing
+                }
+            }
+        }
         if (spec.growDirection != 0) {
             val cells = left + right
             val inset = edgeInset(if (spec.growDirection > 0) cells.lastOrNull() else cells.firstOrNull())

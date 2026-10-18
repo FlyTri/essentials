@@ -90,7 +90,7 @@ fun LineTemplate(
                 endSlot()
             }
         } else {
-            if (spec.growDirection > 0) Spacer(Modifier.width(spec.cameraSlotWidth - spec.cameraGap))
+            if (spec.growDirection > 0) Spacer(Modifier.width((spec.cameraSlotWidth - spec.cameraGap).coerceAtLeast(0.dp)))
             Row(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically,
@@ -102,7 +102,7 @@ fun LineTemplate(
                 LineText(line.end, TextAlign.End, FontWeight.Normal, Modifier.weight(1f))
                 endSlot()
             }
-            if (spec.growDirection < 0) Spacer(Modifier.width(spec.cameraSlotWidth - spec.cameraGap))
+            if (spec.growDirection < 0) Spacer(Modifier.width((spec.cameraSlotWidth - spec.cameraGap).coerceAtLeast(0.dp)))
         }
     }
 }
@@ -176,11 +176,11 @@ private fun CondensedLine(line: LineContent, spec: IslandLayoutSpec, startInset:
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(spec.cellSpacing),
         ) {
-            if (spec.growDirection > 0) Spacer(Modifier.width(spec.cameraSlotWidth - spec.cameraGap))
+            if (spec.growDirection > 0) Spacer(Modifier.width((spec.cameraSlotWidth - spec.cameraGap).coerceAtLeast(0.dp)))
             leadingSlot()
             icon()
             title(natural.coerceAtMost(maxText))
-            if (spec.growDirection < 0) Spacer(Modifier.width(spec.cameraSlotWidth - spec.cameraGap))
+            if (spec.growDirection < 0) Spacer(Modifier.width((spec.cameraSlotWidth - spec.cameraGap).coerceAtLeast(0.dp)))
         }
     }
 }
