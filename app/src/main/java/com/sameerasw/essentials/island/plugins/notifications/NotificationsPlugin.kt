@@ -174,7 +174,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private val timeoutRunnable = Runnable { onTimeout() }
     private val catchUpRunnable = Runnable {
-        if (ctx?.isContentSuppressed?.invoke() == true) catchUpPaused = true else clearAll()
+        if (ctx?.isContentSuppressed?.invoke() == true) catchUpPaused = true else endSession()
     }
 
     private val replied = HashMap<String, Long>()
@@ -434,7 +434,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         }
         if (manualPick) {
             if (c.focusedKey() == ITEM_KEY) c.request(PluginRequest.Collapse(ITEM_KEY))
-            clearAll()
+            endSession()
             return
         }
         if (c.focusedKey() == ITEM_KEY && c.currentStage() == IslandStage.Line) {
@@ -454,7 +454,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
             render()
             return
         }
-        clearAll()
+        endSession()
     }
 
     private fun holdMinimal() {
@@ -555,6 +555,22 @@ class NotificationsPlugin : BaseIslandPlugin() {
         ctx?.mainHandler?.removeCallbacks(timeoutRunnable)
         ctx?.mainHandler?.removeCallbacks(catchUpRunnable)
         ctx?.mainHandler?.removeCallbacks(copiedRunnable)
+    }
+
+    private fun endSession() {
+        if (!hub()) {
+            clearAll()
+            return
+        }
+        cancelTimers()
+        ctx?.mainHandler?.removeCallbacks(unpinRunnable)
+        pinnedKey = null
+        catchingUp = false
+        catchUpPaused = false
+        manualPick = false
+        pendingPopUp = false
+        for (i in alerts.indices) if (!alerts[i].hubOnly) alerts[i] = alerts[i].copy(hubOnly = true)
+        render()
     }
 
     private fun clearAll() {
