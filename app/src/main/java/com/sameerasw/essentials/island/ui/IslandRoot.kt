@@ -159,8 +159,8 @@ fun IslandRoot(
             bonded = false
         }
     }
-    val bond by animateFloatAsState(if (bonded) 1f else 0f, tween(450, easing = FastOutSlowInEasing), label = "islandBond")
-    val presence by animateFloatAsState(targetSpec.cameraPresence, tween(300), label = "cameraPresence")
+    val bond by animateFloatAsState(if (bonded) 1f else 0f, tween(560, easing = FastOutSlowInEasing), label = "islandBond")
+    val presence by animateFloatAsState(targetSpec.cameraPresence, tween(420), label = "cameraPresence")
     val spec = if (presence == 1f && bond == 0f) {
         targetSpec
     } else {
@@ -238,7 +238,6 @@ fun IslandRoot(
     val collapse = remember { Animatable(0f) }
     // Hidden: the width shrinks to a circle first, then the circle shrinks to nothing, so it never turns oval.
     val squash = remember { Animatable(0f) }
-    val squashPx = minSurfaceHeight
     val squashStarted = remember { BooleanArray(1) }
     val dismissOffset = remember { Animatable(0f) }
     var target by remember { mutableStateOf(IntSize.Zero) }
@@ -276,13 +275,17 @@ fun IslandRoot(
         if (stage != IslandStage.Hidden) {
             visible = true
             squashStarted[0] = false
-            squash.snapTo(0f)
+            if (squash.value != 0f) launch { squash.animateTo(0f, IslandMotion.smoothSpatial()) }
         }
         if (stage != IslandStage.Compact) {
             launch { jelly.press.animateTo(0f, CompactJellyState.JellySpring) }
             launch { jelly.releaseStretch(0f, 0f) }
         }
-        dismissOffset.snapTo(0f)
+        if (dismissCommitted) {
+            dismissOffset.snapTo(0f)
+        } else if (dismissOffset.value != 0f) {
+            launch { dismissOffset.animateTo(0f, IslandMotion.release()) }
+        }
         if (dragCommitted && (stage == IslandStage.Expanded || stage == IslandStage.Line)) {
             dragCommitted = false
         }
@@ -293,8 +296,8 @@ fun IslandRoot(
             previousStage = stage
             lastKey = key
             outgoing = null
-            contentAlpha.snapTo(1f)
-            contentMotion.snapTo(0f)
+            launch { contentAlpha.animateTo(1f, tween(durationMillis = 180)) }
+            launch { contentMotion.animateTo(0f, IslandMotion.contentSpring()) }
             delay(IslandMotion.COLLAPSE_MS + 400L)
             if (dragCommitted) {
                 dragCommitted = false
@@ -367,7 +370,7 @@ fun IslandRoot(
     DisposableEffect(Unit) {
         registerCollapseAnimator { commit ->
             scope.launch {
-                dismissOffset.snapTo(0f)
+                if (dismissOffset.value != 0f) launch { dismissOffset.animateTo(0f, IslandMotion.release()) }
                 val finished = try {
                     collapse.animateTo(1f, IslandMotion.collapseProgress())
                     true
@@ -416,7 +419,7 @@ fun IslandRoot(
                 snapshotFlow { surfaceSize.width to compactSize.width }
                     .first { (live, target) -> target > 0 && abs(live - target) <= 6 }
             }
-            catchUpAnim.animateTo(1f, IslandMotion.expressiveDefaultSpatial())
+            catchUpAnim.animateTo(1f, IslandMotion.smoothSpatial())
         } else {
             catchUpAnim.animateTo(0f, IslandMotion.expressiveFastEffects())
         }
@@ -449,7 +452,7 @@ fun IslandRoot(
     val sideWidthPx = with(density) { sideBubbleWidth.roundToPx() }
     val sideWidthAnim = remember { Animatable(sideWidthPx.toFloat()) }
     LaunchedEffect(sideWidthPx) {
-        if (inspection) sideWidthAnim.snapTo(sideWidthPx.toFloat()) else sideWidthAnim.animateTo(sideWidthPx.toFloat(), IslandMotion.expressiveDefaultSpatial())
+        if (inspection) sideWidthAnim.snapTo(sideWidthPx.toFloat()) else sideWidthAnim.animateTo(sideWidthPx.toFloat(), IslandMotion.smoothSpatial())
     }
     fun sideWidthLive(): Int = sideWidthAnim.value.roundToInt()
     val bubbleGapPx = with(density) { spec.cameraGap.roundToPx() }
@@ -491,7 +494,7 @@ fun IslandRoot(
     val queueWidthPx = with(density) { queueWidth.roundToPx() }
     val queueWidthAnim = remember { Animatable(queueWidthPx.toFloat()) }
     LaunchedEffect(queueWidthPx) {
-        if (inspection) queueWidthAnim.snapTo(queueWidthPx.toFloat()) else queueWidthAnim.animateTo(queueWidthPx.toFloat(), IslandMotion.expressiveDefaultSpatial())
+        if (inspection) queueWidthAnim.snapTo(queueWidthPx.toFloat()) else queueWidthAnim.animateTo(queueWidthPx.toFloat(), IslandMotion.smoothSpatial())
     }
     fun queueWidthLive(): Int = queueWidthAnim.value.roundToInt()
     fun queueX(width: Int): Int =
@@ -524,7 +527,7 @@ fun IslandRoot(
         } else {
             0f
         }
-        if (inspection) lineShift.snapTo(shift) else lineShift.animateTo(shift, IslandMotion.expressiveDefaultSpatial())
+        if (inspection) lineShift.snapTo(shift) else lineShift.animateTo(shift, IslandMotion.smoothSpatial())
     }
     val queueBelow = remember { Animatable(0f) }
     
@@ -533,9 +536,9 @@ fun IslandRoot(
         val expandedAlready = stage == IslandStage.Expanded && queueBelow.value >= 0.99f
         when {
             queueShown && expandedAlready -> pillReveal.animateTo(1f, IslandMotion.float())
-            queueShown -> pillReveal.snapTo(1f)
+            queueShown -> pillReveal.animateTo(1f, IslandMotion.float())
             expandedAlready -> pillReveal.animateTo(0f, tween(240))
-            else -> pillReveal.snapTo(0f)
+            else -> pillReveal.animateTo(0f, tween(180))
         }
     }
     LaunchedEffect(stage) {
@@ -806,7 +809,7 @@ fun IslandRoot(
                     val dx = surfaceShiftFor(p.width) + lineShift.value.roundToInt() + catchShiftPx().roundToInt()
                     layout(p.width, p.height) { p.place(dx, 0) }
                 }
-                .offset { IntOffset(0, (squashPx / 2f * squash.value - edgeShift.floatValue - surfaceTopPx * bond).roundToInt()) }
+                .offset { IntOffset(0, (-edgeShift.floatValue - surfaceTopPx * bond).roundToInt()) }
                 .compactJelly(jelly, jellyRangePx)
                 .liquid(surfaceLiquid, TransformOrigin(0.5f, 0f))
                 .drawBehind {
@@ -876,21 +879,13 @@ fun IslandRoot(
                     if (currentState.stage == IslandStage.Hidden && !squashStarted[0] && preW <= minSurfaceHeight) {
                         squashStarted[0] = true
                         scope.launch {
-                            squash.animateTo(1f, tween(IslandMotion.COLLAPSE_MS, easing = LinearEasing))
+                            squash.animateTo(1f, IslandMotion.squash())
                             if (currentState.stage == IslandStage.Hidden) visible = false
                         }
                     }
-                    val w = lerp(preW, 0, squash.value)
-                    liveSurfaceHeight.intValue = lerp(
-                        (if (t > 0f) lerp(child.height, end.height, t) else child.height).coerceAtLeast(minSurfaceHeight),
-                        0,
-                        squash.value,
-                    )
-                    val h = lerp(
-                        (if (t > 0f) lerp(child.height, end.height, t) else child.height).coerceAtLeast(minSurfaceHeight),
-                        0,
-                        squash.value,
-                    )
+                    val w = lerp(preW, minSurfaceWidth, squash.value)
+                    val h = (if (t > 0f) lerp(child.height, end.height, t) else child.height).coerceAtLeast(minSurfaceHeight)
+                    liveSurfaceHeight.intValue = h
                     val range = (expandedHeight[0] - minSurfaceHeight).toFloat()
                     val p = if (range > 0f) ((h - minSurfaceHeight) / range).coerceIn(0f, 1f) else 0f
                     edgeShift.floatValue = outsetPx * p
@@ -902,6 +897,12 @@ fun IslandRoot(
                     layout(w, h) { child.place(childX, 0) }
                 }
                 .onSizeChanged { surfaceSize = it }
+                .layout { measurable, constraints ->
+                    val p = measurable.measure(constraints)
+                    val w = p.width.coerceAtLeast(minSurfaceWidth)
+                    val h = p.height.coerceAtLeast(minSurfaceHeight)
+                    layout(w, h) { p.place((w - p.width) / 2, 0) }
+                }
                 .animateContentSize(
                     animationSpec = when {
                         stage == IslandStage.Expanded || stage == IslandStage.Line -> IslandMotion.size

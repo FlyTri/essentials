@@ -197,10 +197,10 @@ private fun CondensedLine(line: LineContent, spec: IslandLayoutSpec, startInset:
 private fun LeadingSlot(leading: LineLeading?, spec: IslandLayoutSpec) {
     var last by remember { mutableStateOf(leading) }
     if (leading != null) last = leading
-    val width by animateDpAsState(last?.width ?: 0.dp, IslandMotion.expressiveDefaultSpatial(), label = "lineLeadingWidth")
+    val width by animateDpAsState(last?.width ?: 0.dp, IslandMotion.smoothSpatial(), label = "lineLeadingWidth")
     AnimatedVisibility(
         visible = leading != null,
-        enter = expandHorizontally(IslandMotion.expressiveDefaultSpatial()) +
+        enter = expandHorizontally(IslandMotion.smoothSpatial()) +
             scaleIn(IslandMotion.expressiveFastSpatial(), initialScale = 0.6f) +
             fadeIn(IslandMotion.expressiveDefaultEffects()),
         exit = shrinkHorizontally(IslandMotion.expressiveFastEffects()) +
