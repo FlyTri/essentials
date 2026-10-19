@@ -500,10 +500,7 @@ fun IslandRoot(
     var pillSize by remember { mutableStateOf(IntSize.Zero) }
     var lastQueuedIcons by remember { mutableStateOf(emptyList<StackIcon>()) }
     if (queuedIcons.isNotEmpty()) lastQueuedIcons = queuedIcons
-    val queueWidth = when (spec.queueStyle) {
-        QueueStyle.Stack -> spec.compactHeight
-        QueueStyle.Overlap -> stackOverlapWidth(lastQueuedIcons.size, spec.compactHeight)
-    }
+    val queueWidth = spec.compactHeight
     val queueWidthPx = with(density) { queueWidth.roundToPx() }
     val queueWidthAnim = remember { Animatable(queueWidthPx.toFloat()) }
     LaunchedEffect(queueWidthPx) {
@@ -670,24 +667,14 @@ fun IslandRoot(
                             }
                         }
                     }
-                when (spec.queueStyle) {
-                    QueueStyle.Stack -> IslandStackBubble(
-                        icons = lastQueuedIcons,
-                        size = spec.compactHeight,
-                        outlineColor = outlineFor(1f),
-                        outlineThickness = spec.outlineThickness,
-                        modifier = queueModifier,
-                        bond = queueBond,
-                    )
-                    QueueStyle.Overlap -> IslandStackOverlap(
-                        icons = lastQueuedIcons,
-                        size = spec.compactHeight,
-                        outlineColor = outlineFor(1f),
-                        outlineThickness = spec.outlineThickness,
-                        modifier = queueModifier,
-                        bond = queueBond,
-                    )
-                }
+                IslandQueueCount(
+                    count = lastQueuedIcons.size,
+                    size = spec.compactHeight,
+                    outlineColor = outlineFor(1f),
+                    outlineThickness = spec.outlineThickness,
+                    modifier = queueModifier,
+                    bond = queueBond,
+                )
                 IslandStackPill(
                     icons = lastFullStack,
                     selectedKey = lastFullStack.firstOrNull { it.current }?.key,
