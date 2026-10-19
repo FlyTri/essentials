@@ -71,6 +71,7 @@ import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.PermissionUIHelper
 import com.sameerasw.essentials.utils.PermissionUtils
+import com.sameerasw.essentials.ui.core.sheets.HideStatusBarInfoBottomSheet
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.viewmodels.MainViewModel
 
@@ -566,12 +567,17 @@ fun IslandBehaviorSettingsUI(
     val previewSettings = remember { SettingsRepository(context) }
     var showWhen by remember { mutableStateOf(previewSettings.getIslandShowWhen()) }
     var requestingPermissionsFor by remember { mutableStateOf<Pair<Int, List<String>>?>(null) }
+    var showHideStatusBarInfo by remember { mutableStateOf(false) }
     val hasShellPermission =
         if (ShellUtils.isRootEnabled(context)) {
             viewModel.isRootPermissionGranted.value
         } else {
             viewModel.isShizukuPermissionGranted.value
         }
+
+    if (showHideStatusBarInfo) {
+        HideStatusBarInfoBottomSheet(onDismissRequest = { showHideStatusBarInfo = false })
+    }
 
     requestingPermissionsFor?.let { (titleRes, permKeys) ->
         PermissionsBottomSheet(
@@ -737,7 +743,7 @@ fun IslandBehaviorSettingsUI(
             IconToggleItem(
                 iconRes = R.drawable.rounded_visibility_off_24,
                 title = stringResource(R.string.island_hide_status_bar_title),
-                infoText = stringResource(R.string.island_hide_status_bar_info),
+                onInfoClick = { showHideStatusBarInfo = true },
                 isChecked = viewModel.isIslandHideStatusBarInsets.value && hasShellPermission,
                 onCheckedChange = { checked ->
                     HapticUtil.performVirtualKeyHaptic(view)

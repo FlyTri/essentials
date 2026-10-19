@@ -3187,7 +3187,9 @@
     <string name="island_hide_in_owner_app_title">Hide complication inside the app</string>
     <string name="island_hide_on_shade_title">Hide when status bar is expanded</string>
     <string name="island_hide_status_bar_title">Hide status bar</string>
-    <string name="island_hide_status_bar_info">Hides the whole status bar by changing its inset through Shizuku. The display density is nudged once to apply it, which may flicker briefly. Hiding live updates is not needed while this is on.</string>
+    <string name="island_hide_status_bar_info">Hide the entire status bar by using exceeded paddings. This will remove it from the lock screen as well and will hide everything including live updates and the screen recorder.</string>
+    <string name="island_hide_status_bar_info_static">This is not a dynamic setting, so the status bar will not become visible automatically. Applying it needs to be forced.</string>
+    <string name="stb_hide_entire_status_bar_title">Hide the entire status bar</string>
     <string name="island_hide_live_updates_title">Hide live updates dynamically</string>
     <string name="island_dismiss_on_outside_title">Dismiss on outside activity</string>
     <string name="island_like_while_playing_title">Like music while playing</string>
