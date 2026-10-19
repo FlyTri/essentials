@@ -55,6 +55,7 @@ import com.sameerasw.essentials.services.handlers.StatusGlanceHandler
 import com.sameerasw.essentials.services.handlers.VolumeStepsHandler
 import com.sameerasw.essentials.services.receivers.FlashlightActionReceiver
 import com.sameerasw.essentials.utils.FreezeManager
+import com.sameerasw.essentials.utils.VolumePanelDetector
 import com.sameerasw.essentials.utils.media.AppVolumeController
 import com.sameerasw.essentials.utils.performHapticFeedback
 import kotlinx.coroutines.CoroutineScope
@@ -660,10 +661,7 @@ class ScreenOffAccessibilityService :
                 return
             }
             val currentWindows = windows
-            val isVisible = currentWindows?.any { window ->
-                window.type == android.view.accessibility.AccessibilityWindowInfo.TYPE_SYSTEM &&
-                    window.title?.contains("Volume", ignoreCase = true) == true
-            } ?: false
+            val isVisible = currentWindows?.any(VolumePanelDetector::isVolumePanel) ?: false
             buttonRemapHandler.isVolumeDialogVisible = isVisible
         } catch (_: Exception) {
             buttonRemapHandler.isVolumeDialogVisible = false
@@ -696,7 +694,7 @@ class ScreenOffAccessibilityService :
         return currentWindows.any { window ->
             if (window.type != android.view.accessibility.AccessibilityWindowInfo.TYPE_SYSTEM) return@any false
             val title = window.title?.toString().orEmpty()
-            if (title.contains("Volume", ignoreCase = true)) return@any false
+            if (VolumePanelDetector.isVolumePanel(window)) return@any false
             if (!SHADE_WINDOW_TITLES.any { title.contains(it, ignoreCase = true) }) return@any false
             window.getBoundsInScreen(bounds)
             bounds.height() >= screenHeight * 0.2f

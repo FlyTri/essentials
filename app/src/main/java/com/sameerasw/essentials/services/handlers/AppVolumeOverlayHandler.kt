@@ -29,7 +29,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.view.WindowManager
-import android.view.accessibility.AccessibilityWindowInfo
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
@@ -46,6 +45,7 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.ui.activities.AppVolumeControlActivity
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.utils.VolumePanelDetector
 import com.sameerasw.essentials.utils.media.AppVolumeController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -168,10 +168,7 @@ class AppVolumeOverlayHandler(
     private fun findVolumePanelBounds(): Rect? =
         try {
             service.windows
-                ?.firstOrNull { window ->
-                    window.type == AccessibilityWindowInfo.TYPE_SYSTEM &&
-                        window.title?.contains("Volume", ignoreCase = true) == true
-                }?.let { window -> Rect().also(window::getBoundsInScreen).takeUnless { it.isEmpty } }
+                ?.firstOrNull(VolumePanelDetector::isVolumePanel)?.let { window -> Rect().also(window::getBoundsInScreen).takeUnless { it.isEmpty } }
         } catch (_: Exception) {
             null
         }
