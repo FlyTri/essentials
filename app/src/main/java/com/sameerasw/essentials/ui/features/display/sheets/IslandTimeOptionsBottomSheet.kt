@@ -73,6 +73,15 @@ fun IslandTimeOptionsBottomSheet(
                 )
             }
             IslandLauncherOnlyToggle(SettingsRepository.KEY_ISLAND_TIME_BATTERY_LAUNCHER_ONLY)
+            if (rememberIslandShowsWhileLocked()) {
+                RoundedCardContainer(spacing = 2.dp, cornerRadius = 24.dp) {
+                    IslandPrefToggle(
+                        settingKey = SettingsRepository.KEY_ISLAND_TIME_HIDE_LOCKED,
+                        iconRes = R.drawable.rounded_mobile_lock_portrait_24,
+                        title = stringResource(R.string.island_hide_when_locked_title),
+                    )
+                }
+            }
         }
     }
 }

@@ -541,6 +541,8 @@ class SettingsRepository(
         const val KEY_ISLAND_NOTIF_DISABLE_LOCKED = "island_notif_disable_locked"
         const val KEY_ISLAND_NOTIF_CONCEAL_CHAT_PICTURES = "island_notif_conceal_chat_pictures"
         const val KEY_ISLAND_CALENDAR_HIDE_LOCKED = "island_calendar_hide_locked"
+        const val KEY_ISLAND_TIME_HIDE_LOCKED = "island_time_hide_locked"
+        const val KEY_ISLAND_BATTERY_HIDE_LOCKED = "island_battery_hide_locked"
         const val KEY_ISLAND_TIMEOUT_MS = "island_timeout_ms"
         const val KEY_ISLAND_SHOW_GLOW = "island_show_glow"
         const val KEY_ISLAND_EXPANDED_WIDTH = "island_expanded_width"

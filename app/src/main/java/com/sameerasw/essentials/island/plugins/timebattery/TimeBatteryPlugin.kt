@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.plugins.timebattery
 
+import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -35,6 +36,8 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
     override val settingKeys = setOf(
         SettingsRepository.KEY_ISLAND_SHOW_TIME_BATTERY,
         SettingsRepository.KEY_ISLAND_TIME_SHOW_SECONDS,
+        SettingsRepository.KEY_ISLAND_TIME_HIDE_LOCKED,
+        SettingsRepository.KEY_ISLAND_BATTERY_HIDE_LOCKED,
         SettingsRepository.KEY_ISLAND_SHOW_BATTERY,
         SettingsRepository.KEY_ISLAND_BATTERY_STYLE,
         SettingsRepository.KEY_ISLAND_BATTERY_PERCENTAGE,
@@ -130,6 +133,7 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
                 addAction(Intent.ACTION_TIME_TICK)
                 addAction(Intent.ACTION_SCREEN_ON)
                 addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_USER_PRESENT)
                 addAction(Intent.ACTION_TIME_CHANGED)
                 addAction(Intent.ACTION_TIMEZONE_CHANGED)
             },
@@ -214,8 +218,11 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
 
     private fun render() {
         ctx ?: return
-        val showTime = settings.isIslandShowTimeBatteryEnabled()
-        val showBatteryItem = settings.isIslandShowBatteryEnabled()
+        val locked = (context.getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager)?.isKeyguardLocked == true
+        val showTime = settings.isIslandShowTimeBatteryEnabled() &&
+            !(locked && settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_HIDE_LOCKED, false))
+        val showBatteryItem = settings.isIslandShowBatteryEnabled() &&
+            !(locked && settings.getBoolean(SettingsRepository.KEY_ISLAND_BATTERY_HIDE_LOCKED, false))
         if (!showTime && !showBatteryItem) {
             publish(emptyList())
             return
