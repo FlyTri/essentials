@@ -72,6 +72,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntSizeAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -800,6 +801,12 @@ fun IslandRoot(
                 )
             }
         }
+        val collapseEndTarget = when {
+            state.arrangement.visibleItems.isEmpty() -> IntSize(minSurfaceHeight, minSurfaceHeight)
+            compactSize != IntSize.Zero -> compactSize
+            else -> fallbackCompact
+        }
+        val collapseEnd by animateIntSizeAsState(collapseEndTarget, IslandMotion.compactSize, label = "collapseEnd")
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -869,11 +876,7 @@ fun IslandRoot(
                 .layout { measurable, constraints ->
                     val child = measurable.measure(constraints)
                     val t = collapse.value.coerceIn(0f, 1f)
-                    val end = when {
-                        currentState.arrangement.visibleItems.isEmpty() -> IntSize(minSurfaceHeight, minSurfaceHeight)
-                        compactSize != IntSize.Zero -> compactSize
-                        else -> fallbackCompact
-                    }
+                    val end = collapseEnd
                     // Never smaller than the camera, whatever a spring or fling does.
                     val preW = (if (t > 0f) lerp(child.width, end.width, t) else child.width).coerceAtLeast(minSurfaceWidth)
                     if (currentState.stage == IslandStage.Hidden && !squashStarted[0] && preW <= minSurfaceHeight) {
@@ -899,7 +902,8 @@ fun IslandRoot(
                 .onSizeChanged { surfaceSize = it }
                 .layout { measurable, constraints ->
                     val p = measurable.measure(constraints)
-                    val w = p.width.coerceAtLeast(minSurfaceWidth)
+                    val floorW = if (stage == IslandStage.Compact) maxOf(minSurfaceWidth, collapseEnd.width) else minSurfaceWidth
+                    val w = p.width.coerceAtLeast(floorW)
                     val h = p.height.coerceAtLeast(minSurfaceHeight)
                     layout(w, h) { p.place((w - p.width) / 2, 0) }
                 }
