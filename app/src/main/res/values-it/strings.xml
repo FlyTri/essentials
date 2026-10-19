@@ -1569,4 +1569,7 @@
     <string name="duo_action_horizontal_slide_track_desc">Disponibile solo quando il media é in riproduzione</string>
     <string name="island_always_gestures_title">Gesti sempre disponibili</string>
     <string name="island_always_gestures_desc">Mantieni l\'area dei gesti attiva anche quando l\'isola é nascosta</string>
+    <string name="feat_flashlight_title">Torcia</string>
+    <string name="feat_flashlight_desc">Migliora il comportamento della torcia</string>
+    <string name="feat_lockscreen_shortcuts_title">Scorciatoie della schermata di blocco</string>
 </resources>
