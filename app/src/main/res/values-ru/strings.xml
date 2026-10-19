@@ -1864,4 +1864,6 @@
     <string name="label_battery_capacity_health">Здоровье батареи</string>
     <string name="feat_widget_stack_title">Стопка виджетов</string>
     <string name="feat_widget_stack_desc">Складывайте виджеты в стопку и переключайтесь между ними</string>
+    <string name="feat_volume_steps_title">Шаг звука</string>
+    <string name="feat_volume_steps_desc">Изменение шага громкости при каждом нажатие кнопки</string>
 </resources>
