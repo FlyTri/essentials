@@ -409,6 +409,9 @@ class ScreenOffAccessibilityService :
                         }
 
                         Intent.ACTION_USER_PRESENT -> {
+                            lastUnlockAt = android.os.SystemClock.elapsedRealtime()
+                            freezeHandler.removeCallbacks(shadeRecheckRunnable)
+                            freezeHandler.postDelayed(shadeRecheckRunnable, UNLOCK_SHADE_GRACE_MS + 100)
                             faceUnlockBrightnessHandler.onUserPresent()
                             aodWallpaperOverlayHandler.onUserPresent()
                             statusGlanceHandler.onUserPresent()
@@ -669,10 +672,14 @@ class ScreenOffAccessibilityService :
 
     private val shadeRecheckRunnable = Runnable { checkStatusBarExpansion() }
 
+    private var lastUnlockAt = 0L
+
     private fun checkStatusBarExpansion() {
         val expanded =
             try {
-                isScreenOn && !keyguardManager.isKeyguardLocked && isShadeWindowVisible()
+                isScreenOn && !keyguardManager.isKeyguardLocked &&
+                    android.os.SystemClock.elapsedRealtime() - lastUnlockAt > UNLOCK_SHADE_GRACE_MS &&
+                    isShadeWindowVisible()
             } catch (_: Exception) {
                 false
             }
@@ -690,9 +697,9 @@ class ScreenOffAccessibilityService :
             if (window.type != android.view.accessibility.AccessibilityWindowInfo.TYPE_SYSTEM) return@any false
             val title = window.title?.toString().orEmpty()
             if (title.contains("Volume", ignoreCase = true)) return@any false
-            if (SHADE_WINDOW_TITLES.any { title.contains(it, ignoreCase = true) }) return@any true
+            if (!SHADE_WINDOW_TITLES.any { title.contains(it, ignoreCase = true) }) return@any false
             window.getBoundsInScreen(bounds)
-            bounds.height() >= screenHeight * 0.4f
+            bounds.height() >= screenHeight * 0.2f
         }
     }
 
@@ -1061,6 +1068,7 @@ class ScreenOffAccessibilityService :
 
     companion object {
         private val SHADE_WINDOW_TITLES = listOf("NotificationShade", "Notification shade", "Quick settings", "QuickSettings")
+        private const val UNLOCK_SHADE_GRACE_MS = 1500L
 
         var instance: ScreenOffAccessibilityService? = null
 
