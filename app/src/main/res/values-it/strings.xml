@@ -353,12 +353,12 @@
     <string name="hide_clock_desc">Completely remove the clock from the status bar</string>
     <string name="hide_notification_icons_title">Nascondi notifiche</string>
     <string name="hide_notification_icons_desc">Hide all incoming notification icons</string>
-    <string name="feat_hide_gesture_bar_title">Hide gesture bar</string>
-    <string name="feat_hide_gesture_bar_desc">In gesture navigation</string>
-    <string name="feat_hide_gesture_bar_on_launcher_title">Show on launcher</string>
-    <string name="feat_hide_gesture_bar_on_launcher_desc">Dynamically show the gesture bar only when on the home screen</string>
-    <string name="feat_circle_to_search_gesture_title">Circle to Search gesture</string>
-    <string name="feat_circle_to_search_gesture_desc">Long-press the bottom area to trigger Circle to Search</string>
+    <string name="feat_hide_gesture_bar_title">Nascondi barra dei gesti</string>
+    <string name="feat_hide_gesture_bar_desc">Nella navigazione gesti</string>
+    <string name="feat_hide_gesture_bar_on_launcher_title">Mostra nel launcher</string>
+    <string name="feat_hide_gesture_bar_on_launcher_desc">Mostra dinamicamente la barra dei gesti solo quando si è sulla schermata home</string>
+    <string name="feat_circle_to_search_gesture_title">Gesto Cerchia e Cerca</string>
+    <string name="feat_circle_to_search_gesture_desc">Tieni premuta la parte bassa per attivare Cerchia e Cerca</string>
     <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
     <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
     <string name="feat_other_customizations_title">Altre personalizzazioni</string>
@@ -1592,4 +1592,12 @@
     <string name="feat_aod_wallpaper_title">Sfondo su AOD</string>
     <string name="feat_aod_wallpaper_desc">Utilizzando un overlay</string>
     <string name="label_ripple_animation">Animazione a increspatura</string>
+    <string name="feat_split_screen_gesture_title">Gesto per schermo diviso</string>
+    <string name="feat_split_screen_gesture_desc">Scorri in su con due dita dal basso dello schermo per dividere o ripristinare l\'app in primo piano</string>
+    <string name="feat_transparent_navigation_bar_title">Barra di navigazione trasparente</string>
+    <string name="feat_transparent_navigation_bar_desc">Rendi lo sfondo della barra di navigazione di sistema trasparente</string>
+    <string name="feat_back_gesture_title">Gesto indietro</string>
+    <string name="feat_back_gesture_desc">Spessore del gesto indietro dei bordi e impostazione per singola app</string>
+    <string name="back_gesture_add_app">Aggiungi app</string>
+    <string name="back_gesture_add_app_desc">Usa una larghezza diversa mentre una app è aperta</string>
 </resources>
