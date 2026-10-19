@@ -239,7 +239,7 @@ fun IslandRoot(
     val collapse = remember { Animatable(0f) }
     // Hidden: the width shrinks to a circle first, then the circle shrinks to nothing, so it never turns oval.
     val squash = remember { Animatable(0f) }
-    val squashStarted = remember { BooleanArray(1) }
+    val holdSize = remember { IntArray(2) }
     val dismissOffset = remember { Animatable(0f) }
     var target by remember { mutableStateOf(IntSize.Zero) }
     var compactSize by remember { mutableStateOf(IntSize.Zero) }
@@ -271,16 +271,10 @@ fun IslandRoot(
         }
     }
 
-    LaunchedEffect(stage == IslandStage.Hidden) {
-        if (inspection) return@LaunchedEffect
-        if (stage != IslandStage.Hidden) squash.animateTo(0f, IslandMotion.smoothSpatial())
-    }
-
     LaunchedEffect(key) {
         if (inspection) return@LaunchedEffect
         if (stage != IslandStage.Hidden) {
             visible = true
-            squashStarted[0] = false
         }
         if (stage != IslandStage.Compact) {
             launch { jelly.press.animateTo(0f, CompactJellyState.JellySpring) }
@@ -426,9 +420,23 @@ fun IslandRoot(
             }
             catchUpAnim.animateTo(1f, IslandMotion.smoothSpatial())
         } else {
-            catchUpAnim.animateTo(0f, IslandMotion.smoothSpatial())
+            catchUpAnim.animateTo(0f, if (stage == IslandStage.Hidden) IslandMotion.hideBubble() else IslandMotion.smoothSpatial())
         }
     }
+    // Hiding runs in order: secondary bubbles fold back first, then the main pill closes into the camera.
+    LaunchedEffect(stage == IslandStage.Hidden) {
+        if (inspection) return@LaunchedEffect
+        if (stage != IslandStage.Hidden) {
+            squash.animateTo(0f, IslandMotion.smoothSpatial())
+            return@LaunchedEffect
+        }
+        withTimeoutOrNull(IslandMotion.HIDE_BUBBLE_MS + 120L) {
+            snapshotFlow { catchUpAnim.value }.first { it <= 0.02f }
+        }
+        squash.animateTo(1f, IslandMotion.squash())
+        visible = false
+    }
+
     val bubbleSizePx = with(density) { spec.compactHeight.roundToPx() }
     val compactSlack = remember { mutableIntStateOf(0) }
     val compactBaseWidth = remember { mutableIntStateOf(0) }
@@ -462,7 +470,7 @@ fun IslandRoot(
     fun sideWidthLive(): Int = sideWidthAnim.value.roundToInt()
     val bubbleGapPx = with(density) { spec.cameraGap.roundToPx() }
     fun sideBubbleProgress(): Float =
-        if (spec.growDirection == 0 && hasCompactCells) catchUpAnim.value.coerceIn(0f, 1f) else 0f
+        if (spec.growDirection == 0 && (hasCompactCells || stage == IslandStage.Hidden)) catchUpAnim.value.coerceIn(0f, 1f) else 0f
     fun catchShiftPx(): Float = sideBubbleProgress() * compactSlack.intValue / 2f
     val lineShift = remember { Animatable(0f) }
     val liveSurfaceHeight = remember { mutableIntStateOf(0) }
@@ -766,9 +774,9 @@ fun IslandRoot(
                         }
                         .liquid(bubbleLiquid)
                         .graphicsLayer {
-                            val appear = if (bubbleOnlyLayout) catchUpAnim.value.coerceIn(0f, 1f) else 1f
+                            val appear = if (bubbleOnlyLayout || stage == IslandStage.Hidden) catchUpAnim.value.coerceIn(0f, 1f) else 1f
                             alpha = (1f - (abs(dragX.value) / maxDrag).coerceIn(0f, 0.8f)) * appear
-                            val appearScale = if (bubbleOnlyLayout) 0.6f + 0.4f * appear else 1f
+                            val appearScale = if (bubbleOnlyLayout || stage == IslandStage.Hidden) 0.6f + 0.4f * appear else 1f
                             scaleX = appearScale
                             scaleY = appearScale
                         }
@@ -883,16 +891,19 @@ fun IslandRoot(
                     val end = collapseEnd
                     // Never smaller than the camera, whatever a spring or fling does.
                     val preW = (if (t > 0f) lerp(child.width, end.width, t) else child.width).coerceAtLeast(minSurfaceWidth)
-                    if (currentState.stage == IslandStage.Hidden && !squashStarted[0] && preW <= minSurfaceHeight) {
-                        squashStarted[0] = true
-                        scope.launch {
-                            if (currentState.stage != IslandStage.Hidden) return@launch
-                            squash.animateTo(1f, IslandMotion.squash())
-                            if (currentState.stage == IslandStage.Hidden) visible = false
-                        }
+                    val preH = (if (t > 0f) lerp(child.height, end.height, t) else child.height).coerceAtLeast(minSurfaceHeight)
+                    val hiding = currentState.stage == IslandStage.Hidden
+                    // While hiding, the pill keeps its last visible size until its turn to close into the camera.
+                    val baseW = if (hiding && holdSize[0] > 0) holdSize[0] else preW
+                    val baseH = if (hiding && holdSize[1] > 0) holdSize[1] else preH
+                    val heightProgress = (squash.value / 0.4f).coerceIn(0f, 1f)
+                    val widthProgress = ((squash.value - 0.2f) / 0.8f).coerceIn(0f, 1f)
+                    val w = lerp(baseW, minSurfaceWidth, widthProgress)
+                    val h = lerp(baseH, minSurfaceHeight, heightProgress).coerceAtLeast(minSurfaceHeight)
+                    if (!hiding) {
+                        holdSize[0] = preW
+                        holdSize[1] = preH
                     }
-                    val w = lerp(preW, minSurfaceWidth, squash.value)
-                    val h = (if (t > 0f) lerp(child.height, end.height, t) else child.height).coerceAtLeast(minSurfaceHeight)
                     liveSurfaceHeight.intValue = h
                     val range = (expandedHeight[0] - minSurfaceHeight).toFloat()
                     val p = if (range > 0f) ((h - minSurfaceHeight) / range).coerceIn(0f, 1f) else 0f

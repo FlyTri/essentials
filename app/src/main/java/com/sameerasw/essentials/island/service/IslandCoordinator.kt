@@ -633,7 +633,7 @@ class IslandCoordinator(
                 stop()
             }
             pendingStop = task
-            mainHandler.postDelayed(task, IslandMotion.SQUASH_MS + HIDE_SETTLE_MS)
+            mainHandler.postDelayed(task, IslandMotion.HIDE_BUBBLE_MS + IslandMotion.SQUASH_MS + HIDE_SETTLE_MS)
             return
         }
         mainHandler.removeCallbacks(endReveal)

@@ -29,6 +29,9 @@ object IslandMotion {
     fun <T> collapseFloat(): FiniteAnimationSpec<T> = tween(COLLAPSE_MS, easing = CollapseEasing)
     fun collapseProgress(): FiniteAnimationSpec<Float> = tween(COLLAPSE_MS, easing = CollapseEasing)
 
+    const val HIDE_BUBBLE_MS = 320
+    fun hideBubble(): FiniteAnimationSpec<Float> = tween(HIDE_BUBBLE_MS, easing = ExpandEasing)
+
     const val SQUASH_MS = 560
     private val SquashEasing = CubicBezierEasing(0.4f, 0f, 0.2f, 1f)
     fun squash(): FiniteAnimationSpec<Float> = tween(SQUASH_MS, easing = SquashEasing)
