@@ -89,7 +89,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         val here = focusedKey == ITEM_KEY && (stage == IslandStage.Line || stage == IslandStage.Expanded)
         val left = wasHere && !here
         wasHere = here
-        if (left && !pendingPopUp && alerts.isNotEmpty() && settings.isIslandCatchUpEnabled()) {
+        if (left && !pendingPopUp && alerts.isNotEmpty() && currentAlert()?.hubOnly == false && settings.isIslandCatchUpEnabled()) {
             val c = ctx
             if (c != null) {
                 c.mainHandler.removeCallbacks(timeoutRunnable)
@@ -440,7 +440,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
             scheduleTimeout()
             return
         }
-        if (settings.isIslandCatchUpEnabled() && alerts.isNotEmpty()) {
+        if (settings.isIslandCatchUpEnabled() && alerts.isNotEmpty() && currentAlert()?.hubOnly == false) {
             if (!settings.isIslandCatchUpInfinite()) c.mainHandler.postDelayed(catchUpRunnable, settings.getIslandCatchUpTimeoutMs())
             pinLatest()
             catchingUp = true
@@ -471,8 +471,9 @@ class NotificationsPlugin : BaseIslandPlugin() {
     private fun pinLatest() {
         val c = ctx ?: return
         if (!hub() || settings.getIslandNotifHubOrder() != SettingsRepository.ISLAND_NOTIF_HUB_ORDER_DYNAMIC) return
-        pinnedKey = currentAlert()?.key ?: return
         c.mainHandler.removeCallbacks(unpinRunnable)
+        pinnedKey = currentAlert()?.takeIf { !it.hubOnly }?.key
+        if (pinnedKey == null) return
         val stay = settings.getIslandCatchUpStoredMs()
         if (stay > 0L) c.mainHandler.postDelayed(unpinRunnable, stay)
     }
