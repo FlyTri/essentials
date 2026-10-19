@@ -735,9 +735,30 @@ fun IslandBehaviorSettingsUI(
             )
 
             IconToggleItem(
+                iconRes = R.drawable.rounded_visibility_off_24,
+                title = stringResource(R.string.island_hide_status_bar_title),
+                infoText = stringResource(R.string.island_hide_status_bar_info),
+                isChecked = viewModel.isIslandHideStatusBarInsets.value && hasShellPermission,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    if (checked && !hasShellPermission) {
+                        requestingPermissionsFor =
+                            Pair(
+                                R.string.island_hide_status_bar_title,
+                                listOf(if (ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"),
+                            )
+                    } else {
+                        viewModel.setIslandHideStatusBarInsets(checked, context)
+                    }
+                },
+                modifier = Modifier.highlight(highlightSetting == "island_hide_status_bar_insets"),
+            )
+
+            IconToggleItem(
                 iconRes = R.drawable.rounded_notifications_off_24,
                 title = stringResource(R.string.island_hide_live_updates_title),
-                isChecked = viewModel.isIslandHideLiveUpdates.value,
+                enabled = !viewModel.isIslandHideStatusBarInsets.value,
+                isChecked = viewModel.isIslandHideLiveUpdates.value && !viewModel.isIslandHideStatusBarInsets.value,
                 onCheckedChange = { checked ->
                     HapticUtil.performVirtualKeyHaptic(view)
                     if (checked && !hasShellPermission) {
