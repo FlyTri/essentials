@@ -1302,7 +1302,7 @@
     <string name="feat_text_animations_title">Scala e animazioni</string>
     <string name="feat_text_animations_desc">Regola la scala e le animazioni del sistema</string>
     <string name="feat_screen_refresh_rate_title">Frequenza di Aggiornamento dello Schermo</string>
-    <string name="feat_screen_refresh_rate_desc">Set a fixed or ranged screen refresh rate</string>
+    <string name="feat_screen_refresh_rate_desc">Imposta un valore variabile o fisso della frequenza di aggiornamento dello schermo</string>
     <string name="settings_section_text">Testo</string>
     <string name="label_font_scale">Scala dei caratteri</string>
     <string name="label_font_weight">Peso del carattere</string>
@@ -1392,7 +1392,7 @@
     <string name="custom_video">Custom video</string>
     <string name="about_desc_live_wallpaper">Set your favorite video as your home screen wallpaper. Choose between triggering the animation upon unlocking or simply whenever the screen turns on for a dynamic experience.</string>
     <!-- Shut-Up! Feature -->
-    <string name="feat_shut_up_title">Shut-Up!</string>
+    <string name="feat_shut_up_title">Zitto! </string>
     <string name="feat_shut_up_desc">So cosa sto facendo</string>
     <string name="shut_up_description">Shut-Up! bypasses app restrictions and checks for developer options, accessibility and debugging by dynamically hiding them when you launch sensitive apps. \n\nUse the custom shortcuts to ensure settings are hidden before the app launches.</string>
     <string name="shut_up_select_apps_title">Select Apps</string>
@@ -1572,4 +1572,23 @@
     <string name="feat_flashlight_title">Torcia</string>
     <string name="feat_flashlight_desc">Migliora il comportamento della torcia</string>
     <string name="feat_lockscreen_shortcuts_title">Scorciatoie della schermata di blocco</string>
+    <string name="feat_widget_stack_title">Sovrapponi/Impila Widget</string>
+    <string name="feat_widget_stack_desc">Sovrapponi widget e scorri da uno all\'altro</string>
+    <string name="watch_watchface_desc">Personalizza la watchface</string>
+    <string name="feat_sync_sound_mode_title">Modalità audio</string>
+    <string name="feat_sync_sound_mode_desc">Sincronizza automaticamente con l\'orologio</string>
+    <string name="watch_notif_sync_desc">Solo per il launcher</string>
+    <string name="watch_call_sync_desc">Solo per il launcher</string>
+    <string name="watch_esim_install_title">Installa eSIM</string>
+    <string name="watch_esim_install_desc">Anche in aree non supportate</string>
+    <string name="setting_location_reached_full_screen_alarm_desc">Riproduci la suoneria della sveglia e mostra un avviso a schermo intero al momento dell\'arrivo a destinazione</string>
+    <string name="batteries_notification_title">Notifica di batterie</string>
+    <string name="battery_show_percentage_title">Mostra percentuale</string>
+    <string name="feat_conscious_gate_title">Portale di consapevolezza</string>
+    <string name="feat_conscious_gate_desc">Una pausa prima di aprire determinate app</string>
+    <string name="feat_face_unlock_brightness_title">Illuminazione volto</string>
+    <string name="feat_face_unlock_brightness_desc">Aumenta la luminosità in condizioni di luce scarsa</string>
+    <string name="feat_screenshots_desc">Rimuovi screenshot già condivisi o vecchi</string>
+    <string name="feat_aod_wallpaper_title">Sfondo su AOD</string>
+    <string name="feat_aod_wallpaper_desc">Utilizzando un overlay</string>
 </resources>
