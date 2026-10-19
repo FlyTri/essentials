@@ -121,8 +121,15 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private fun advanceCurrent() {
         if (alerts.size < 2) return
-        currentIndex = (currentIndex.coerceIn(0, alerts.size - 1) + 1) % alerts.size
-        markSeen()
+        val start = currentIndex.coerceIn(0, alerts.size - 1)
+        for (offset in 1 until alerts.size) {
+            val index = (start + offset) % alerts.size
+            if (!alerts[index].hubOnly) {
+                currentIndex = index
+                markSeen()
+                return
+            }
+        }
     }
 
     private fun advanceToUnseen(): Boolean {
@@ -227,7 +234,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         live.forEach { alert ->
             val index = alerts.indexOfFirst { it.key == alert.key }
             if (index >= 0) {
-                alerts[index] = alert
+                alerts[index] = alert.copy(hubOnly = alerts[index].hubOnly)
             } else {
                 insertSilently(alert)
             }
@@ -254,7 +261,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private fun addSilently(alert: ActiveNotificationAlert) {
         val index = alerts.indexOfFirst { it.key == alert.key }
-        if (index >= 0) alerts[index] = alert else insertSilently(alert)
+        if (index >= 0) alerts[index] = alert.copy(hubOnly = alerts[index].hubOnly) else insertSilently(alert)
         render()
     }
 
@@ -392,8 +399,17 @@ class NotificationsPlugin : BaseIslandPlugin() {
         val index = alerts.indexOfFirst { it.key == key }
         if (index < 0) return
         alerts.removeAt(index).also { seen.remove(it.key) }
+        val wasCurrent = index == currentIndex
         if (index < currentIndex) currentIndex--
         currentIndex = currentIndex.coerceIn(0, (alerts.size - 1).coerceAtLeast(0))
+        if (wasCurrent && alerts.getOrNull(currentIndex)?.hubOnly == true) {
+            val fresh = (currentIndex until alerts.size).firstOrNull { !alerts[it].hubOnly }
+                ?: (currentIndex - 1 downTo 0).firstOrNull { !alerts[it].hubOnly }
+            if (fresh != null) {
+                currentIndex = fresh
+                markSeen()
+            }
+        }
         if (alerts.isEmpty()) clearAll() else render()
     }
 
@@ -576,9 +592,13 @@ class NotificationsPlugin : BaseIslandPlugin() {
             return
         }
         val index = alerts.indexOf(alert)
-        val next = if (queueEnabled()) alerts.getOrNull(index + 1) ?: alerts.getOrNull(index - 1) else null
+        val next = if (queueEnabled()) {
+            alerts.drop(index + 1).firstOrNull { !it.hubOnly } ?: alerts.take(index).lastOrNull { !it.hubOnly }
+        } else {
+            null
+        }
         val stack = alerts.map { stackIconFor(it, current = it === alert) }
-        val waitingAlerts = waitingInOrder(alert).let { all -> if (hub()) all.filter { it.key !in seen } else all }
+        val waitingAlerts = waitingInOrder(alert).filter { !it.hubOnly }
         val queued = waitingAlerts.map { stackIconFor(it, current = false) }
         val minimal = minimal()
         val waiting = if (minimal) queued else emptyList()
