@@ -1167,6 +1167,7 @@ fun IslandRoot(
             // Keyed, so the leaving layer keeps its composition (a Line marquee doesn't restart when it becomes outgoing).
             for (layerKey in listOfNotNull(shownOutgoing, key)) key(layerKey) {
                 val current = layerKey == key
+                val providedLeading = inlineQueue.takeIf { current && inlineLineQueue }
                 val layerModifier = if (current) {
                     Modifier
                         .layout { measurable, constraints ->
