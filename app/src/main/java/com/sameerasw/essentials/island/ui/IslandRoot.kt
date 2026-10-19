@@ -271,12 +271,16 @@ fun IslandRoot(
         }
     }
 
+    LaunchedEffect(stage == IslandStage.Hidden) {
+        if (inspection) return@LaunchedEffect
+        if (stage != IslandStage.Hidden) squash.animateTo(0f, IslandMotion.smoothSpatial())
+    }
+
     LaunchedEffect(key) {
         if (inspection) return@LaunchedEffect
         if (stage != IslandStage.Hidden) {
             visible = true
             squashStarted[0] = false
-            if (squash.value != 0f) launch { squash.animateTo(0f, IslandMotion.smoothSpatial()) }
         }
         if (stage != IslandStage.Compact) {
             launch { jelly.press.animateTo(0f, CompactJellyState.JellySpring) }
@@ -285,7 +289,7 @@ fun IslandRoot(
         if (dismissCommitted) {
             dismissOffset.snapTo(0f)
         } else if (dismissOffset.value != 0f) {
-            launch { dismissOffset.animateTo(0f, IslandMotion.release()) }
+            scope.launch { dismissOffset.animateTo(0f, IslandMotion.release()) }
         }
         if (dragCommitted && (stage == IslandStage.Expanded || stage == IslandStage.Line)) {
             dragCommitted = false
@@ -422,7 +426,7 @@ fun IslandRoot(
             }
             catchUpAnim.animateTo(1f, IslandMotion.smoothSpatial())
         } else {
-            catchUpAnim.animateTo(0f, IslandMotion.expressiveFastEffects())
+            catchUpAnim.animateTo(0f, IslandMotion.smoothSpatial())
         }
     }
     val bubbleSizePx = with(density) { spec.compactHeight.roundToPx() }
@@ -882,6 +886,7 @@ fun IslandRoot(
                     if (currentState.stage == IslandStage.Hidden && !squashStarted[0] && preW <= minSurfaceHeight) {
                         squashStarted[0] = true
                         scope.launch {
+                            if (currentState.stage != IslandStage.Hidden) return@launch
                             squash.animateTo(1f, IslandMotion.squash())
                             if (currentState.stage == IslandStage.Hidden) visible = false
                         }

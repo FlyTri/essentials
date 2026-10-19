@@ -12,11 +12,14 @@ object IslandMotion {
     const val DAMPING = 0.86f
     const val STIFFNESS = 260f
 
-    val size: FiniteAnimationSpec<IntSize> = spring(Spring.DampingRatioNoBouncy, 300f, IntSize(1, 1))
+    const val EXPAND_MS = 460
+    private val ExpandEasing = CubicBezierEasing(0.4f, 0f, 0.2f, 1f)
+    val size: FiniteAnimationSpec<IntSize> = tween(EXPAND_MS, easing = ExpandEasing)
     const val COMPACT_DAMPING = 0.78f
     const val COMPACT_STIFFNESS = 230f
-    val compactSize: FiniteAnimationSpec<IntSize> = spring(Spring.DampingRatioNoBouncy, 260f, IntSize(1, 1))
-    val compactOffset: FiniteAnimationSpec<IntOffset> = spring(Spring.DampingRatioNoBouncy, 260f, IntOffset(1, 1))
+    const val COMPACT_MS = 380
+    val compactSize: FiniteAnimationSpec<IntSize> = tween(COMPACT_MS, easing = ExpandEasing)
+    val compactOffset: FiniteAnimationSpec<IntOffset> = tween(COMPACT_MS, easing = ExpandEasing)
     fun <T> compactFloat(): FiniteAnimationSpec<T> = spring(COMPACT_DAMPING, COMPACT_STIFFNESS)
     const val COLLAPSE_MS = 480
     private val CollapseEasing = CubicBezierEasing(0.3f, 0f, 0.1f, 1f)
@@ -41,7 +44,7 @@ object IslandMotion {
     const val CONTENT_SCALE = 0.06f
     fun contentSpring(): FiniteAnimationSpec<Float> = spring(0.9f, 300f)
 
-    fun <T> smoothSpatial(): FiniteAnimationSpec<T> = spring(Spring.DampingRatioNoBouncy, 300f)
+    fun <T> smoothSpatial(): FiniteAnimationSpec<T> = tween(EXPAND_MS, easing = ExpandEasing)
     fun <T> expressiveFastSpatial(): FiniteAnimationSpec<T> = spring(0.7f, 650f)
     fun <T> expressiveDefaultSpatial(): FiniteAnimationSpec<T> = spring(0.82f, 300f)
     fun <T> expressiveSlowSpatial(): FiniteAnimationSpec<T> = spring(0.82f, 160f)
