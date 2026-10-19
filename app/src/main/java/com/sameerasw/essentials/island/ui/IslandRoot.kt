@@ -1033,28 +1033,22 @@ fun IslandRoot(
                             dy += amount.y
                             val inward = dx * inwardSign()
                             val horizontal = abs(dx) >= abs(dy)
-                            val stacked = currentState.focused?.queue != null
                             val dismissible = currentState.focused?.dismissible == true
-                            sliding = if (peek) {
-                                (stacked && horizontal) || (horizontal && inward <= 0f)
-                            } else {
-                                horizontal
-                            }
-                            val advancing = peek && sliding && stacked && inward > 0f
+                            sliding = if (peek) horizontal && inward <= 0f else horizontal
                             if (sliding) {
                                 progress = 0f
                                 scope.launch { collapse.snapTo(0f) }
-                                scope.launch { dismissOffset.snapTo(if (advancing || dismissible) dx else dx * 0.25f) }
+                                scope.launch { dismissOffset.snapTo(if (dismissible) dx else dx * 0.25f) }
                             } else {
                                 val pull = if (peek) maxOf(inward, -dy) else -dy
                                 progress = (pull / collapseRange).coerceIn(0f, 1f)
                                 scope.launch { collapse.snapTo(progress) }
                                 scope.launch { dismissOffset.snapTo(0f) }
                             }
-                            val now = if (sliding) abs(dx) > dismissThreshold && (advancing || dismissible) else progress > COLLAPSE_COMMIT
+                            val now = if (sliding) abs(dx) > dismissThreshold && dismissible else progress > COLLAPSE_COMMIT
                             swipeIntent = when {
                                 !now -> null
-                                advancing || !sliding -> SwipeIntent.Hide
+                                !sliding -> SwipeIntent.Hide
                                 else -> SwipeIntent.Dismiss
                             }
                             if (now != crossed) {
@@ -1075,8 +1069,7 @@ fun IslandRoot(
                                 val focused = currentState.focused
                                 val flung = abs(v.x) > 1500f
                                 val dir = if ((if (flung) v.x else dx) > 0f) 1f else -1f
-                                val advance = peek && focused?.queue != null && dir * inwardSign() > 0f
-                                val commit = (advance || focused?.dismissible == true) && (crossed || flung)
+                                val commit = focused?.dismissible == true && (crossed || flung)
                                 scope.launch {
                                     if (!commit || focused == null) {
                                         dismissOffset.animateTo(0f, IslandMotion.fling(), initialVelocity = v.x)
@@ -1089,7 +1082,7 @@ fun IslandRoot(
                                     val throwSpec = tween<Float>(throwMs, easing = LinearEasing)
                                     dismissOffset.animateTo(dir * flyOff, throwSpec)
                                     if (focused.queue != null) {
-                                        if (advance) actions.onAdvance() else actions.onDismiss()
+                                        actions.onDismiss()
                                         withTimeoutOrNull(250L) { snapshotFlow { currentState.focused }.first { it !== focused } }
                                     } else {
                                         dismissCommitted = true
