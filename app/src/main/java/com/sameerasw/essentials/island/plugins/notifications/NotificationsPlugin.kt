@@ -119,12 +119,15 @@ class NotificationsPlugin : BaseIslandPlugin() {
         currentAlert()?.let { seen.add(it.key) }
     }
 
+    private fun cycles(from: ActiveNotificationAlert, to: ActiveNotificationAlert) = from.hubOnly || !to.hubOnly
+
     private fun advanceCurrent() {
         if (alerts.size < 2) return
         val start = currentIndex.coerceIn(0, alerts.size - 1)
+        val from = alerts[start]
         for (offset in 1 until alerts.size) {
             val index = (start + offset) % alerts.size
-            if (!alerts[index].hubOnly) {
+            if (cycles(from, alerts[index])) {
                 currentIndex = index
                 markSeen()
                 return
@@ -398,8 +401,8 @@ class NotificationsPlugin : BaseIslandPlugin() {
     private fun onRemoved(key: String) {
         val index = alerts.indexOfFirst { it.key == key }
         if (index < 0) return
-        alerts.removeAt(index).also { seen.remove(it.key) }
-        val wasCurrent = index == currentIndex
+        val removed = alerts.removeAt(index).also { seen.remove(it.key) }
+        val wasCurrent = index == currentIndex && !removed.hubOnly
         if (index < currentIndex) currentIndex--
         currentIndex = currentIndex.coerceIn(0, (alerts.size - 1).coerceAtLeast(0))
         if (wasCurrent && alerts.getOrNull(currentIndex)?.hubOnly == true) {
@@ -593,12 +596,12 @@ class NotificationsPlugin : BaseIslandPlugin() {
         }
         val index = alerts.indexOf(alert)
         val next = if (queueEnabled()) {
-            alerts.drop(index + 1).firstOrNull { !it.hubOnly } ?: alerts.take(index).lastOrNull { !it.hubOnly }
+            alerts.drop(index + 1).firstOrNull { cycles(alert, it) } ?: alerts.take(index).lastOrNull { cycles(alert, it) }
         } else {
             null
         }
         val stack = alerts.map { stackIconFor(it, current = it === alert) }
-        val waitingAlerts = waitingInOrder(alert).filter { !it.hubOnly }
+        val waitingAlerts = waitingInOrder(alert).filter { cycles(alert, it) }
         val queued = waitingAlerts.map { stackIconFor(it, current = false) }
         val minimal = minimal()
         val waiting = if (minimal) queued else emptyList()
