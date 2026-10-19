@@ -625,7 +625,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
             null
         }
         val stack = alerts.map { stackIconFor(it, current = it === alert) }
-        val waitingAlerts = waitingInOrder(alert).filter { cycles(alert, it) }
+        val waitingAlerts = waitingInOrder(alert).filter { !it.hubOnly && it.key !in seen }
         val queued = waitingAlerts.map { stackIconFor(it, current = false) }
         val minimal = minimal()
         val waiting = if (minimal) queued else emptyList()
