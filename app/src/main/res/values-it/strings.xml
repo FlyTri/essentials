@@ -688,7 +688,7 @@
     <string name="label_haptic_feedback">Feedback Aptico</string>
     <string name="label_updates">Aggiornamenti</string>
     <string name="label_auto_check_updates">Controlla in automatico gli aggiornamenti</string>
-    <string name="desc_auto_check_updates">Controlla gli aggiornamenti all/\'apertura dell\'app</string>
+    <string name="desc_auto_check_updates">Controlla gli aggiornamenti all\'apertura dell\'app</string>
     <string name="action_all_set">Fatto</string>
     <string name="action_check_whats_new">Cosa c\'è di nuovo?</string>
     <string name="welcome_back_title">Welcome back to Essentials</string>
