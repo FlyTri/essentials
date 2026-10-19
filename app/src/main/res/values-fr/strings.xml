@@ -1731,4 +1731,10 @@ Les effets de la LED HiLight peuvent être aussi utilisés comme une action dans
     <string name="feat_activity_launcher_title">Lanceur d\'activité</string>
     <string name="feat_activity_launcher_desc">Ouvre/Épingle chaque activité d\'une application</string>
     <string name="feat_lockscreen_shortcuts_title">Racc. de l\'écran de verrouillage</string>
+    <string name="island_border_outline_title">Contour de la bordure</string>
+    <string name="island_border_outline_desc">Affiche un contour fin autour de l\'Island</string>
+    <string name="island_border_outline_dynamic_title">Couleurs dynamique</string>
+    <string name="island_border_outline_hide_expanded_title">Cacher quand étendu</string>
+    <string name="island_border_outline_thickness_title">Épaisseur du contour</string>
+    <string name="island_preview_ring_title">Montrer l\'aide pour l\'alignement</string>
 </resources>
