@@ -3359,6 +3359,7 @@
     <string name="island_sound_mode_sound">Sound</string>
     <string name="island_sound_mode_vibrate">Vibrate</string>
     <string name="island_sound_mode_silent">Silent</string>
+    <string name="island_sound_mode_mode_fallback">Mode</string>
     <string name="island_network_wifi">Wi-Fi</string>
     <string name="island_network_connected_to">Connected to</string>
     <string name="island_network_disconnected_from">Disconnected from</string>
