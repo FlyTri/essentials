@@ -24,6 +24,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.session.MediaSessionManager
 import android.os.Handler
+import android.os.HandlerThread
 import android.os.Looper
 import android.os.Vibrator
 import android.view.KeyEvent
@@ -411,8 +412,8 @@ class ScreenOffAccessibilityService :
 
                         Intent.ACTION_USER_PRESENT -> {
                             lastUnlockAt = android.os.SystemClock.elapsedRealtime()
-                            freezeHandler.removeCallbacks(shadeRecheckRunnable)
-                            freezeHandler.postDelayed(shadeRecheckRunnable, UNLOCK_SHADE_GRACE_MS + 100)
+                            windowHandler.removeCallbacks(shadeRecheckRunnable)
+                            windowHandler.postDelayed(shadeRecheckRunnable, UNLOCK_SHADE_GRACE_MS + 100)
                             faceUnlockBrightnessHandler.onUserPresent()
                             aodWallpaperOverlayHandler.onUserPresent()
                             statusGlanceHandler.onUserPresent()
@@ -585,6 +586,8 @@ class ScreenOffAccessibilityService :
             }
             isLightSensorRegistered = false
         }
+        windowHandler.removeCallbacksAndMessages(null)
+        windowThread.quitSafely()
         serviceScope.cancel()
         getSharedPreferences("essentials_prefs", MODE_PRIVATE)
             .unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
@@ -610,11 +613,9 @@ class ScreenOffAccessibilityService :
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED ||
             event.eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED
         ) {
-            checkFullscreenState()
-            checkStatusBarExpansion()
-            freezeHandler.removeCallbacks(shadeRecheckRunnable)
-            freezeHandler.postDelayed(shadeRecheckRunnable, 300)
-            checkVolumeDialogState()
+            requestWindowScan()
+            windowHandler.removeCallbacks(shadeRecheckRunnable)
+            windowHandler.postDelayed(shadeRecheckRunnable, 300)
             faceUnlockBrightnessHandler.onWindowsChanged()
             lockscreenShortcutsHandler.onWindowsChanged()
             appVolumeOverlayHandler.onWindowsChanged()
@@ -653,41 +654,57 @@ class ScreenOffAccessibilityService :
         }
     }
 
-    private fun checkVolumeDialogState() {
-        try {
-            val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
-            if (!prefs.getBoolean("button_remap_pause_on_volume_dialog", true)) {
-                buttonRemapHandler.isVolumeDialogVisible = false
-                return
-            }
-            val currentWindows = windows
-            val isVisible = currentWindows?.any(VolumePanelDetector::isVolumePanel) ?: false
-            buttonRemapHandler.isVolumeDialogVisible = isVisible
+    private val windowThread = HandlerThread("essentials-windows").apply { start() }
+    private val windowHandler = Handler(windowThread.looper)
+    private val uiHandler = Handler(Looper.getMainLooper())
+    private val windowScanQueued = AtomicBoolean(false)
+    private val shadeRecheckRunnable = Runnable { requestWindowScan() }
+
+    @Volatile
+    private var lastUnlockAt = 0L
+
+    // Window queries are binder calls, so they run on their own thread, once per burst of events, and only the results hop to main
+    private fun requestWindowScan() {
+        if (windowScanQueued.compareAndSet(false, true)) windowHandler.post(windowScanRunnable)
+    }
+
+    private val windowScanRunnable = Runnable {
+        windowScanQueued.set(false)
+        val snapshot = try {
+            windows
         } catch (_: Exception) {
-            buttonRemapHandler.isVolumeDialogVisible = false
+            null
+        }
+        val fullscreen = fullscreenOf(snapshot)
+        val shadeExpanded = try {
+            isScreenOn && !keyguardManager.isKeyguardLocked &&
+                android.os.SystemClock.elapsedRealtime() - lastUnlockAt > UNLOCK_SHADE_GRACE_MS &&
+                isShadeWindowVisible(snapshot)
+        } catch (_: Exception) {
+            false
+        }
+        val volumeDialogVisible = try {
+            val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
+            prefs.getBoolean("button_remap_pause_on_volume_dialog", true) &&
+                snapshot?.any(VolumePanelDetector::isVolumePanel) == true
+        } catch (_: Exception) {
+            false
+        }
+        uiHandler.post {
+            fullscreen?.let {
+                duoOverlayHandler.setFullscreen(it)
+                statusGlanceHandler.setFullscreen(it)
+                islandOverlayHandler.setFullscreen(it)
+            }
+            statusGlanceHandler.setShadeExpanded(shadeExpanded)
+            islandOverlayHandler.setShadeExpanded(shadeExpanded)
+            duoOverlayHandler.setShadeExpanded(shadeExpanded)
+            buttonRemapHandler.isVolumeDialogVisible = volumeDialogVisible
+            appVolumeOverlayHandler.onWindowsChanged()
         }
     }
 
-    private val shadeRecheckRunnable = Runnable { checkStatusBarExpansion() }
-
-    private var lastUnlockAt = 0L
-
-    private fun checkStatusBarExpansion() {
-        val expanded =
-            try {
-                isScreenOn && !keyguardManager.isKeyguardLocked &&
-                    android.os.SystemClock.elapsedRealtime() - lastUnlockAt > UNLOCK_SHADE_GRACE_MS &&
-                    isShadeWindowVisible()
-            } catch (_: Exception) {
-                false
-            }
-        statusGlanceHandler.setShadeExpanded(expanded)
-        islandOverlayHandler.setShadeExpanded(expanded)
-        duoOverlayHandler.setShadeExpanded(expanded)
-    }
-
-    private fun isShadeWindowVisible(): Boolean {
-        val currentWindows = windows
+    private fun isShadeWindowVisible(currentWindows: List<android.view.accessibility.AccessibilityWindowInfo>?): Boolean {
         if (currentWindows.isNullOrEmpty()) return false
         val screenHeight = resources.displayMetrics.heightPixels
         val bounds = android.graphics.Rect()
@@ -701,29 +718,21 @@ class ScreenOffAccessibilityService :
         }
     }
 
-    private fun checkFullscreenState() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            try {
-                val currentWindows = windows
-                if (!currentWindows.isNullOrEmpty()) {
-                    val hasStatusBar = currentWindows.any { it.type == android.view.accessibility.AccessibilityWindowInfo.TYPE_SYSTEM }
-                    val appWindow = currentWindows.firstOrNull { it.type == android.view.accessibility.AccessibilityWindowInfo.TYPE_APPLICATION && it.isFocused }
-                        ?: currentWindows.firstOrNull { it.type == android.view.accessibility.AccessibilityWindowInfo.TYPE_APPLICATION }
-
-                    if (appWindow != null) {
-                        val outBounds = android.graphics.Rect()
-                        appWindow.getBoundsInScreen(outBounds)
-                        val displayMetrics = resources.displayMetrics
-                        val isCoveringFullDisplay = outBounds.width() >= displayMetrics.widthPixels &&
-                            outBounds.height() >= displayMetrics.heightPixels
-
-                        val isFullscreen = isCoveringFullDisplay && !hasStatusBar
-                        duoOverlayHandler.setFullscreen(isFullscreen)
-                        statusGlanceHandler.setFullscreen(isFullscreen)
-                        islandOverlayHandler.setFullscreen(isFullscreen)
-                    }
-                }
-            } catch (_: Exception) {}
+    private fun fullscreenOf(currentWindows: List<android.view.accessibility.AccessibilityWindowInfo>?): Boolean? {
+        if (currentWindows.isNullOrEmpty()) return null
+        return try {
+            val hasStatusBar = currentWindows.any { it.type == android.view.accessibility.AccessibilityWindowInfo.TYPE_SYSTEM }
+            val appWindow = currentWindows.firstOrNull { it.type == android.view.accessibility.AccessibilityWindowInfo.TYPE_APPLICATION && it.isFocused }
+                ?: currentWindows.firstOrNull { it.type == android.view.accessibility.AccessibilityWindowInfo.TYPE_APPLICATION }
+                ?: return null
+            val outBounds = android.graphics.Rect()
+            appWindow.getBoundsInScreen(outBounds)
+            val displayMetrics = resources.displayMetrics
+            val isCoveringFullDisplay = outBounds.width() >= displayMetrics.widthPixels &&
+                outBounds.height() >= displayMetrics.heightPixels
+            isCoveringFullDisplay && !hasStatusBar
+        } catch (_: Exception) {
+            null
         }
     }
 

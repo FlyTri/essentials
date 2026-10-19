@@ -812,8 +812,10 @@ fun IslandRoot(
                 .padding(top = spec.surfaceTop)
                 .layout { measurable, constraints ->
                     val p = measurable.measure(constraints)
-                    val dx = surfaceShiftFor(p.width) + lineShift.value.roundToInt() + catchShiftPx().roundToInt()
-                    layout(p.width, p.height) { p.place(dx, 0) }
+                    layout(p.width, p.height) {
+                        val dx = surfaceShiftFor(p.width) + lineShift.value.roundToInt() + catchShiftPx().roundToInt()
+                        p.place(dx, 0)
+                    }
                 }
                 .offset { IntOffset(0, (-edgeShift.floatValue - surfaceTopPx * bond).roundToInt()) }
                 .compactJelly(jelly, jellyRangePx)

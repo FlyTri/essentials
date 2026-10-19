@@ -54,6 +54,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 
 class AppVolumeOverlayHandler(
     private val service: AccessibilityService,
@@ -78,6 +79,8 @@ class AppVolumeOverlayHandler(
     private var isButtonPressed = false
     private var hidePending = false
     private var isPolling = false
+    private val scanning = AtomicBoolean(false)
+    private var rescan = false
     private var lastTouchAt = 0L
 
     private val pollRunnable =
@@ -127,7 +130,28 @@ class AppVolumeOverlayHandler(
             return
         }
         if (button == null) create()
-        val bounds = if (isEnabled()) findVolumePanelBounds() else null
+        if (!isEnabled()) {
+            applyBounds(null)
+            return
+        }
+        if (!scanning.compareAndSet(false, true)) {
+            rescan = true
+            return
+        }
+        scope.launch(Dispatchers.Default) {
+            val bounds = findVolumePanelBounds()
+            withContext(Dispatchers.Main) {
+                scanning.set(false)
+                applyBounds(bounds)
+                if (rescan) {
+                    rescan = false
+                    onWindowsChanged()
+                }
+            }
+        }
+    }
+
+    private fun applyBounds(bounds: Rect?) {
         if (bounds == null) {
             scheduleHide()
             return
