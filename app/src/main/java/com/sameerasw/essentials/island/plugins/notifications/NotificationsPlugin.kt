@@ -7,6 +7,7 @@ import kotlin.math.ceil
 import android.accessibilityservice.AccessibilityService
 import android.app.KeyguardManager
 import android.content.Context
+import android.os.PowerManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
@@ -58,6 +59,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_ORDER,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_SILENT,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_GROUP,
+        SettingsRepository.KEY_ISLAND_NOTIF_DISABLE_LOCKED,
         SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED,
         SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_CHAT_PICTURES,
         SettingsRepository.KEY_ISLAND_OTP_ENABLED,
@@ -317,6 +319,11 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private fun maskOtp(code: String) = formatOtp(code).map { if (it == ' ') ' ' else '•' }.joinToString("")
 
+    private fun lockedOut(): Boolean =
+        settings.getBoolean(SettingsRepository.KEY_ISLAND_NOTIF_DISABLE_LOCKED, true) &&
+            ((context.getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager)?.isKeyguardLocked == true ||
+                (context.getSystemService(Context.POWER_SERVICE) as? PowerManager)?.isInteractive == false)
+
     private fun concealed(): Boolean =
         settings.getBoolean(SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED, false) &&
             (context.getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager)?.isKeyguardLocked == true
@@ -327,7 +334,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
             if (hub()) addSilently(alert)
             return
         }
-        if (c.isContentSuppressed() || !settings.isIslandShowNotificationsEnabled() || !passesFilters(alert)) {
+        if (c.isContentSuppressed() || lockedOut() || !settings.isIslandShowNotificationsEnabled() || !passesFilters(alert)) {
             if (hub()) addSilently(alert)
             return
         }
@@ -591,7 +598,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
             return
         }
         val alert = currentAlert()
-        if (alert == null) {
+        if (alert == null || lockedOut()) {
             publish(null)
             return
         }

@@ -538,6 +538,7 @@ class SettingsRepository(
         const val ISLAND_SHOW_WHEN_SCREEN_ON = "screen_on"
         const val ISLAND_SHOW_WHEN_ALWAYS = "always"
         const val KEY_ISLAND_NOTIF_CONCEAL_LOCKED = "island_notif_conceal_locked"
+        const val KEY_ISLAND_NOTIF_DISABLE_LOCKED = "island_notif_disable_locked"
         const val KEY_ISLAND_NOTIF_CONCEAL_CHAT_PICTURES = "island_notif_conceal_chat_pictures"
         const val KEY_ISLAND_CALENDAR_HIDE_LOCKED = "island_calendar_hide_locked"
         const val KEY_ISLAND_TIMEOUT_MS = "island_timeout_ms"

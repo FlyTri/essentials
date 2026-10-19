@@ -941,6 +941,11 @@ fun IslandNotificationSettingsUI(
                 highlightSetting in setOf("island_notif_queue_style", "island_notif_queue_inline"),
         )
     }
+    var lockedDisabled by remember {
+        mutableStateOf(
+            SettingsRepository(context).getBoolean(SettingsRepository.KEY_ISLAND_NOTIF_DISABLE_LOCKED, true)
+        )
+    }
     var concealed by remember {
         mutableStateOf(
             SettingsRepository(context).getBoolean(SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED, false)
@@ -1304,21 +1309,36 @@ fun IslandNotificationSettingsUI(
         if (rememberIslandShowsWhileLocked()) {
             IslandSettingsSection(R.string.island_notif_section_lock_screen) {
                 IslandPrefToggle(
-                    settingKey = SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED,
-                    iconRes = R.drawable.rounded_visibility_off_24,
-                    title = stringResource(R.string.island_notif_conceal_locked_title),
-                    onChanged = { concealed = it },
+                    settingKey = SettingsRepository.KEY_ISLAND_NOTIF_DISABLE_LOCKED,
+                    iconRes = R.drawable.rounded_notifications_off_24,
+                    title = stringResource(R.string.label_disabled),
+                    defaultValue = true,
+                    onChanged = { lockedDisabled = it },
                 )
                 AnimatedVisibility(
-                    visible = concealed,
+                    visible = !lockedDisabled,
                     enter = fadeIn() + expandVertically(),
                     exit = fadeOut() + shrinkVertically(),
                 ) {
-                    IslandPrefToggle(
-                        settingKey = SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_CHAT_PICTURES,
-                        iconRes = R.drawable.rounded_person_24,
-                        title = stringResource(R.string.island_notif_conceal_chat_pictures_title),
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        IslandPrefToggle(
+                            settingKey = SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED,
+                            iconRes = R.drawable.rounded_visibility_off_24,
+                            title = stringResource(R.string.island_notif_conceal_locked_title),
+                            onChanged = { concealed = it },
+                        )
+                        AnimatedVisibility(
+                            visible = concealed,
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically(),
+                        ) {
+                            IslandPrefToggle(
+                                settingKey = SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_CHAT_PICTURES,
+                                iconRes = R.drawable.rounded_person_24,
+                                title = stringResource(R.string.island_notif_conceal_chat_pictures_title),
+                            )
+                        }
+                    }
                 }
             }
         }
