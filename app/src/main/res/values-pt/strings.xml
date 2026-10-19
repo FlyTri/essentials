@@ -1763,4 +1763,10 @@
     <string name="duo_hide_when_screen_off_title">esconder quando a tela é desligada</string>
     <string name="duo_hide_when_screen_off_only_idle_title">apenas esconder quando o AOD estiver mostrando</string>
     <string name="duo_tap_for_brief_title">toque para a apresentação do ilha</string>
+    <string name="app_volume_add_app">
+adicionar algum app</string>
+    <string name="app_volume_add_app_desc">seleciona automáticamente o nível de volume depois do APP começar a tocar</string>
+    <string name="app_volume_enable_title">ativar volume de app</string>
+    <string name="app_volume_overlay_title">sobreposição da UI do controle</string>
+    <string name="volume_steps_enable_title">adicionar etapas de volume</string>
 </resources>
