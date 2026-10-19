@@ -538,8 +538,11 @@ class SettingsRepository(
         const val ISLAND_SHOW_WHEN_SCREEN_ON = "screen_on"
         const val ISLAND_SHOW_WHEN_ALWAYS = "always"
         const val KEY_ISLAND_NOTIF_CONCEAL_LOCKED = "island_notif_conceal_locked"
+        const val KEY_ISLAND_NOTIF_DISABLE_LOCKED = "island_notif_disable_locked"
         const val KEY_ISLAND_NOTIF_CONCEAL_CHAT_PICTURES = "island_notif_conceal_chat_pictures"
         const val KEY_ISLAND_CALENDAR_HIDE_LOCKED = "island_calendar_hide_locked"
+        const val KEY_ISLAND_TIME_HIDE_LOCKED = "island_time_hide_locked"
+        const val KEY_ISLAND_BATTERY_HIDE_LOCKED = "island_battery_hide_locked"
         const val KEY_ISLAND_TIMEOUT_MS = "island_timeout_ms"
         const val KEY_ISLAND_SHOW_GLOW = "island_show_glow"
         const val KEY_ISLAND_EXPANDED_WIDTH = "island_expanded_width"
@@ -588,6 +591,7 @@ class SettingsRepository(
         const val KEY_ISLAND_ALWAYS_GESTURES = "island_always_gestures"
         const val KEY_ISLAND_DISMISS_ON_OUTSIDE = "island_dismiss_on_outside"
         const val KEY_ISLAND_HIDE_LIVE_UPDATES = "island_hide_live_updates"
+        const val KEY_ISLAND_HIDE_STATUS_BAR_INSETS = "island_hide_status_bar_insets"
         const val KEY_ISLAND_CAMERA_POSITION = "island_camera_position"
         const val KEY_ISLAND_ORIENTATION_PROFILES = "island_orientation_profiles"
         const val KEY_ISLAND_HIDE_PORTRAIT = "island_hide_portrait"
@@ -4268,6 +4272,8 @@ class SettingsRepository(
 
     fun isIslandHideLiveUpdatesEnabled(): Boolean = getBoolean(KEY_ISLAND_HIDE_LIVE_UPDATES, false)
     fun setIslandHideLiveUpdatesEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_HIDE_LIVE_UPDATES, enabled)
+    fun isIslandHideStatusBarInsetsEnabled(): Boolean = getBoolean(KEY_ISLAND_HIDE_STATUS_BAR_INSETS, false)
+    fun setIslandHideStatusBarInsetsEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_HIDE_STATUS_BAR_INSETS, enabled)
     fun isIslandDismissOnOutsideEnabled(): Boolean = getBoolean(KEY_ISLAND_DISMISS_ON_OUTSIDE, false)
     fun setIslandDismissOnOutsideEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_DISMISS_ON_OUTSIDE, enabled)
 

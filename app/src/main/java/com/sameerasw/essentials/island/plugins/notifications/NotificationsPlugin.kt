@@ -7,6 +7,7 @@ import kotlin.math.ceil
 import android.accessibilityservice.AccessibilityService
 import android.app.KeyguardManager
 import android.content.Context
+import android.os.PowerManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
@@ -58,6 +59,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_ORDER,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_SILENT,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_GROUP,
+        SettingsRepository.KEY_ISLAND_NOTIF_DISABLE_LOCKED,
         SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED,
         SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_CHAT_PICTURES,
         SettingsRepository.KEY_ISLAND_OTP_ENABLED,
@@ -89,7 +91,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         val here = focusedKey == ITEM_KEY && (stage == IslandStage.Line || stage == IslandStage.Expanded)
         val left = wasHere && !here
         wasHere = here
-        if (left && !pendingPopUp && alerts.isNotEmpty() && settings.isIslandCatchUpEnabled()) {
+        if (left && !pendingPopUp && alerts.isNotEmpty() && currentAlert()?.hubOnly == false && settings.isIslandCatchUpEnabled()) {
             val c = ctx
             if (c != null) {
                 c.mainHandler.removeCallbacks(timeoutRunnable)
@@ -119,10 +121,20 @@ class NotificationsPlugin : BaseIslandPlugin() {
         currentAlert()?.let { seen.add(it.key) }
     }
 
+    private fun cycles(from: ActiveNotificationAlert, to: ActiveNotificationAlert) = from.hubOnly || !to.hubOnly
+
     private fun advanceCurrent() {
         if (alerts.size < 2) return
-        currentIndex = (currentIndex.coerceIn(0, alerts.size - 1) + 1) % alerts.size
-        markSeen()
+        val start = currentIndex.coerceIn(0, alerts.size - 1)
+        val from = alerts[start]
+        for (offset in 1 until alerts.size) {
+            val index = (start + offset) % alerts.size
+            if (cycles(from, alerts[index])) {
+                currentIndex = index
+                markSeen()
+                return
+            }
+        }
     }
 
     private fun advanceToUnseen(): Boolean {
@@ -162,7 +174,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private val timeoutRunnable = Runnable { onTimeout() }
     private val catchUpRunnable = Runnable {
-        if (ctx?.isContentSuppressed?.invoke() == true) catchUpPaused = true else clearAll()
+        if (ctx?.isContentSuppressed?.invoke() == true) catchUpPaused = true else endSession()
     }
 
     private val replied = HashMap<String, Long>()
@@ -227,7 +239,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         live.forEach { alert ->
             val index = alerts.indexOfFirst { it.key == alert.key }
             if (index >= 0) {
-                alerts[index] = alert
+                alerts[index] = alert.copy(hubOnly = alerts[index].hubOnly)
             } else {
                 insertSilently(alert)
             }
@@ -254,7 +266,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private fun addSilently(alert: ActiveNotificationAlert) {
         val index = alerts.indexOfFirst { it.key == alert.key }
-        if (index >= 0) alerts[index] = alert else insertSilently(alert)
+        if (index >= 0) alerts[index] = alert.copy(hubOnly = alerts[index].hubOnly) else insertSilently(alert)
         render()
     }
 
@@ -307,6 +319,11 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private fun maskOtp(code: String) = formatOtp(code).map { if (it == ' ') ' ' else '•' }.joinToString("")
 
+    private fun lockedOut(): Boolean =
+        settings.getBoolean(SettingsRepository.KEY_ISLAND_NOTIF_DISABLE_LOCKED, true) &&
+            ((context.getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager)?.isKeyguardLocked == true ||
+                (context.getSystemService(Context.POWER_SERVICE) as? PowerManager)?.isInteractive == false)
+
     private fun concealed(): Boolean =
         settings.getBoolean(SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED, false) &&
             (context.getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager)?.isKeyguardLocked == true
@@ -317,7 +334,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
             if (hub()) addSilently(alert)
             return
         }
-        if (c.isContentSuppressed() || !settings.isIslandShowNotificationsEnabled() || !passesFilters(alert)) {
+        if (c.isContentSuppressed() || lockedOut() || !settings.isIslandShowNotificationsEnabled() || !passesFilters(alert)) {
             if (hub()) addSilently(alert)
             return
         }
@@ -391,9 +408,18 @@ class NotificationsPlugin : BaseIslandPlugin() {
     private fun onRemoved(key: String) {
         val index = alerts.indexOfFirst { it.key == key }
         if (index < 0) return
-        alerts.removeAt(index).also { seen.remove(it.key) }
+        val removed = alerts.removeAt(index).also { seen.remove(it.key) }
+        val wasCurrent = index == currentIndex && !removed.hubOnly
         if (index < currentIndex) currentIndex--
         currentIndex = currentIndex.coerceIn(0, (alerts.size - 1).coerceAtLeast(0))
+        if (wasCurrent && alerts.getOrNull(currentIndex)?.hubOnly == true) {
+            val fresh = (currentIndex until alerts.size).firstOrNull { !alerts[it].hubOnly }
+                ?: (currentIndex - 1 downTo 0).firstOrNull { !alerts[it].hubOnly }
+            if (fresh != null) {
+                currentIndex = fresh
+                markSeen()
+            }
+        }
         if (alerts.isEmpty()) clearAll() else render()
     }
 
@@ -408,7 +434,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         }
         if (manualPick) {
             if (c.focusedKey() == ITEM_KEY) c.request(PluginRequest.Collapse(ITEM_KEY))
-            clearAll()
+            endSession()
             return
         }
         if (c.focusedKey() == ITEM_KEY && c.currentStage() == IslandStage.Line) {
@@ -421,14 +447,14 @@ class NotificationsPlugin : BaseIslandPlugin() {
             scheduleTimeout()
             return
         }
-        if (settings.isIslandCatchUpEnabled() && alerts.isNotEmpty()) {
+        if (settings.isIslandCatchUpEnabled() && alerts.isNotEmpty() && currentAlert()?.hubOnly == false) {
             if (!settings.isIslandCatchUpInfinite()) c.mainHandler.postDelayed(catchUpRunnable, settings.getIslandCatchUpTimeoutMs())
             pinLatest()
             catchingUp = true
             render()
             return
         }
-        clearAll()
+        endSession()
     }
 
     private fun holdMinimal() {
@@ -452,8 +478,9 @@ class NotificationsPlugin : BaseIslandPlugin() {
     private fun pinLatest() {
         val c = ctx ?: return
         if (!hub() || settings.getIslandNotifHubOrder() != SettingsRepository.ISLAND_NOTIF_HUB_ORDER_DYNAMIC) return
-        pinnedKey = currentAlert()?.key ?: return
         c.mainHandler.removeCallbacks(unpinRunnable)
+        pinnedKey = currentAlert()?.takeIf { !it.hubOnly }?.key
+        if (pinnedKey == null) return
         val stay = settings.getIslandCatchUpStoredMs()
         if (stay > 0L) c.mainHandler.postDelayed(unpinRunnable, stay)
     }
@@ -530,6 +557,22 @@ class NotificationsPlugin : BaseIslandPlugin() {
         ctx?.mainHandler?.removeCallbacks(copiedRunnable)
     }
 
+    private fun endSession() {
+        if (!hub()) {
+            clearAll()
+            return
+        }
+        cancelTimers()
+        ctx?.mainHandler?.removeCallbacks(unpinRunnable)
+        pinnedKey = null
+        catchingUp = false
+        catchUpPaused = false
+        manualPick = false
+        pendingPopUp = false
+        for (i in alerts.indices) if (!alerts[i].hubOnly) alerts[i] = alerts[i].copy(hubOnly = true)
+        render()
+    }
+
     private fun clearAll() {
         ctx?.mainHandler?.removeCallbacks(unpinRunnable)
         pinnedKey = null
@@ -571,14 +614,19 @@ class NotificationsPlugin : BaseIslandPlugin() {
             return
         }
         val alert = currentAlert()
-        if (alert == null) {
+        if (alert == null || lockedOut()) {
             publish(null)
             return
         }
         val index = alerts.indexOf(alert)
-        val next = if (queueEnabled()) alerts.getOrNull(index + 1) ?: alerts.getOrNull(index - 1) else null
+        val next = if (queueEnabled()) {
+            alerts.drop(index + 1).firstOrNull { cycles(alert, it) } ?: alerts.take(index).lastOrNull { cycles(alert, it) }
+        } else {
+            null
+        }
         val stack = alerts.map { stackIconFor(it, current = it === alert) }
-        val queued = waitingInOrder(alert).map { stackIconFor(it, current = false) }
+        val waitingAlerts = waitingInOrder(alert).filter { !it.hubOnly && it.key !in seen }
+        val queued = waitingAlerts.map { stackIconFor(it, current = false) }
         val minimal = minimal()
         val waiting = if (minimal) queued else emptyList()
         val inlineQueue = minimal && waiting.isNotEmpty() && settings.isIslandNotifQueueInlineEnabled()

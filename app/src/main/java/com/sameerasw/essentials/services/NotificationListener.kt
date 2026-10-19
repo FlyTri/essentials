@@ -2048,7 +2048,7 @@ class NotificationListener : NotificationListenerService() {
 
         val notif = sbn.notification
         val isGroupSummary = (notif.flags and Notification.FLAG_GROUP_SUMMARY) != 0
-        if (isGroupSummary) return false
+        if (isGroupSummary && !isStandaloneSummary(sbn)) return false
         if (allowSilent) return true
 
         try {
@@ -2080,9 +2080,21 @@ class NotificationListener : NotificationListenerService() {
         return (rankingMap ?: currentRanking)?.getRanking(sbn.key, ranking) == true && ranking.isConversation
     }
 
+    private fun isStandaloneSummary(sbn: StatusBarNotification): Boolean {
+        val group = sbn.notification.group ?: return true
+        if (group.startsWith("Aggregate_") || sbn.key.contains("Aggregate_")) return false
+        val hasChildren = safeActiveNotifications().orEmpty().any {
+            it.key != sbn.key &&
+                it.packageName == sbn.packageName &&
+                it.notification.group == group &&
+                (it.notification.flags and Notification.FLAG_GROUP_SUMMARY) == 0
+        }
+        return !hasChildren
+    }
+
     private fun hubAlertOf(sbn: StatusBarNotification, rankingMap: RankingMap?): ActiveNotificationAlert? {
         if (sbn.packageName == packageName || !hasReadableExtras(sbn) || isMediaNotification(sbn)) return null
-        if ((sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0) return null
+        if ((sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0 && !isStandaloneSummary(sbn)) return null
         return extractNotificationAlert(sbn)?.copy(
             isSilent = isSilentNotification(sbn, rankingMap),
             blockedByDnd = isBlockedByDnd(sbn, rankingMap),

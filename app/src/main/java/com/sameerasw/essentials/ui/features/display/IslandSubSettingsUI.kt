@@ -71,6 +71,7 @@ import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.PermissionUIHelper
 import com.sameerasw.essentials.utils.PermissionUtils
+import com.sameerasw.essentials.ui.core.sheets.HideStatusBarInfoBottomSheet
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.viewmodels.MainViewModel
 
@@ -566,12 +567,17 @@ fun IslandBehaviorSettingsUI(
     val previewSettings = remember { SettingsRepository(context) }
     var showWhen by remember { mutableStateOf(previewSettings.getIslandShowWhen()) }
     var requestingPermissionsFor by remember { mutableStateOf<Pair<Int, List<String>>?>(null) }
+    var showHideStatusBarInfo by remember { mutableStateOf(false) }
     val hasShellPermission =
         if (ShellUtils.isRootEnabled(context)) {
             viewModel.isRootPermissionGranted.value
         } else {
             viewModel.isShizukuPermissionGranted.value
         }
+
+    if (showHideStatusBarInfo) {
+        HideStatusBarInfoBottomSheet(onDismissRequest = { showHideStatusBarInfo = false })
+    }
 
     requestingPermissionsFor?.let { (titleRes, permKeys) ->
         PermissionsBottomSheet(
@@ -735,9 +741,30 @@ fun IslandBehaviorSettingsUI(
             )
 
             IconToggleItem(
+                iconRes = R.drawable.rounded_visibility_off_24,
+                title = stringResource(R.string.island_hide_status_bar_title),
+                onInfoClick = { showHideStatusBarInfo = true },
+                isChecked = viewModel.isIslandHideStatusBarInsets.value && hasShellPermission,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    if (checked && !hasShellPermission) {
+                        requestingPermissionsFor =
+                            Pair(
+                                R.string.island_hide_status_bar_title,
+                                listOf(if (ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"),
+                            )
+                    } else {
+                        viewModel.setIslandHideStatusBarInsets(checked, context)
+                    }
+                },
+                modifier = Modifier.highlight(highlightSetting == "island_hide_status_bar_insets"),
+            )
+
+            IconToggleItem(
                 iconRes = R.drawable.rounded_notifications_off_24,
                 title = stringResource(R.string.island_hide_live_updates_title),
-                isChecked = viewModel.isIslandHideLiveUpdates.value,
+                enabled = !viewModel.isIslandHideStatusBarInsets.value,
+                isChecked = viewModel.isIslandHideLiveUpdates.value && !viewModel.isIslandHideStatusBarInsets.value,
                 onCheckedChange = { checked ->
                     HapticUtil.performVirtualKeyHaptic(view)
                     if (checked && !hasShellPermission) {
@@ -912,6 +939,11 @@ fun IslandNotificationSettingsUI(
         mutableStateOf(
             viewModel.isIslandNotifQueue.value &&
                 highlightSetting in setOf("island_notif_queue_style", "island_notif_queue_inline"),
+        )
+    }
+    var lockedDisabled by remember {
+        mutableStateOf(
+            SettingsRepository(context).getBoolean(SettingsRepository.KEY_ISLAND_NOTIF_DISABLE_LOCKED, true)
         )
     }
     var concealed by remember {
@@ -1277,21 +1309,36 @@ fun IslandNotificationSettingsUI(
         if (rememberIslandShowsWhileLocked()) {
             IslandSettingsSection(R.string.island_notif_section_lock_screen) {
                 IslandPrefToggle(
-                    settingKey = SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED,
-                    iconRes = R.drawable.rounded_visibility_off_24,
-                    title = stringResource(R.string.island_notif_conceal_locked_title),
-                    onChanged = { concealed = it },
+                    settingKey = SettingsRepository.KEY_ISLAND_NOTIF_DISABLE_LOCKED,
+                    iconRes = R.drawable.rounded_notifications_off_24,
+                    title = stringResource(R.string.label_disabled),
+                    defaultValue = true,
+                    onChanged = { lockedDisabled = it },
                 )
                 AnimatedVisibility(
-                    visible = concealed,
+                    visible = !lockedDisabled,
                     enter = fadeIn() + expandVertically(),
                     exit = fadeOut() + shrinkVertically(),
                 ) {
-                    IslandPrefToggle(
-                        settingKey = SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_CHAT_PICTURES,
-                        iconRes = R.drawable.rounded_person_24,
-                        title = stringResource(R.string.island_notif_conceal_chat_pictures_title),
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        IslandPrefToggle(
+                            settingKey = SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_LOCKED,
+                            iconRes = R.drawable.rounded_visibility_off_24,
+                            title = stringResource(R.string.island_notif_conceal_locked_title),
+                            onChanged = { concealed = it },
+                        )
+                        AnimatedVisibility(
+                            visible = concealed,
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically(),
+                        ) {
+                            IslandPrefToggle(
+                                settingKey = SettingsRepository.KEY_ISLAND_NOTIF_CONCEAL_CHAT_PICTURES,
+                                iconRes = R.drawable.rounded_person_24,
+                                title = stringResource(R.string.island_notif_conceal_chat_pictures_title),
+                            )
+                        }
+                    }
                 }
             }
         }

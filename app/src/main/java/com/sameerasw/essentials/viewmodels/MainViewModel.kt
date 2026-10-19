@@ -92,6 +92,7 @@ import com.sameerasw.essentials.utils.RootUtils
 import com.sameerasw.essentials.utils.ScreenshotCleaner
 import com.sameerasw.essentials.utils.PrivilegedMode
 import com.sameerasw.essentials.utils.ShellUtils
+import com.sameerasw.essentials.utils.StatusBarInsetsUtils
 import com.sameerasw.essentials.utils.ShizukuUtils
 import com.sameerasw.essentials.utils.SplitScreenUtil
 import com.sameerasw.essentials.utils.SurfaceFlingerControl
@@ -241,6 +242,7 @@ class MainViewModel : ViewModel() {
     val islandLandscapeTopSpacing = mutableFloatStateOf(0f)
     val isIslandDismissOnOutside = mutableStateOf(false)
     val isIslandHideLiveUpdates = mutableStateOf(false)
+    val isIslandHideStatusBarInsets = mutableStateOf(false)
     val islandExpandedScale = mutableFloatStateOf(1f)
     val islandCameraPosition = mutableStateOf(SettingsRepository.ISLAND_CAMERA_POSITION_CENTER)
     val isIslandShowCalls = mutableStateOf(true)
@@ -2504,6 +2506,7 @@ class MainViewModel : ViewModel() {
         islandLandscapeTopSpacing.floatValue = settingsRepository.getIslandLandscapeTopSpacing()
         isIslandDismissOnOutside.value = settingsRepository.isIslandDismissOnOutsideEnabled()
         isIslandHideLiveUpdates.value = settingsRepository.isIslandHideLiveUpdatesEnabled()
+        isIslandHideStatusBarInsets.value = settingsRepository.isIslandHideStatusBarInsetsEnabled()
         islandExpandedScale.floatValue = settingsRepository.getIslandExpandedScale()
         islandCameraPosition.value = settingsRepository.getIslandCameraPosition()
         isIslandShowCalls.value = settingsRepository.isIslandShowCallsEnabled()
@@ -5866,6 +5869,19 @@ class MainViewModel : ViewModel() {
     fun setIslandHideLiveUpdates(enabled: Boolean) {
         isIslandHideLiveUpdates.value = enabled
         settingsRepository.setIslandHideLiveUpdatesEnabled(enabled)
+    }
+
+    fun setIslandHideStatusBarInsets(
+        enabled: Boolean,
+        context: Context,
+    ) {
+        isIslandHideStatusBarInsets.value = enabled
+        settingsRepository.setIslandHideStatusBarInsetsEnabled(enabled)
+        if (enabled) setIslandHideLiveUpdates(false)
+        val appContext = context.applicationContext
+        viewModelScope.launch(Dispatchers.IO) {
+            StatusBarInsetsUtils.apply(appContext, enabled)
+        }
     }
 
     fun setIslandDismissOnOutside(enabled: Boolean) {

@@ -161,6 +161,29 @@ fun IslandStackBubble(
     }
 }
 
+@Composable
+fun IslandQueueCount(
+    count: Int,
+    size: Dp,
+    modifier: Modifier = Modifier,
+    outlineColor: Color? = null,
+    outlineThickness: Dp = 1.dp,
+    bond: LiquidBond? = null,
+) {
+    val liquid = rememberLiquidBody(LiquidSpec.Droplet, bond)
+    Box(
+        modifier = modifier
+            .liquid(liquid)
+            .size(size)
+            .clip(CircleShape)
+            .background(Color.Black)
+            .islandOutline(outlineColor, outlineThickness, CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        QueueOverflowCounter(count, size * 0.7f)
+    }
+}
+
 const val OVERLAP_MAX = 3
 
 private fun queueVisible(icons: List<StackIcon>, max: Int): List<StackIcon> {

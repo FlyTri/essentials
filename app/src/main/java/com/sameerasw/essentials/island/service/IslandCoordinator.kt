@@ -633,7 +633,7 @@ class IslandCoordinator(
                 stop()
             }
             pendingStop = task
-            mainHandler.postDelayed(task, IslandMotion.COLLAPSE_MS + HIDE_SETTLE_MS)
+            mainHandler.postDelayed(task, IslandMotion.HIDE_BUBBLE_MS + IslandMotion.SQUASH_MS + HIDE_SETTLE_MS)
             return
         }
         mainHandler.removeCallbacks(endReveal)
@@ -795,7 +795,7 @@ class IslandCoordinator(
     }
 
     private companion object {
-        const val REVEAL_DELAY_MS = 120L
+        const val REVEAL_DELAY_MS = 160L
         const val HIDE_SETTLE_MS = 700L
         const val SETTLE_MS = 300L
         const val PREVIEW_SOURCE = "preview"

@@ -29,7 +29,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.view.WindowManager
-import android.view.accessibility.AccessibilityWindowInfo
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
@@ -46,6 +45,7 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.ui.activities.AppVolumeControlActivity
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.utils.VolumePanelDetector
 import com.sameerasw.essentials.utils.media.AppVolumeController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +54,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 
 class AppVolumeOverlayHandler(
     private val service: AccessibilityService,
@@ -78,6 +79,8 @@ class AppVolumeOverlayHandler(
     private var isButtonPressed = false
     private var hidePending = false
     private var isPolling = false
+    private val scanning = AtomicBoolean(false)
+    private var rescan = false
     private var lastTouchAt = 0L
 
     private val pollRunnable =
@@ -127,7 +130,28 @@ class AppVolumeOverlayHandler(
             return
         }
         if (button == null) create()
-        val bounds = if (isEnabled()) findVolumePanelBounds() else null
+        if (!isEnabled()) {
+            applyBounds(null)
+            return
+        }
+        if (!scanning.compareAndSet(false, true)) {
+            rescan = true
+            return
+        }
+        scope.launch(Dispatchers.Default) {
+            val bounds = findVolumePanelBounds()
+            withContext(Dispatchers.Main) {
+                scanning.set(false)
+                applyBounds(bounds)
+                if (rescan) {
+                    rescan = false
+                    onWindowsChanged()
+                }
+            }
+        }
+    }
+
+    private fun applyBounds(bounds: Rect?) {
         if (bounds == null) {
             scheduleHide()
             return
@@ -168,10 +192,7 @@ class AppVolumeOverlayHandler(
     private fun findVolumePanelBounds(): Rect? =
         try {
             service.windows
-                ?.firstOrNull { window ->
-                    window.type == AccessibilityWindowInfo.TYPE_SYSTEM &&
-                        window.title?.contains("Volume", ignoreCase = true) == true
-                }?.let { window -> Rect().also(window::getBoundsInScreen).takeUnless { it.isEmpty } }
+                ?.firstOrNull(VolumePanelDetector::isVolumePanel)?.let { window -> Rect().also(window::getBoundsInScreen).takeUnless { it.isEmpty } }
         } catch (_: Exception) {
             null
         }
