@@ -4082,6 +4082,9 @@ class SettingsRepository(
 
     fun isIslandCatchUpInfinite(): Boolean = getIslandCatchUpTimeoutMs() <= 0L
 
+    // Ignores the hub's override, for features that borrow the catch-up duration
+    fun isIslandCatchUpStoredInfinite(): Boolean = getIslandCatchUpStoredMs() <= 0L
+
     fun isIslandShowMediaEnabled(): Boolean = getBoolean(KEY_ISLAND_SHOW_MEDIA, true)
     fun setIslandShowMediaEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_SHOW_MEDIA, enabled)
 
