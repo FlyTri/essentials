@@ -1629,8 +1629,8 @@
     <string name="setting_hidden_debugging_title">隐藏调试选项</string>
     <string name="duo_enable_title">启用 Duo</string>
     <string name="duo_enable_desc">不能折叠，但是看起来挺酷的，不是吗？</string>
-    <string name="duo_auto_detect_title">自動偵測鏡頭</string>
-    <string name="duo_auto_detect_desc">自動定位至前鏡頭開孔處</string>
+    <string name="duo_auto_detect_title">自动检测摄像头</string>
+    <string name="duo_auto_detect_desc">自动定位至摄像头孔前</string>
     <string name="duo_show_battery_title">电池</string>
     <string name="duo_show_battery_percentage_title">电量显示</string>
     <string name="cat_networks">数据信号强度显示</string>
@@ -1644,7 +1644,7 @@
     <string name="duo_action_double_tap_title">點兩下</string>
     <string name="duo_action_swipe_down_title">下滑</string>
     <string name="feat_allow_overlays_in_settings_desc">允許各種應用程式在系統設定上方繪製覆蓋層</string>
-    <string name="cat_navigation">導覽操作</string>
+    <string name="cat_navigation">导航</string>
     <string name="island_font_scale_title">字体大小</string>
     <string name="island_border_outline_dynamic_title">自适应(随播放专辑主题色同步变化)</string>
     <string name="island_border_outline_hide_expanded_title">灵动岛展开后隐藏边框</string>
@@ -1677,7 +1677,7 @@
     <string name="island_show_when_title">在什么时候显示</string>
     <string name="island_show_when_unlocked">解锁时</string>
     <string name="island_hide_in_owner_app_title">打开应用时隐藏</string>
-    <string name="keep_in_full_screen_title">全屏时保持显示</string>
+    <string name="keep_in_full_screen_title">保持全屏</string>
     <string name="island_suppress_system_heads_up_title">隐藏系统的通知（横幅通知）</string>
     <string name="island_hide_live_updates_title">动态隐藏实时更新</string>
     <string name="island_compact_hide_status_bar_title">隐藏紧凑型灵动岛的所有项目</string>
@@ -1727,4 +1727,15 @@
     <string name="watch_esim_install_desc">即使在不支持的地区/国家</string>
     <string name="feat_hilight_title">高光</string>
     <string name="feat_activity_launcher_title">活动启动器</string>
+    <string name="island_combine_with_duo">与镜头交互换联用</string>
+    <string name="duo_combine_with_island">与灵动岛联用</string>
+    <string name="island_network_activity_title">显示网络活动</string>
+    <string name="island_show_signal_title">显示移动信号</string>
+    <string name="island_signal_wifi_title">显示Wi-Fi信号</string>
+    <string name="island_signal_low_only_title">低信号时显示</string>
+    <string name="island_signal_show_mode_title">显示网络模式</string>
+    <string name="diy_category_notifications">通知</string>
+    <string name="battery_show_percentage_title">显示百分比</string>
+    <string name="island_always_gestures_title">手势始终可用</string>
+    <string name="island_always_gestures_desc">即使灵动岛隐藏，手势区域也保持可用</string>
 </resources>
