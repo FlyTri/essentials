@@ -74,34 +74,11 @@ fun WhatsNewCustomContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        WhatsNewSectionCard(
-            title = "New: Shake to get help",
-            summary = "Shake your phone for instant help",
+        ShakeForHelpCard(
             expanded = expandedSection == 0,
             onToggle = { toggle(0) },
-            icon = { SectionIcon(R.drawable.rounded_mobile_vibrate_24) },
-        ) {
-            Text(
-                text = "Shake your phone anywhere in Essentials to open help for the screen you are on. Inside a feature you get that feature's guide, and everywhere else you get the general Help and Guides.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            RoundedCardContainer {
-                IconToggleItem(
-                    iconRes = R.drawable.rounded_mobile_vibrate_24,
-                    title = stringResource(R.string.label_shake_for_help),
-                    isChecked = mainViewModel.isShakeForHelpEnabled.value,
-                    onCheckedChange = { mainViewModel.setShakeForHelpEnabled(it, context) },
-                )
-            }
-
-            Text(
-                text = "Give your phone a shake now to try it!",
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.primary,
-            )
-        }
+            mainViewModel = mainViewModel,
+        )
 
         Text(
             text = stringResource(R.string.whats_new_previous_updates),
@@ -124,6 +101,43 @@ fun WhatsNewCustomContent(
             )
             EssentialsWatchfacePromoContent()
         }
+    }
+}
+
+@Composable
+fun ShakeForHelpCard(
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    mainViewModel: MainViewModel = viewModel(),
+) {
+    val context = LocalContext.current
+    WhatsNewSectionCard(
+        title = "New: Shake to get help",
+        summary = "Shake your phone for instant help",
+        expanded = expanded,
+        onToggle = onToggle,
+        icon = { SectionIcon(R.drawable.rounded_mobile_vibrate_24) },
+    ) {
+        Text(
+            text = "Shake your phone anywhere in Essentials to open help for the screen you are on. Inside a feature you get that feature's guide, and everywhere else you get the general Help and Guides.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        RoundedCardContainer {
+            IconToggleItem(
+                iconRes = R.drawable.rounded_mobile_vibrate_24,
+                title = stringResource(R.string.label_shake_for_help),
+                isChecked = mainViewModel.isShakeForHelpEnabled.value,
+                onCheckedChange = { mainViewModel.setShakeForHelpEnabled(it, context) },
+            )
+        }
+
+        Text(
+            text = "Give your phone a shake now to try it!",
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.primary,
+        )
     }
 }
 
