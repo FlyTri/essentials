@@ -3003,6 +3003,7 @@ object FeatureRegistry {
                 category = R.string.cat_tools,
                 description = R.string.feat_screenshots_desc,
                 aboutDescription = R.string.about_desc_screenshots,
+                contributors = listOf("jawzf"),
                 permissionKeys = listOf("ACCESSIBILITY", "STORAGE"),
                 showToggle = false,
                 searchableSettings =

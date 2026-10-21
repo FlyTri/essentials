@@ -3393,7 +3393,7 @@
     <string name="feat_screenshot_share_cleanup_desc">Trash screenshots after sharing</string>
     <string name="screenshot_share_cleanup_trashed">Shared screenshot moved to trash</string>
     <string name="screenshot_share_cleanup_scheduled">Shared screenshot will be moved to trash later</string>
-    <string name="feat_screenshots_title">Screenshots</string>
+    <string name="feat_screenshots_title">Screenshot clean-up</string>
     <string name="feat_screenshots_desc">Clean up shared and old screenshots</string>
     <string name="about_desc_screenshots">Keeps your gallery free of one-off screenshots. Shared screenshots can be trashed right after sharing or a little later, and every new screenshot can be trashed automatically after a few days unless you keep it from its notification or star it in Photos. Trashed screenshots can be restored from Files or Photos for 30 days.</string>
     <string name="screenshots_section_after_sharing">After sharing</string>
