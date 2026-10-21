@@ -116,6 +116,12 @@ object ShellUtils {
     }
 
     private const val MAX_OUTPUT_CHARS = 2_000_000
+    private const val OUTPUT_TIMEOUT_MS = 10_000L
+
+    private val watchdog =
+        java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r ->
+            Thread(r, "shell-watchdog").apply { isDaemon = true }
+        }
 
     private fun java.io.Reader.readCapped(limit: Int): String {
         val sb = StringBuilder()
@@ -137,9 +143,11 @@ object ShellUtils {
         try {
             val process = newProcess(context, arrayOf("sh", "-c", command), featureName, notifyOnError)
             process?.let {
+                val timeout = watchdog.schedule({ it.destroy() }, OUTPUT_TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
                 try {
                     it.inputStream.bufferedReader().use { reader -> reader.readCapped(MAX_OUTPUT_CHARS) }.trim()
                 } finally {
+                    timeout.cancel(false)
                     it.destroy()
                 }
             }
