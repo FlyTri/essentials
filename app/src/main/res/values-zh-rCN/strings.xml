@@ -1725,7 +1725,7 @@
     <string name="label_animator_duration_scale">动画器时长缩放</string>
     <string name="label_transition_animation_scale">过渡动画缩放</string>
     <string name="label_window_animation_scale">窗口动画缩放</string>
-    <string name="about_desc_text_animations">调整系统级字体缩放、粗细和动画速度。请注意，某些设置可能需要高级权限或重启设备才能让某些应用反映更改。\n\n缩放调整可能需要额外的 shizuku 或 root 权限</string>
+    <string name="about_desc_text_animations">Adjust how your whole system looks and feels.\n\nChange the font scale and weight, the display scale (smallest width), and the animation speeds for windows, transitions and animators. You can also set the screen timeout and auto rotate.\n\nSwitch between Default and Glove mode profiles in one tap. Glove mode adjusts the UI scale and increases touch sensitivity so the screen responds better with gloves or screen protectors. A Quick Settings tile is available to toggle it quickly.\n\nSome settings may require advanced permissions or a device reboot for certain apps to reflect changes. Shizuku or root permission may be necessary for scale adjustments.</string>
     <string name="about_desc_screen_refresh_rate">使用 Shizuku 设置自定义屏幕刷新率。固定模式将最小和峰值刷新率都锁定为一个值，而范围模式允许你定义单独的最小值和峰值。重置会清除自定义覆盖并返回系统管理的刷新行为。</string>
     <string name="refresh_rate_section_mode">模式</string>
     <string name="refresh_rate_section_values">刷新率</string>

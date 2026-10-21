@@ -1317,7 +1317,7 @@
     <string name="label_animator_duration_scale">Animator再生時間スケール</string>
     <string name="label_transition_animation_scale">トランジションアニメスケール</string>
     <string name="label_window_animation_scale">ウィンドウアニメスケール</string>
-    <string name="about_desc_text_animations">システム全体のフォントサイズ、太さ、アニメーション速度を調整します。一部のアプリでは変更を反映させるために高度な権限やデバイスの再起動が必要な場合があります。\n\nサイズ調整には追加のShizuku権限またはRoot権限が必要になる場合があります</string>
+    <string name="about_desc_text_animations">Adjust how your whole system looks and feels.\n\nChange the font scale and weight, the display scale (smallest width), and the animation speeds for windows, transitions and animators. You can also set the screen timeout and auto rotate.\n\nSwitch between Default and Glove mode profiles in one tap. Glove mode adjusts the UI scale and increases touch sensitivity so the screen responds better with gloves or screen protectors. A Quick Settings tile is available to toggle it quickly.\n\nSome settings may require advanced permissions or a device reboot for certain apps to reflect changes. Shizuku or root permission may be necessary for scale adjustments.</string>
     <string name="about_desc_screen_refresh_rate">Shizukuを使用して、画面のリフレッシュレートをカスタマイズできます。「固定」モードでは、最小リフレッシュレートと最大リフレッシュレートを同じ値に固定します。「可変」モードでは、最小値と最大値を個別に設定できます。「リセット」を選択すると、カスタマイズ設定が解除され、デバイスはシステムが管理するリフレッシュレート設定に戻ります。</string>
     <string name="refresh_rate_section_mode">モード</string>
     <string name="refresh_rate_section_values">リフレッシュレート</string>

@@ -1359,9 +1359,7 @@ Es zeigt den Akkustand all Ihrer verbundenen Geräte in einer einzigen, permanen
     <string name="label_animator_duration_scale">Animationsdauerfaktor</string>
     <string name="label_transition_animation_scale">Übergangsanimationsfaktor</string>
     <string name="label_window_animation_scale">Fensteranimationsfaktor</string>
-    <string name="about_desc_text_animations">Passe die systemweite Schriftgröße, Schriftstärke und Animationsgeschwindigkeit an. Beachte dabei, dass für bestimmte Einstellungen erweiterte Berechtigungen oder ein Neustart des Geräts erforderlich sein könnte, damit die Änderungen in einzelnen Apps wirksam werden.
-
-Für Anpassungen der Skalierung sind möglicherweise zusätzlich Shizuku- oder Root-Berechtigungen erforderlich.</string>
+    <string name="about_desc_text_animations">Adjust how your whole system looks and feels.\n\nChange the font scale and weight, the display scale (smallest width), and the animation speeds for windows, transitions and animators. You can also set the screen timeout and auto rotate.\n\nSwitch between Default and Glove mode profiles in one tap. Glove mode adjusts the UI scale and increases touch sensitivity so the screen responds better with gloves or screen protectors. A Quick Settings tile is available to toggle it quickly.\n\nSome settings may require advanced permissions or a device reboot for certain apps to reflect changes. Shizuku or root permission may be necessary for scale adjustments.</string>
     <string name="about_desc_screen_refresh_rate">Lege mithilfe von Shizuku eine benutzerdefinierte Bildwiederholrate fest. Der Modus „Fest“ fixiert sowohl die minimale als auch die maximale Bildwiederholrate auf einen einzigen Wert, während im Modus „Bereich“ separate Werte für das Minimum und das Maximum definiert werden können. Die Option „Zurücksetzen“ hebt die benutzerdefinierte Einstellung auf und stellt das vom System verwaltete Verhalten der Bildwiederholrate wieder her.</string>
     <string name="refresh_rate_section_mode">Mode</string>
     <string name="refresh_rate_section_values">Refresh Rate</string>
