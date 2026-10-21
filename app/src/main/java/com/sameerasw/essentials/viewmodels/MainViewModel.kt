@@ -3739,7 +3739,7 @@ class MainViewModel : ViewModel() {
      * @param activity [Activity] Target activity.
      */
     fun requestReadPhoneStatePermission(activity: Activity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
+        com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
             activity,
             arrayOf(Manifest.permission.READ_PHONE_STATE),
             1005,
@@ -8284,7 +8284,7 @@ class MainViewModel : ViewModel() {
      * @param activity [androidx.activity.ComponentActivity] Target activity.
      */
     fun requestReadPhoneStatePermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
+        com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
             activity,
             arrayOf(Manifest.permission.READ_PHONE_STATE),
             1001,
@@ -8297,7 +8297,7 @@ class MainViewModel : ViewModel() {
      * @param activity [androidx.activity.ComponentActivity] Target activity.
      */
     fun requestLocationPermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
+        com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
             activity,
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -8314,7 +8314,7 @@ class MainViewModel : ViewModel() {
      */
     fun requestBackgroundLocationPermission(activity: androidx.activity.ComponentActivity) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            androidx.core.app.ActivityCompat.requestPermissions(
+            com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
                 activity,
                 arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
                 1004,
@@ -8328,7 +8328,7 @@ class MainViewModel : ViewModel() {
      * @param activity [androidx.activity.ComponentActivity] Target activity.
      */
     fun requestBluetoothPermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
+        com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
             activity,
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
@@ -8345,7 +8345,7 @@ class MainViewModel : ViewModel() {
      * @param activity [androidx.activity.ComponentActivity] Target activity.
      */
     fun requestCalendarPermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
+        com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
             activity,
             arrayOf(
                 Manifest.permission.READ_CALENDAR,
@@ -8362,7 +8362,7 @@ class MainViewModel : ViewModel() {
      */
     fun requestNotificationPermission(activity: androidx.activity.ComponentActivity) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            androidx.core.app.ActivityCompat.requestPermissions(
+            com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
                 activity,
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                 1002,
