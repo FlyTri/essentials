@@ -1758,4 +1758,15 @@
     <string name="watchface_glance_comp_alarm_desc">Exibir o horário do alarme quando não houver eventos.</string>
     <string name="feat_screenshots_title">capturas de tela</string>
     <string name="feat_screenshots_desc">Limpar capturas de tela compartilhadas e antigas</string>
+    <string name="duo_combine_with_island">combinar com o ilha</string>
+    <string name="duo_hide_when_locked_title">esconder quando bloqueado</string>
+    <string name="duo_hide_when_screen_off_title">esconder quando a tela é desligada</string>
+    <string name="duo_hide_when_screen_off_only_idle_title">apenas esconder quando o AOD estiver mostrando</string>
+    <string name="duo_tap_for_brief_title">toque para a apresentação do ilha</string>
+    <string name="app_volume_add_app">
+adicionar algum app</string>
+    <string name="app_volume_add_app_desc">seleciona automáticamente o nível de volume depois do APP começar a tocar</string>
+    <string name="app_volume_enable_title">ativar volume de app</string>
+    <string name="app_volume_overlay_title">sobreposição da UI do controle</string>
+    <string name="volume_steps_enable_title">adicionar etapas de volume</string>
 </resources>
