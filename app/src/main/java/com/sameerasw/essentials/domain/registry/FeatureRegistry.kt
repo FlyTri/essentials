@@ -3006,28 +3006,38 @@ object FeatureRegistry {
                 permissionKeys = listOf("ACCESSIBILITY", "STORAGE"),
                 showToggle = false,
                 searchableSettings =
-                    listOf(
-                        SearchSetting(
-                            R.string.feat_screenshot_share_cleanup_title,
-                            R.string.feat_screenshots_title,
-                            "screenshot_share_cleanup_enabled",
-                        ),
-                        SearchSetting(
-                            R.string.screenshot_share_cleanup_delay_title,
-                            R.string.feat_screenshots_title,
-                            "screenshot_share_cleanup_delay",
-                        ),
-                        SearchSetting(
-                            R.string.screenshot_auto_clean_title,
-                            R.string.feat_screenshots_title,
-                            "screenshot_auto_clean_enabled",
-                        ),
-                        SearchSetting(
-                            R.string.screenshot_auto_clean_days_title,
-                            R.string.feat_screenshots_title,
-                            "screenshot_auto_clean_days",
-                        ),
-                    ),
+                    buildList {
+                        if (DeviceUtils.isGoogleDevice()) {
+                            add(
+                                SearchSetting(
+                                    R.string.feat_screenshot_share_cleanup_title,
+                                    R.string.feat_screenshots_title,
+                                    "screenshot_share_cleanup_enabled",
+                                ),
+                            )
+                            add(
+                                SearchSetting(
+                                    R.string.screenshot_share_cleanup_delay_title,
+                                    R.string.feat_screenshots_title,
+                                    "screenshot_share_cleanup_delay",
+                                ),
+                            )
+                        }
+                        add(
+                            SearchSetting(
+                                R.string.screenshot_auto_clean_title,
+                                R.string.feat_screenshots_title,
+                                "screenshot_auto_clean_enabled",
+                            ),
+                        )
+                        add(
+                            SearchSetting(
+                                R.string.screenshot_auto_clean_days_title,
+                                R.string.feat_screenshots_title,
+                                "screenshot_auto_clean_days",
+                            ),
+                        )
+                    },
                 parentFeatureId = "Security",
             ) {
                 override fun isEnabled(viewModel: MainViewModel) =
@@ -3039,8 +3049,7 @@ object FeatureRegistry {
                     enabled: Boolean,
                 ) {}
 
-                override fun isDeviceSupported(context: Context) =
-                    DeviceUtils.isGoogleDevice() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                override fun isDeviceSupported(context: Context) = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
             },
             object : Feature(
                 id = "Lockdown mode",
