@@ -1079,14 +1079,10 @@
     <string name="instruction_section_shizuku_desc">Shizuku는 앱이 ADB 또는 루트 권한으로 시스템 API를 직접 사용할 수 있게 해주는 강력한 도구입니다. Maps min 모드, App Freezer와 같은 기능에 필요합니다. 그리고 willa는 WRITE_SECURE_SETTINGS와 같은 일부 권한을 부여해야 한다고 주장합니다. \n\n그러나 Shizuku의 Play 스토어 버전은 오래되었을 수 있으며 최신 Android 버전에서는 사용하지 못할 수 있으므로 이 경우 Github에서 최신 버전을 다운로드하거나 최신 버전의 포크를 다운로드하세요.</string>
     <string name="instruction_section_maps_title">지도 절전 모드</string>
     <string name="instruction_section_maps_desc">이 기능은 현재 Pixel 10 시리즈에만 제공되는 Google 지도 절전 모드를 자동으로 실행합니다. 커뮤니티 회원은 루트 권한으로 지도 minMode 활동을 실행하여 모든 Android 기기에서 여전히 사용할 수 있다는 것을 발견했습니다. \n\n그런 다음 Tasker를 사용하여 탐색 세션 중에 화면이 꺼지면 자동으로 트리거하도록 자동화한 다음 런타임 Shizuku 권한만으로 동일한 작업을 수행할 수 있었습니다. \n\nAOD를 통해 표시되도록 의도되었습니다. Pixel 10 시리즈는 이로 인해 가로 모드를 지원하지 않는다는 메시지가 디스플레이에 가끔 표시될 수 있습니다. 이는 앱에서 피할 수 없으므로 무시할 수 있습니다.</string>
-    <string name="instruction_section_silent_title">무음 모드</string>
-    <string name="instruction_section_silent_desc">무음 모드에서도 DND가 실행된다는 점을 눈치채셨을 것입니다. \n\n이것은 Android에서 구현한 방식 때문입니다. 동일한 API를 사용하여 진동 모드로 전환하더라도 어떤 이유로 무음 모드와 함께 DND가 켜지고 현재로서는 이를 피할 수 없습니다. :(</string>
     <string name="instruction_section_freeze_title">동결이란 무엇입니까?</string>
     <string name="instruction_section_freeze_desc">백그라운드에서 앱이 실행되는 것을 방지하여 약간의 전력을 절약하는 동시에 일시 중지하고 앱 방해 요소를 피하세요. 거의 사용하지 않는 앱에 적합합니다. \n\n잠금을 해제하지 않는 한 긴급 상황에 알림을 보내지 않으므로 모든 통신 서비스에는 권장되지 않습니다. \n\n시스템 앱은 시스템 불안정을 초래할 수 있으므로 정지하지 않는 것이 좋습니다. 주의해서 진행하세요. 경고를 받았습니다. \n\nHail &lt;3에서 영감을 얻었습니다.</string>
     <string name="instruction_section_security_title">앱 잠금과 화면 잠금 보안은 실제로 안전한가요?</string>
     <string name="instruction_section_security_desc">절대 그렇지 않습니다. \n\n모든 타사 애플리케이션은 일반적인 기기 상호 작용을 100% 방해할 수 없으며 앱 잠금도 선택한 앱 위에 오버레이되어 상호 작용을 방지할 뿐입니다. 해결 방법이 있으며 완벽하지는 않습니다. \n\n어떤 이유로든 Pixels의 모든 사람이 액세스할 수 있는 네트워크 타일과 상호 작용하려는 사람을 감지하는 화면 잠금 보안 기능도 마찬가지입니다. 따라서 충분히 노력하면 여전히 변경할 수 있으며 특히 비행 모드 QS 타일이 추가된 경우 이 앱은 해당 타일과의 상호 작용을 막을 수 없습니다. \n\n이러한 기능은 간단한 사용을 위한 실험으로 만들어졌으며 강력한 보안 및 개인 정보 보호 솔루션으로 권장되지 않습니다. \n\n안전함 대안:\n - 앱 잠금: Pixels 및 Samsung\n - 모바일 네트워크 액세스 방지: 도난 방지 및 오프라인/전원 끄기 내 장치 찾기 설정이 켜져 있는지 확인하세요. Graphene OS도 살펴볼 수 있습니다.</string>
-    <string name="instruction_section_statusbar_title">상태 표시줄 아이콘</string>
-    <string name="instruction_section_statusbar_desc">상태 표시줄 아이콘을 재설정한 후에도 장치 회전, 유선 헤드폰 아이콘과 같은 일부 아이콘이 계속 표시될 수 있습니다. 이는 Android에서 상태 표시줄 블랙리스트가 구현되는 방식과 OEM이 이를 사용자 정의한 방식으로 인해 발생합니다. \n추가 조정이 필요할 수 있습니다. \n\n또한 OEM 구현 및 가용성에 따라 일부 아이콘 표시 옵션이 작동하지 않을 수도 있습니다.</string>
     <string name="instruction_section_lighting_title">알림 조명이 작동하지 않습니다</string>
     <string name="instruction_section_lighting_desc">OEM에 따라 다릅니다. OneUI와 같은 일부는 AOD 위에 오버레이를 허용하지 않아 조명 효과가 표시되지 않는 것 같습니다. 이 경우 해결 방법으로 주변 디스플레이를 사용해 보세요.</string>
     <string name="instruction_section_button_title">디스플레이가 꺼진 동안에는 버튼 다시 매핑이 작동하지 않습니다.</string>

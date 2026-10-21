@@ -1313,8 +1313,6 @@
     <string name="instruction_section_maps_title">Карталардағы энергия үнемдеу режимі</string>
     <string name="instruction_section_maps_desc">Бұл мүмкіндік экран қызғанда немесе батарея азайғанда жарықтық пен кадр жиілігін автоматты түрде реттейді.</string>
 
-    <string name="instruction_section_silent_title">Дыбыссыз режим</string>
-    <string name="instruction_section_silent_desc">Қоңыраулар мен хабарландырулардың дыбысын өшіру үшін пайдаланылады.</string>
 
     <string name="instruction_section_freeze_title">Тоқтату (Freeze) дегеніміз не?</string>
     <string name="instruction_section_freeze_desc">Қолданбаны фондық режимде жұмыс істемеуі үшін тоқтату және қажет болған кезде жылдам іске қосу мүмкіндігі.</string>
@@ -1322,8 +1320,6 @@
     <string name="instruction_section_security_title">Қолданба құлпы мен экран қауіпсіздігі сенімді ме?</string>
     <string name="instruction_section_security_desc">Absolutely not. \n\nAny 3rd party application can not 100% interfere with regular device interactions and even the app lock is only an overlay above selected apps to prevent interacting with them. There are workarounds and it is not foolproof. \n\nSame goes with the screen locked security feature which detects someone trying to interact with the network tiles which for some reason are still accessible for anyone on Pixels. So if they try hard enough they might still be able to change them and especially if you have a flight mode QS tile added, this app can not prevent interactions with it. \n\nThese features are made just as experiments for light usage and would never recommend as strong security and privacy solutions. \n\nSecure alternatives:\n - App lock: Private Space and Secure folder on Pixels and Samsung\n - Preventing mobile networks access: Make sure your theft protection and offline/ power off find my device settings are on. You may look into Graphene OS as well.</string>
 
-    <string name="instruction_section_statusbar_title">Күй жолағының белгішелері</string>
-    <string name="instruction_section_statusbar_desc">Күй жолағын ретсіздіктен тазарту үшін қажет емес жүйелік белгішелерді жасыруға болады.</string>
 
     <string name="instruction_section_battery_saver_title">Қуат және батарея баптаулары қалай жұмыс істейді?</string>
     <string name="instruction_section_battery_saver_desc">Бұл параметрлер Android жүйесінің ішкі энергия үнемдеу механизмдерін тікелей басқарады.</string>
@@ -1363,17 +1359,11 @@
     <string name="instruction_section_diy_title">DIY Automations</string>
     <string name="instruction_section_diy_desc">Build powerful custom routines tailored to your daily usage.\n\n• Trigger Automations: Event-driven rules that run specific actions once an event happens (e.g. when charger is disconnected, trigger Haptic Vibration).\n• State Automations: Condition-driven rules that run Entry Actions when entering a state (e.g. Charging or Time Window) and Exit Actions when leaving it.\n• App Automations: Automatically apply profiles or freeze/unfreeze tags when launching or exiting specified applications.</string>
 
-    <string name="instruction_section_searchbar_title">Pixel Searchbar Customization</string>
-    <string name="instruction_section_searchbar_desc">Customize your Glance home screen searchbar widget.\n\n• Widget Responsiveness: Glance widgets rely on system broadcast updates and may not always update instantaneously in all launcher environments.\n• Search Engine Settings: Tap actions utilize the default system search provider configured on your device, which may vary or be restricted depending on your region and OEM setup.</string>
 
-    <string name="instruction_section_callvibes_title">Call Vibrations &amp; Haptics</string>
-    <string name="instruction_section_callvibes_desc">Add haptic feedback during phone call events.\n\n• Call Answered: Provides a subtle tactile vibration as soon as the recipient picks up the call.\n• Call Disconnected: Provides feedback when a call ends.\n• Permissions: Requires Notification Listener and Phone State permissions to monitor call states.</string>
 
     <string name="instruction_section_backup_title">Backup &amp; Restore</string>
     <string name="instruction_section_backup_desc">Safeguard and transfer your custom setup across devices.\n\n• Export Config: Generate a JSON backup of your DIY Automations, App Tags, Tile configurations, and custom preferences.\n• Import Config: Easily restore your saved setup file without re-configuring individual settings.</string>
 
-    <string name="instruction_section_pocketmode_title">Pocket Mode</string>
-    <string name="instruction_section_pocketmode_desc">Prevents accidental touch interactions when your device is in a pocket, bag, or face down.\n\n• Proximity &amp; Light Sensors: Uses hardware proximity and ambient light sensors to detect enclosed spaces.\n• Touch Blocking: Disables screen touch input temporarily when obscured to prevent accidental pocket dials and app launches.</string>
 
     <!-- Bug Reporting -->
     <string name="toast_bug_report_copied">Отчет об ошибке скопирован в буфер обмена.</string>

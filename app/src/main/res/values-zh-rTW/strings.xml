@@ -1158,14 +1158,10 @@
     <string name="instruction_section_shizuku_desc">Shizuku是一個強大的工具，允許應用程式通過ADB或root權限直接使用系統API。地圖最小模式、應用程式凍結等功能需要它。它還將協助授予某些權限，例如WRITE_SECURE_SETTINGS。\n\n但Play Store版本的Shizuku可能已過時，在較新的Android版本上可能無法使用，因此在這種情況下，請從github或最新的分支取得最新版本。</string>
     <string name="instruction_section_maps_title">地圖省電模式</string>
     <string name="instruction_section_maps_desc">此功能會自動觸發 Google 地圖的省電模式，該功能目前僅限 Pixel 10 系列專屬。有位社群成員發現，只要以 root 權限啟動地圖的 minMode 活動，任何 Android 裝置仍可使用此功能。\n\n之後，我利用 Tasker 將其自動化，使其在導航過程中螢幕關閉時自動觸發，並成功僅透過 Shizuku 的執行時權限就達到了相同效果。\n\n此功能原本是設計用來疊加在 Pixel 10 系列的 AOD（始終顯示）上，因此您可能會偶爾看到螢幕上彈出「不支援橫向模式」的訊息。這是應用程式無法避免的情況，您可以忽略此提示。</string>
-    <string name="instruction_section_silent_title">靜音聲音模式</string>
-    <string name="instruction_section_silent_desc">您可能已經注意到靜音模式也會觸發勿擾模式。\n\n這是由於Android實現的方式，即使我們使用相同的API切換到振動模式，由於某些原因，它也會在靜音模式下同時開啟勿擾模式，目前這是無法避免的。:(</string>
     <string name="instruction_section_freeze_title">什麼是凍結？</string>
     <string name="instruction_section_freeze_desc">暫停並遠離應用程式干擾，同時通過阻止應用程式在後台執行來節省一點電量。適用於不常用的應用程式。\n\n不建議用於任何通訊服務，因為除非您解凍它們，否則它們在緊急情況下不會通知您。\n\n強烈建議不要凍結系統應用程式，因為它們可能導致系統不穩定。請謹慎操作，您已被警告。\n\n靈感來自Hail &lt;3</string>
     <string name="instruction_section_security_title">應用程式鎖和鎖定畫面安全真的安全嗎？</string>
     <string name="instruction_section_security_desc">絕對不安全。\n\n任何第三方應用程式都無法100%干預常規設備交互，即使應用程式鎖也只是在選定應用程式上方的一個覆蓋層，以防止與它們交互。存在解決方法，並非萬無一失。\n\n鎖定畫面安全功能也是如此，它檢測到有人試圖與網路磁貼交互（由於某些原因，在Pixel上這些磁貼對任何人都可存取）。因此，如果他們足夠努力，仍然可能變更它們，特別是如果您新增了飛航模式QS磁貼，此應用程式無法阻止與其交互。\n\n這些功能只是作為輕量級使用的實驗而製作，絕不推薦作為強大的安全和隱私解決方案。\n\n安全的替代方案：\n- 應用程式鎖：Pixel和三星上的私人空間和安全資料夾\n- 防止行動網路存取：確保您的防盜保護和離線/關機查找設備設定已開啟。您也可以考慮Graphene OS。</string>
-    <string name="instruction_section_statusbar_title">狀態欄圖示</string>
-    <string name="instruction_section_statusbar_desc">您可能會注意到，即使重置了狀態欄圖示，某些圖示如設備旋轉、有線耳機圖示可能仍然可見。這是由於Android中狀態欄黑名單的實現方式以及您的OEM可能對它們進行了自訂。\n您可能需要進一步調整。\n\n另外，並非所有圖示可見性選項都能正常工作，因為它們取決於OEM的實現和可用性。</string>
     <string name="instruction_section_battery_saver_title">電源和電池設定如何運作？ </string>
     <string name="instruction_section_battery_saver_desc">這些設定會直接覆寫 Android 內部的省電模式策略常數（具體來說是全域設定表屬性：battery_saver_constants）。 \n\n當 Android 啟動省電模式時，它會讀取這些鍵值來確定應該限制哪些系統功能（例如降低螢幕亮度、停用 AOD、限制 GPS 位置存取或使應用程式進入睡眠狀態）。 \n\n如果您修改這些值，您的自訂省電策略將在下次啟用省電模式時生效。您可以隨時使用螢幕底部的按鈕將其重設為預設值。寫入這些系統配置需要 WRITE_SECURE_SETTINGS 權限。 </string>
     <string name="about_desc_power_battery">Fine-tune Android「s internal Battery Saver constants policy. Customize behavior such as brightness limit, location throttling, vibration toggle, background sync deferrals, and sensor states when battery saver is turned on.</string>

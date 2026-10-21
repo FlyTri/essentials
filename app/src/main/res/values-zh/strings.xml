@@ -1075,14 +1075,10 @@
     <string name="instruction_section_shizuku_desc">Shizuku是一个强大的工具，允许应用通过ADB或root权限直接使用系统API。地图最小模式、应用冻结等功能需要它。它还将协助授予某些权限，例如WRITE_SECURE_SETTINGS。\n\n但Play Store版本的Shizuku可能已过时，在较新的Android版本上可能无法使用，因此在这种情况下，请从github或最新的分支获取最新版本。</string>
     <string name="instruction_section_maps_title">地图省电模式</string>
     <string name="instruction_section_maps_desc">此功能自动触发Google Maps省电模式，该模式目前是Pixel 10系列独有的。一位社区成员发现，通过root权限启动maps minMode活动，它仍然可以在任何Android设备上使用。\n\n然后，我使用Tasker将其自动化，在导航期间屏幕关闭时自动触发，然后通过运行时Shizuku权限实现了相同的效果。\n\n它旨在显示在Pixel 10系列的AOD上，因此，您可能会偶尔看到显示屏上弹出不支持横屏模式的消息。这是应用无法避免的，您可以忽略。</string>
-    <string name="instruction_section_silent_title">静音声音模式</string>
-    <string name="instruction_section_silent_desc">您可能已经注意到静音模式也会触发勿扰模式。\n\n这是由于Android实现的方式，即使我们使用相同的API切换到振动模式，由于某些原因，它也会在静音模式下同时打开勿扰模式，目前这是无法避免的。:(</string>
     <string name="instruction_section_freeze_title">什么是冻结？</string>
     <string name="instruction_section_freeze_desc">暂停并远离应用干扰，同时通过阻止应用在后台运行来节省一点电量。适用于不常用的应用。\n\n不建议用于任何通讯服务，因为除非您解冻它们，否则它们在紧急情况下不会通知您。\n\n强烈建议不要冻结系统应用，因为它们可能导致系统不稳定。请谨慎操作，您已被警告。\n\n灵感来自Hail &lt;3</string>
     <string name="instruction_section_security_title">应用锁和锁屏安全真的安全吗？</string>
     <string name="instruction_section_security_desc">绝对不安全。\n\n任何第三方应用都无法100%干预常规设备交互，即使应用锁也只是在选定应用上方的一个覆盖层，以防止与它们交互。存在解决方法，并非万无一失。\n\n锁屏安全功能也是如此，它检测到有人试图与网络磁贴交互（由于某些原因，在Pixel上这些磁贴对任何人都可访问）。因此，如果他们足够努力，仍然可能更改它们，特别是如果您添加了飞行模式QS磁贴，此应用无法阻止与其交互。\n\n这些功能只是作为轻量级使用的实验而制作，绝不推荐作为强大的安全和隐私解决方案。\n\n安全的替代方案：\n- 应用锁：Pixel和三星上的私人空间和安全文件夹\n- 防止移动网络访问：确保您的防盗保护和离线/关机查找设备设置已开启。您也可以考虑Graphene OS。</string>
-    <string name="instruction_section_statusbar_title">状态栏图标</string>
-    <string name="instruction_section_statusbar_desc">您可能会注意到，即使重置了状态栏图标，某些图标如设备旋转、有线耳机图标可能仍然可见。这是由于Android中状态栏黑名单的实现方式以及您的OEM可能对它们进行了自定义。\n您可能需要进一步调整。\n\n另外，并非所有图标可见性选项都能正常工作，因为它们取决于OEM的实现和可用性。</string>
     <string name="instruction_section_lighting_title">通知光效不起作用</string>
     <string name="instruction_section_lighting_desc">这取决于OEM。像OneUI似乎不允许在AOD上显示叠加层，从而阻止显示光效。在这种情况下，请尝试使用环境显示作为解决方法。</string>
     <string name="instruction_section_button_title">按键重映射在屏幕关闭时不起作用</string>

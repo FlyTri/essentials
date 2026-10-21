@@ -1314,8 +1314,6 @@
     <string name="instruction_section_maps_title">地图省电模式</string>
     <string name="instruction_section_maps_desc">此功能会在受支持的 Android 设备上自动触发 Google 地图省电模式。一位社区成员发现，通过 root 权限启动 maps minMode 活动仍然可以使用。\n\n然后，我用 Tasker 将其自动化，在导航会话期间屏幕关闭时自动触发，后来通过运行时 Shizuku 权限实现了同样的效果。\n\n它旨在叠加在导航体验之上，因此你可能会偶尔看到不支持横屏模式的消息。应用无法避免这一点，你可以忽略它。</string>
 
-    <string name="instruction_section_silent_title">静音声音模式</string>
-    <string name="instruction_section_silent_desc">你可能已经注意到，静音模式也会触发勿扰模式。\n\n这是由于 Android 的实现方式，即使我们使用相同的 API 切换到振动模式，它也会出于某种原因在静音模式的同时打开勿扰模式，目前这是无法避免的。:(</string>
 
     <string name="instruction_section_freeze_title">什么是冻结？</string>
     <string name="instruction_section_freeze_desc">暂停并远离应用干扰，同时节省一点电量，防止应用在后台运行。适合不常用的应用。\n\n不建议用于任何通讯服务，除非你解冻它们，否则它们在紧急情况下不会通知你。\n\n强烈建议不要冻结系统应用，因为它们可能导致系统不稳定。请谨慎操作，你已经受到警告。\n\n灵感来自 Hail &lt;3</string>
@@ -1323,8 +1321,6 @@
     <string name="instruction_section_security_title">应用锁和锁定安全真的安全吗？</string>
     <string name="instruction_section_security_desc">绝对不是。\n\n任何第三方应用都无法 100% 干预正常的设备交互，即使是应用锁也只是一个覆盖在所选应用之上的浮层，用于防止与它们交互。有变通方法，并非万无一失。\n\n锁定安全功能也是如此，它会检测有人试图与网络磁贴交互，在 Pixel 上这些磁贴出于某种原因仍然对任何人开放。所以如果他们足够努力，仍然可能更改它们，尤其是如果你添加了飞行模式 QS 磁贴，此应用无法防止与它交互。\n\n这些功能只是为轻度使用而做的实验，绝不会推荐作为强大的安全和隐私解决方案。\n\n安全替代方案：\n - 应用锁：Pixel 和三星上的隐私空间和安全文件夹\n - 防止移动网络访问：确保你的防盗保护和离线/关机查找我的设备设置已开启。你也可以考虑使用 Graphene OS。</string>
 
-    <string name="instruction_section_statusbar_title">状态栏图标</string>
-    <string name="instruction_section_statusbar_desc">你可能注意到，即使在重置状态栏图标后，某些图标（如设备旋转、有线耳机图标）仍会保持可见。这是由于 Android 中状态栏黑名单的实现方式以及你的 OEM 可能对其进行的自定义。\n你可能需要进一步调整。\n\n另外，并非所有图标可见性选项都能正常工作，因为它们取决于 OEM 的实现和可用性。</string>
 
     <string name="instruction_section_battery_saver_title">电源和电池设置如何工作？</string>
     <string name="instruction_section_battery_saver_desc">这些设置直接覆盖 Android 内部的电池保护程序策略常量（特别是全局设置表属性：battery_saver_constants）。\n\n当 Android 激活电池保护模式时，它会读取这些键以确定应限制哪些系统功能（例如降低屏幕亮度、禁用 AOD、限制 GPS 位置访问或将应用置于休眠状态）。\n\n如果你修改这些值，你的自定义电池保护策略将在下次开启电池保护程序时生效。你可以随时使用屏幕底部的按钮重置为默认值。写入这些系统配置需要 WRITE_SECURE_SETTINGS 权限。</string>
@@ -1364,17 +1360,11 @@
     <string name="instruction_section_diy_title">DIY 自动化</string>
     <string name="instruction_section_diy_desc">构建适合你日常使用的强大自定义例程。\n\n• 触发自动化：事件驱动的规则，事件发生时运行特定操作（例如断开充电器时触发触觉振动）。\n• 状态自动化：条件驱动的规则，进入状态（例如充电或时间窗口）时运行进入操作，离开时运行退出操作。\n• 应用自动化：启动或退出指定应用时自动应用配置文件或冻结/解冻标签。</string>
 
-    <string name="instruction_section_searchbar_title">Pixel 搜索栏自定义</string>
-    <string name="instruction_section_searchbar_desc">自定义你的 Glance 主屏幕搜索栏小部件。\n\n• 小部件响应性：Glance 小部件依赖系统广播更新，可能并非在所有启动器环境中都能即时更新。\n• 搜索引擎设置：点按操作使用设备上配置的默认系统搜索提供商，这可能因地区和 OEM 设置而异或受到限制。</string>
 
-    <string name="instruction_section_callvibes_title">通话振动与触觉</string>
-    <string name="instruction_section_callvibes_desc">在通话事件期间添加触觉反馈。\n\n• 接听电话：接听方接起电话时提供轻微的触觉振动。\n• 挂断电话：通话结束时提供反馈。\n• 权限：需要通知使用权和手机状态权限来监控通话状态。</string>
 
     <string name="instruction_section_backup_title">备份与恢复</string>
     <string name="instruction_section_backup_desc">跨设备保护并转移你的自定义设置。\n\n• 导出配置：生成 DIY 自动化、应用标签、磁贴配置和自定义偏好的 JSON 备份。\n• 导入配置：无需逐个重新配置即可轻松恢复你保存的设置文件。</string>
 
-    <string name="instruction_section_pocketmode_title">口袋模式</string>
-    <string name="instruction_section_pocketmode_desc">防止设备放在口袋、包中或屏幕朝下时发生意外触摸交互。\n\n• 距离与光线传感器：使用硬件距离和环境光传感器检测封闭空间。\n• 触摸阻止：在遮挡时暂时禁用屏幕触摸输入，防止意外的口袋拨号和应用启动。</string>
 
     <!-- Bug Reporting -->
     <string name="toast_bug_report_copied">问题报告已复制到剪贴板</string>
