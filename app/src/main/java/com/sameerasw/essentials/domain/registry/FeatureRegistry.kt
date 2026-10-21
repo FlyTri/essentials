@@ -803,11 +803,10 @@ object FeatureRegistry {
                 iconRes = R.drawable.rounded_upcoming_24,
                 category = R.string.cat_interface,
                 description = R.string.island_desc,
-                aboutDescription = R.string.island_desc,
+                aboutDescription = R.string.about_desc_island,
                 permissionKeys = listOf("ACCESSIBILITY", "NOTIFICATION_LISTENER"),
                 hasMoreSettings = true,
                 showToggle = true,
-                isBeta = true,
                 animationRes = R.raw.island_motion,
                 searchableSettings =
                     listOf(
