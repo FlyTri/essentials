@@ -177,7 +177,7 @@
     <string name="flashlight_pulse_title">Sáng đèn pin</string>
     <string name="flashlight_pulse_facedown_title">Chỉ khi úp mặt xuống</string>
     <string name="flashlight_pulse_same_as_lighting_title">Ứng dụng tương tự như đèn thông báo</string>
-    <string name="flashlight_pulse_max_brightness">Max brightness</string>
+    <string name="flashlight_pulse_max_brightness">Độ sáng tối đa</string>
     <string name="flashlight_pulse_preview">Preview pulse</string>
     <string name="settings_section_style">Phong cách</string>
     <string name="notification_lighting_stroke_adjustment_section">Điều chỉnh hành trình</string>
@@ -1960,4 +1960,51 @@ Cần có quyền truy cập trợ năng để hiển thị lớp phủ và cầ
     <string name="essential_search_label">Tìm kiếm Essential</string>
     <string name="island_landscape_top_spacing_title">Khoảng cách phía trên ở chế độ ngang</string>
     <string name="island_bond_edge_title">Liên kết với tai thỏ khi không hoạt động</string>
+    <string name="feat_widget_stack_title">Chồng tiện ích</string>
+    <string name="feat_widget_stack_desc">Xếp chồng các tiện ích và chuyển đổi qua lại giữa chúng</string>
+    <string name="feat_activity_launcher_title">Trình khởi chạy hoạt động</string>
+    <string name="feat_activity_launcher_desc">Mở hoặc ghim bất kỳ màn hình ứng dụng nào</string>
+    <string name="feat_lockscreen_shortcuts_title">Phím tắt trên màn hình khóa</string>
+    <string name="feat_lockscreen_shortcuts_desc">Thực hiện các thao tác của riêng bạn ngay từ màn hình khóa</string>
+    <string name="lockscreen_shortcuts_enable_title">Bật phím tắt trên màn hình khóa</string>
+    <string name="about_desc_activity_launcher">Duyệt qua các màn hình (hoạt động) bên trong bất kỳ ứng dụng nào, mở trực tiếp chúng và ghim vào màn hình chính của bạn. Những màn hình được ứng dụng giữ ở chế độ riêng tư sẽ được đánh dấu là \"Chỉ dành cho quyền root\" và cần có quyền root để mở.</string>
+    <string name="about_desc_lockscreen_shortcuts">Thêm các lối tắt thiết yếu vào các góc dưới của màn hình khóa. Chạm và giữ một lối tắt để thực hiện tác vụ tương ứng. Tính năng này chỉ khả dụng khi các lối tắt trên màn hình khóa mặc định của hệ thống đã được tắt.</string>
+    <string name="feat_navigation_desc">Thanh cử chỉ, các thao tác điều hướng và tùy chỉnh thanh điều hướng</string>
+    <string name="feat_hilight_desc">Bật các đèn LED phía sau để nhận thông báo và theo dõi tiến trình trực tiếp</string>
+    <string name="about_desc_hilight">Kích hoạt các đèn LED \"Hilight\" ở mặt sau của Pixel 11 Pro, Pro XL và Pro Fold khi có thông báo, với hiệu ứng tùy chỉnh cho từng ứng dụng mà bạn thêm vào. Các hiệu ứng Hilight cũng có thể được sử dụng làm tác vụ trong tính năng tùy chỉnh nút bấm (Button remap) và các quy trình tự động hóa. Yêu cầu phải có Shizuku; ứng dụng này cần được khởi động lại sau mỗi lần khởi động lại thiết bị.</string>
+    <string name="about_desc_volume_steps">Thiết lập mức thay đổi âm lượng mỗi khi bạn nhấn phím âm lượng. Nếu giữ phím, âm lượng sẽ tiếp tục thay đổi cho đến khi bạn thả tay ra. Đối với các cuộc gọi, nhạc chuông, báo thức và ứng dụng máy ảnh, âm lượng vẫn hoạt động theo cách thông thường.
+
+Nếu bạn đã thiết lập thao tác \"nhấn giữ\" cho một phím âm lượng trong ứng dụng Button Remap, thì khi giữ phím đó, thao tác đã thiết lập sẽ được thực thi thay vì thay đổi âm lượng; trong khi đó, thao tác \"nhấn nhanh\" vẫn sẽ làm thay đổi âm lượng theo mức bạn đã định. Theo mặc định, Button Remap sẽ tạm dừng khi bảng điều khiển âm lượng đang hiển thị, nhờ đó việc giữ phím lúc này sẽ làm thay đổi âm lượng. Nếu muốn thao tác đã thiết lập luôn được ưu tiên thực thi, bạn hãy tắt tùy chọn \"Disabled while volume dialog open\" (Vô hiệu hóa khi hộp thoại âm lượng đang mở) trong ứng dụng Button Remap.</string>
+    <string name="about_desc_app_volume">Tính năng này cho phép giảm âm lượng của từng ứng dụng một cách riêng biệt mà không làm thay đổi âm lượng phương tiện chung của toàn hệ thống. Bạn có thể thiết lập mức âm lượng cụ thể cho mỗi ứng dụng; mức này sẽ được áp dụng mỗi khi ứng dụng đó phát âm thanh, kể cả khi đang chạy ngầm.
+
+Bạn chỉ có thể điều chỉnh âm lượng xuống thấp hơn mức bình thường, không thể tăng vượt quá mức đó. Một số trò chơi hoặc ứng dụng yêu cầu độ trễ âm thanh thấp có thể sẽ không tuân theo các thiết lập này. Để các mức âm lượng mới có hiệu lực, ứng dụng Shizuku cần phải đang hoạt động; vì vậy, hãy khởi chạy lại Shizuku sau mỗi lần khởi động lại thiết bị.</string>
+    <string name="about_desc_widget_stack">Đặt nhiều tiện ích (widget) từ bất kỳ ứng dụng nào vào cùng một vị trí trên màn hình chính.
+
+Các tiện ích trong chồng (stack) sẽ tự động chuyển đổi theo bộ hẹn giờ, hoặc bạn có thể tự chuyển đổi bằng cách sử dụng các mũi tên bên dưới. Những tiện ích hiển thị danh sách dạng cuộn, chẳng hạn như lịch trình công việc, sẽ không thể đưa vào chồng tiện ích.</string>
+    <string name="watch_esim_install_title">Tải eSIM</string>
+    <string name="watch_esim_install_desc">Ngay cả ở những khu vực không được hỗ trợ</string>
+    <string name="feat_split_screen_gesture_title">Thao tác chia đôi màn hình</string>
+    <string name="feat_split_screen_gesture_desc">Vuốt lên bằng 2 ngón tay từ cạnh dưới để chia màn hình hoặc thoát chế độ chia màn hình đối với ứng dụng hiện tại</string>
+    <string name="feat_back_gesture_title">Thao tác quay lại</string>
+    <string name="feat_back_gesture_desc">Độ rộng cạnh và thao tác quay lại theo từng ứng dụng</string>
+    <string name="feat_hilight_notifications_title">Hiệu ứng thông báo</string>
+    <string name="hilight_notifications_desc">Phát hiệu ứng riêng của từng ứng dụng khi có thông báo từ ứng dụng đó</string>
+    <string name="hilight_progress_title">Tiến độ trực tiếp</string>
+    <string name="feat_hilight_progress_desc">Hiển thị tiến trình tải xuống và cập nhật trực tiếp trên các đèn LED</string>
+    <string name="hilight_only_screen_off_title">Chỉ khi màn hình tắt</string>
+    <string name="feat_face_unlock_brightness_title">Chiếu sáng khuôn mặt</string>
+    <string name="feat_face_unlock_brightness_desc">Tăng độ sáng trong điều kiện thiếu sáng</string>
+    <string name="face_unlock_ambient_threshold_title">Ngưỡng môi trường</string>
+    <string name="face_unlock_auto_illuminate_title">Tự động sáng lên khi đánh thức</string>
+    <string name="face_unlock_trigger_unlock_title">Kích hoạt mở khóa</string>
+    <string name="face_unlock_light_tint_title">Tông màu nhạt</string>
+    <string name="about_desc_screenshots">Giúp thư viện ảnh của bạn không bị lấp đầy bởi các ảnh chụp màn hình chỉ dùng một lần. Bạn có thể xóa ảnh chụp màn hình ngay sau khi chia sẻ hoặc vào một thời điểm khác; ngoài ra, mọi ảnh chụp màn hình mới đều có thể tự động bị xóa sau vài ngày, trừ khi bạn chọn giữ lại thông qua thông báo hoặc đánh dấu sao trong ứng dụng Ảnh. Các ảnh chụp màn hình đã xóa có thể được khôi phục từ ứng dụng Tệp hoặc ứng dụng Ảnh trong vòng 30 ngày.</string>
+    <string name="feat_screenshots_title">Ảnh chụp màn hình</string>
+    <string name="feat_screenshots_desc">Dọn dẹp các ảnh chụp màn hình cũ và đã chia sẻ</string>
+    <string name="feat_screenshot_share_cleanup_title">Xóa ảnh chụp màn hình đã chia sẻ</string>
+    <string name="feat_screenshot_share_cleanup_desc">Xóa ảnh chụp màn hình sau khi chia sẻ</string>
+    <string name="screenshot_auto_clean_title">Tự động dọn dẹp ảnh chụp màn hình</string>
+    <string name="screenshot_auto_clean_note">Mỗi ảnh chụp màn hình mới đều đi kèm một thông báo kín đáo để bạn chọn giữ lại. Những ảnh chụp màn hình được gắn dấu sao sẽ luôn được lưu giữ.</string>
+    <string name="screenshots_cleaned_count_title">Ảnh chụp màn hình đã được làm sạch</string>
+    <string name="screenshots_storage_saved_title">Đã lưu vào bộ nhớ</string>
 </resources>
