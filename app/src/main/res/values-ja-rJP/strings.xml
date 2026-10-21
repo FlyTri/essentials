@@ -826,7 +826,7 @@
     <string name="about_desc_bubbles">通知バブルを有効または無効にできます。\n\n会話バブルのシステム全体の設定を素早く切り替えます。</string>
     <string name="about_desc_sensitive_content">ロック画面で機密性の高いコンテンツを非表示にします。\n\nデバイスがロックされているときに通知コンテンツを表示するか非表示にするかを切り替えます。</string>
     <string name="about_desc_tap_to_wake">タップして起動する機能を切り替えます。\n\nタップで画面を起動する機能を有効または無効にします。</string>
-    <string name="about_desc_aod">常時表示ディスプレイを切り替えます。\n\n常時表示ディスプレイを素早く有効または無効にして、情報を一目で確認します。</string>
+    <string name="about_desc_aod">Control the Always On Display from one place. Turn it on or off, and quickly check the time, notifications and other info at a glance while the screen is off.\n\nYou can also force it to turn off when there are no notifications, and show your wallpaper behind the clock using an overlay.\n\nWriting secure settings permission is required to toggle it, and accessibility is needed for the force turn off option.</string>
     <string name="about_desc_notification_glance">Automatically control your Always On Display based on your notifications. When a message or alert arrives from a selected app, AOD will stay on until you dismiss the notification, ensuring you never miss important info without wasting battery when no alerts are present.</string>
     <string name="about_desc_mono_audio">音声チャンネルをモノラルに統合します。\n\n片方のイヤホンを使用する場合や、アクセシビリティの目的で便利です。</string>
     <string name="about_desc_flashlight_tile">フラッシュライトのオン/オフを切り替えます。\n\n長押しすると明るさ調整のコントロールが開きます。これはハードウェア実装が必要な場合があり、一部のデバイスでは対応していない可能性があります。</string>

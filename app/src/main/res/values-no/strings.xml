@@ -769,9 +769,7 @@ Skjul spesifikke ikoner som WiFi, Bluetooth eller mobildata for å holde statusl
     <string name="about_desc_bubbles">Aktiver eller deaktiver flytende varslingsbobler.\n\nVeksle raskt den systemomfattende innstillingen for samtalebobler.</string>
     <string name="about_desc_sensitive_content">Skjul sensitivt innhold på låseskjermen.\n\nVeksle om varslingsinnhold skal vises eller skjules når enheten din er låst.</string>
     <string name="about_desc_tap_to_wake">Veksle trykk for å vekke funksjonalitet.\n\nAktiver eller deaktiver muligheten til å vekke skjermen med et trykk.</string>
-    <string name="about_desc_aod">Slå av eller på Alltid på-skjerm.
-
-Aktiver eller deaktiver alltid på-skjermen raskt for å se informasjon med et øyeblikk.</string>
+    <string name="about_desc_aod">Control the Always On Display from one place. Turn it on or off, and quickly check the time, notifications and other info at a glance while the screen is off.\n\nYou can also force it to turn off when there are no notifications, and show your wallpaper behind the clock using an overlay.\n\nWriting secure settings permission is required to toggle it, and accessibility is needed for the force turn off option.</string>
     <string name="about_desc_notification_glance">Kontroller Always On Display automatisk basert på varslene dine. Når en melding eller et varsel kommer fra en valgt app, vil AOD forbli på til du avviser varselet, og sikrer at du aldri går glipp av viktig informasjon uten å kaste bort batteriet når ingen varsler er tilstede.</string>
     <string name="about_desc_mono_audio">Kombiner lydkanaler til mono.\n\nNyttig når du bruker en enkelt øreplugg eller for tilgjengelighetsformål.</string>
     <string name="about_desc_flashlight_tile">Slå på lommelykten.\n\n Et langt trykk åpner kontrollene for intensitetsjustering som kan trenge maskinvareimplementering som enkelte enheter kan mangle.</string>

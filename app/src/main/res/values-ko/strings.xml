@@ -767,7 +767,7 @@
     <string name="about_desc_bubbles">부동 알림 풍선을 활성화 또는 비활성화합니다.\n\n대화 풍선에 대한 시스템 전체 설정을 빠르게 전환합니다.</string>
     <string name="about_desc_sensitive_content">잠금 화면에서 민감한 콘텐츠를 숨깁니다.\n\n기기가 잠겨 있을 때 알림 콘텐츠를 표시할지 숨길지 전환합니다.</string>
     <string name="about_desc_tap_to_wake">탭하여 깨우기 기능을 전환합니다.\n\n탭으로 화면을 깨우는 기능을 활성화 또는 비활성화합니다.</string>
-    <string name="about_desc_aod">Always On Display를 전환합니다.\n\nAlways On Display를 빠르게 활성화 또는 비활성화하여 정보를 한눈에 볼 수 있습니다.</string>
+    <string name="about_desc_aod">Control the Always On Display from one place. Turn it on or off, and quickly check the time, notifications and other info at a glance while the screen is off.\n\nYou can also force it to turn off when there are no notifications, and show your wallpaper behind the clock using an overlay.\n\nWriting secure settings permission is required to toggle it, and accessibility is needed for the force turn off option.</string>
     <string name="about_desc_notification_glance">알림을 기반으로 Always On Display를 자동으로 제어합니다. 선택한 앱에서 메시지나 알림이 도착하면 알림을 해제할 때까지 AOD가 계속 켜져 있어 알림이 없을 때 배터리를 낭비하지 않고 중요한 정보를 놓치지 않도록 해줍니다.</string>
     <string name="about_desc_mono_audio">오디오 채널을 모노로 결합합니다.\n\n단일 이어버드를 사용할 때 또는 접근성 목적으로 유용합니다.</string>
     <string name="about_desc_flashlight_tile">손전등을 전환합니다.\n\nA 길게 누르면 일부 장치에는 부족할 수 있는 하드웨어 구현이 필요할 수 있는 강도 조정 컨트롤이 열립니다.</string>

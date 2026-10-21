@@ -901,7 +901,7 @@
     <string name="about_desc_bubbles">تفعيل أو تعطيل فقاعات الإشعارات العائمة.\n\nالتبديل السريع لإعداد فقاعات المحادثات على مستوى النظام.</string>
     <string name="about_desc_sensitive_content">إخفاء المحتوى الحساس على شاشة القفل.\n\nالتبديل بين إظهار أو إخفاء محتوى الإشعارات عند قفل جهازك.</string>
     <string name="about_desc_tap_to_wake">تبديل وظيفة النقر للاستيقاظ.\n\nتفعيل أو تعطيل القدرة على إيقاظ شاشتك بنقرة.</string>
-    <string name="about_desc_aod">تبديل Always On Display.\n\nتفعيل أو تعطيل الشاشة الدائمة لعرض المعلومات في لمحة سريعة.</string>
+    <string name="about_desc_aod">Control the Always On Display from one place. Turn it on or off, and quickly check the time, notifications and other info at a glance while the screen is off.\n\nYou can also force it to turn off when there are no notifications, and show your wallpaper behind the clock using an overlay.\n\nWriting secure settings permission is required to toggle it, and accessibility is needed for the force turn off option.</string>
     <string name="about_desc_notification_glance">تحكم تلقائي في Always On Display بناءً على إشعاراتك. عند وصول رسالة أو تنبيه من تطبيق محدد، سيبقى AOD مفعلاً حتى ترفض الإشعار، مما يضمن عدم تفويت أي معلومات مهمة دون إهدار البطارية عند عدم وجود تنبيهات.</string>
     <string name="about_desc_mono_audio">دمج القنوات الصوتية في قناة أحادية.\n\nمفيد عند استخدام سماعة أذن واحدة أو لأغراض إمكانية الوصول.</string>
     <string name="about_desc_flashlight_tile">تبديل المصباح اليدوي.\n\nالضغط المطول يفتح عناصر التحكم لضبط الشدة والتي قد تحتاج إلى دعم من الأجهزة قد تفتقده بعض الأجهزة.</string>

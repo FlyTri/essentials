@@ -826,7 +826,7 @@
     <string name="about_desc_bubbles">啟用或禁用浮動通知氣泡。\n\n快速切換會話氣泡的系統級設定。</string>
     <string name="about_desc_sensitive_content">在鎖定畫面上隱藏敏感內容。\n\n切換設備鎖定時是否顯示或隱藏通知內容。</string>
     <string name="about_desc_tap_to_wake">切換點按喚醒功能。\n\n啟用或禁用通過點按喚醒螢幕的功能。</string>
-    <string name="about_desc_aod">開關螢幕長亮模式\n\n快速開啟或關閉螢幕長亮模式以快速查看訊息。</string>
+    <string name="about_desc_aod">Control the Always On Display from one place. Turn it on or off, and quickly check the time, notifications and other info at a glance while the screen is off.\n\nYou can also force it to turn off when there are no notifications, and show your wallpaper behind the clock using an overlay.\n\nWriting secure settings permission is required to toggle it, and accessibility is needed for the force turn off option.</string>
     <string name="about_desc_notification_glance">根據您的通知自動控制螢幕長亮模式。當您從選定的應用程式收到訊息或提醒時，螢幕長亮模式將保持開啟狀態，直到您關閉該通知為止，確保您不會錯過重要資訊，同時在沒有通知時也不會浪費電量。</string>
     <string name="about_desc_mono_audio">將音訊通道合併為單聲道。\n\n使用單個耳塞或出於無障礙目的時很有用。</string>
     <string name="about_desc_flashlight_tile">切換手電筒。\n\n長按開啟亮度調節控件，這可能需要某些設備缺乏的硬體實現。</string>

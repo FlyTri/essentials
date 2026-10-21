@@ -763,7 +763,7 @@
     <string name="about_desc_bubbles">启用或禁用浮动通知气泡。\n\n快速切换会话气泡的系统级设置。</string>
     <string name="about_desc_sensitive_content">在锁屏上隐藏敏感内容。\n\n切换设备锁定时是否显示或隐藏通知内容。</string>
     <string name="about_desc_tap_to_wake">切换点按唤醒功能。\n\n启用或禁用通过点按唤醒屏幕的功能。</string>
-    <string name="about_desc_aod">切换始终显示。\n\n快速启用或禁用始终显示以快速查看信息。</string>
+    <string name="about_desc_aod">Control the Always On Display from one place. Turn it on or off, and quickly check the time, notifications and other info at a glance while the screen is off.\n\nYou can also force it to turn off when there are no notifications, and show your wallpaper behind the clock using an overlay.\n\nWriting secure settings permission is required to toggle it, and accessibility is needed for the force turn off option.</string>
     <string name="about_desc_notification_glance">根据通知自动控制您的始终显示。当来自选定应用的消息或提醒到达时，AOD将保持开启，直到您关闭通知，确保您不会错过重要信息，同时在没有提醒时不会浪费电池。</string>
     <string name="about_desc_mono_audio">将音频通道合并为单声道。\n\n使用单个耳塞或出于无障碍目的时很有用。</string>
     <string name="about_desc_flashlight_tile">切换手电筒。\n\n长按打开亮度调节控件，这可能需要某些设备缺乏的硬件实现。</string>
