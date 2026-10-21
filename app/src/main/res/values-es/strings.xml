@@ -300,7 +300,7 @@ Sin embargo, sí te permite reanudarla desde la lista de aplicaciones del lanzad
     <string name="icon_vpn">VPN</string>
     <string name="icon_airplane_mode">Modo avión</string>
     <string name="icon_hotspot">Punto de acceso</string>
-    <string name="icon_cast">Enviar</string>
+    <string name="icon_cast">Transmitir</string>
     <string name="icon_mobile_data">Datos móviles</string>
     <string name="icon_phone_signal">Señal de teléfono</string>
     <string name="icon_volte">VoLTE / VoNR</string>
@@ -686,7 +686,7 @@ Sin embargo, sí te permite reanudarla desde la lista de aplicaciones del lanzad
     <string name="preferences_desc">Configura algunos ajustes básicos para empezar.</string>
     <string name="label_app_settings">Ajustes de la aplicación</string>
     <string name="label_app_language">Idioma</string>
-    <string name="label_haptic_feedback">Retroalimentación háptica</string>
+    <string name="label_haptic_feedback">Vibración</string>
     <string name="label_updates">Actualizaciones</string>
     <string name="label_auto_check_updates">Comprobación automática de actualizaciones</string>
     <string name="desc_auto_check_updates">Buscar actualizaciones al iniciar la aplicacion</string>
@@ -1437,7 +1437,7 @@ Cuando llegue un mensaje o alerta de una aplicación seleccionada, la Pantalla s
     <string name="label_width">Anchura</string>
     <string name="label_grade">Gradación</string>
     <string name="label_roundness">Redondez</string>
-    <string name="label_color_tone">Ligereza</string>
+    <string name="label_color_tone">Luminosidad</string>
     <string name="label_variation">Variación</string>
     <string name="label_color">Color</string>
     <string name="label_style_font">Estilo y fuente</string>
@@ -1594,7 +1594,7 @@ Cuando llegue un mensaje o alerta de una aplicación seleccionada, la Pantalla s
     <string name="watchface_right_complication_title">Complicación derecha</string>
     <string name="feat_circle_to_search_gesture_width_desc">Ajuste el ancho del área táctil en la parte inferior.</string>
     <string name="feat_circle_to_search_gesture_width_title">Ancho de la zona de gestos</string>
-    <string name="label_motion_blur">Desdibujo de movimiento</string>
+    <string name="label_motion_blur">Desenfoque de movimiento</string>
     <string name="crash_logs_title">Reportes de errores</string>
     <string name="crash_logs_desc">Mira y comparte los reportes de errores recientes</string>
     <string name="settings_translated_texts">Traducido</string>
@@ -1647,7 +1647,7 @@ Cuando llegue un mensaje o alerta de una aplicación seleccionada, la Pantalla s
     <string name="island_desc">Isla dinamica</string>
     <string name="island_tap_action_title">Accion del toque</string>
     <string name="island_suppress_system_heads_up_title">Ocultar notificaciones emergentes del sistema</string>
-    <string name="island_dynamic_hide_status_bar_title">Dinamicamente oculta los iconos de la barra de estado</string>
+    <string name="island_dynamic_hide_status_bar_title">Automáticamente oculta los íconos de la barra de estado</string>
     <string name="status_glance_show_calendar_title">Eventos del calendario</string>
     <string name="status_glance_calendar_show_all_day_title">Mostrar eventos de todo el dia</string>
     <string name="status_glance_calendar_timeframe_title">Mostra eventos en</string>
@@ -1693,7 +1693,7 @@ Cuando llegue un mensaje o alerta de una aplicación seleccionada, la Pantalla s
     <string name="island_camera_position_left">Izquierda </string>
     <string name="island_camera_position_right">Derecha</string>
     <string name="island_camera_position_center">Centrar</string>
-    <string name="island_hide_in_owner_app_title">Ocultar la complicación dentro de la aplicación</string>
+    <string name="island_hide_in_owner_app_title">Ocultar la notificación dentro de la app activa</string>
     <string name="about_desc_conscious_gate">Agrega una breve pantalla de puerta de atención plena antes de abrir las aplicaciones que has elegido usar con más intencionalidad, como las redes sociales.
 
 El botón Continuar permanece deshabilitado durante unos segundos para que tengas un momento para decidir, y la pausa puede reaparecer opcionalmente si sigues usando la aplicación más allá de un tiempo determinado</string>
@@ -1721,7 +1721,7 @@ Requiere permiso de administrador del dispositivo si se utiliza el bloqueo.</str
     <string name="duo_action_horizontal_slide_sound_mode">Modo de sonido</string>
     <string name="island_show_network_title">Actividad de conexiones</string>
     <string name="island_devices_battery_section">Dispositivos</string>
-    <string name="island_brief_desc">Ten un breve de que esta pasando</string>
+    <string name="island_brief_desc">Ten un breve vistazo de lo importante</string>
     <string name="island_like_while_playing_title">Like a la cancion si se esta reproduciendo</string>
     <string name="duo_action_horizontal_slide_track">Cambiar cancion</string>
     <string name="duo_action_horizontal_slide_track_desc">Solo activar si los medios estan sonando</string>
@@ -1744,10 +1744,10 @@ Requiere permiso de administrador del dispositivo si se utiliza el bloqueo.</str
     <string name="watchface_glance_complications_desc">Seleccionar qué mostrar</string>
     <string name="watchface_show_glow_title">Mostrar brillo</string>
     <string name="watchface_show_glow_desc">Degradado dinámico en la parte superior para eventos y viajes</string>
-    <string name="setting_hidden_debugging_title">Ocultar soporte de deduperacion</string>
+    <string name="setting_hidden_debugging_title">Ocultar soporte de Depuración</string>
     <string name="island_section_visuals">Visuales</string>
     <string name="island_section_duration">Duracion</string>
-    <string name="island_section_behavior">Opacidad</string>
+    <string name="island_section_behavior">Comportamiento</string>
     <string name="island_section_placement">Posicion</string>
     <string name="island_brief_show_alarm_title">Mostrar las siguientes alarmas</string>
     <string name="island_brief_two_line_header_title">Encabezado de 2 líneas</string>
@@ -1767,7 +1767,7 @@ Requiere permiso de administrador del dispositivo si se utiliza el bloqueo.</str
     <string name="island_show_when_unlocked">Desbloquear</string>
     <string name="island_show_when_screen_on">Activar Pantalla</string>
     <string name="island_show_when_always">Siempre</string>
-    <string name="island_line_peek_desc">Vistas breve de la notificación en la Isla después regresa a forma compacta</string>
+    <string name="island_line_peek_desc">Vista breve de la notificación en la Isla después regresa a forma compacta</string>
     <string name="island_expanded_scale_title">Escala Expandida</string>
     <string name="island_font_scale_title">Tamaño de Fuente</string>
     <string name="island_expanded_roundness_title">Radio de las Esquinas Expandida</string>
@@ -1831,7 +1831,7 @@ Requiere permiso de administrador del dispositivo si se utiliza el bloqueo.</str
     <string name="island_secondary_bubble_title">Burbuja secundaria</string>
     <string name="island_balance_compact_title">Isla compacta visualmente equilibrada</string>
     <string name="keep_in_full_screen_title">Mantenlo en pantalla completa</string>
-    <string name="island_hide_icons_title">Ocultar dinámicamente (isla compacta) los iconos de la barra de estado</string>
+    <string name="island_hide_icons_title">Ocultar iconos seleccionador de la barra de estado con Isla Compacta  </string>
     <string name="feat_volume_steps_title">Escalones de volumen</string>
     <string name="feat_volume_steps_desc">Cambia el volumen del medio más rápido con cada pulsación de tecla</string>
     <string name="feat_app_volume_title">Volumen por app</string>
@@ -1870,4 +1870,6 @@ Requiere permiso de administrador del dispositivo si se utiliza el bloqueo.</str
     <string name="feat_face_unlock_brightness_title">Iluminación facial</string>
     <string name="feat_face_unlock_brightness_desc">Aumentar el brillo en condiciones de poca luz.</string>
     <string name="face_unlock_ambient_threshold_title">Umbral de luz ambiental</string>
+    <string name="icon_glove_mode">Modo Guantes</string>
+    <string name="icon_frame_rate">Frec. de Actualización / Vel. de Fotogramas</string>
 </resources>
