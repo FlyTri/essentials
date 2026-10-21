@@ -1645,7 +1645,7 @@ Réinitialiser permet d\'effacer les valeurs personnalisées et le système gér
     <string name="setting_swipe_tabs_title">Glisser entre les onglets</string>
     <string name="notification_lighting_sweep_select_shapes_title">Sélectionner les formes</string>
     <string name="feat_prefer_gpu_composing_title">Privilégier le GPU pour la composition d\'écran</string>
-    <string name="feat_prefer_gpu_composing_desc">Désactivez les superpositions matérielles pour forcer la composition d\'écran par le GPU. Réinitialisation au redémarrage de l\'appareil.</string>
+    <string name="feat_prefer_gpu_composing_desc">Désactivez les superpositions matérielles pour forcer la composition d\'écran par le GPU. Réinitialisation du paramètre au redémarrage de l\'appareil.</string>
     <string name="perm_calendar_title">Calendrier</string>
     <string name="perm_install_packages_title">Installation d\'applis inconnus</string>
     <string name="perm_install_packages_desc">Requis pour installer les MàJ.</string>
@@ -1660,11 +1660,11 @@ Réinitialiser permet d\'effacer les valeurs personnalisées et le système gér
     <string name="duo_battery_critical_color_title">Batterie très faible (&lt;10%)</string>
     <string name="duo_battery_power_save_color_title">Économiseur d\'énergie</string>
     <string name="feat_allow_overlays_in_settings_title">Autoriser les overlays dans les paramètres</string>
-    <string name="feat_allow_overlays_in_settings_desc">Permets aux applications d\'ajouter un/des overlays par dessus les paramètres système.</string>
+    <string name="feat_allow_overlays_in_settings_desc">Permets aux applications d\'ajouter un/des overlays par dessus les paramètres système</string>
     <string name="app_icon_default">Par défaut</string>
     <string name="haptic_mode_stronger">Très fort</string>
     <string name="conscious_gate_enable_title">Activer la barrière de conscience</string>
-    <string name="conscious_gate_select_apps_title">Sélectionnez les applications à accès restreint</string>
+    <string name="conscious_gate_select_apps_title">Sélectionnez les applications</string>
     <string name="conscious_gate_select_apps_desc">Choisissez quels applications vont devoir afficher un écran d\'une barrière de conscience avant leurs ouvertures.</string>
     <string name="conscious_gate_preview_button">Prévisualiser l\'écran de la barrière de conscience</string>
     <string name="conscious_gate_delay_title">Délai de pause</string>
@@ -1719,4 +1719,22 @@ Les effets de la LED HiLight peuvent être aussi utilisés comme une action dans
     <string name="hilight_progress_mode_sequential">Séquentiel</string>
     <string name="about_desc_hilight_progress">Affiche la progression des téléchargements et les mises à jour en direct sur les LED Hilight, allumant une LED supplémentaire à chaque huitième de progression et faisant clignoter les huit LED une fois le téléchargement terminé. Nécessite Shizuku.</string>
     <string name="keep_in_full_screen_title">Garder en plein écran</string>
+    <string name="feat_face_unlock_brightness_title">Illumination de la tête</string>
+    <string name="feat_face_unlock_brightness_desc">Augmenter la luminosité quand la luminosité est faible</string>
+    <string name="feat_screenshot_share_cleanup_title">Supprimer les captures d\'écran partagées</string>
+    <string name="feat_screenshot_share_cleanup_desc">Supprimer les captures d\'écran quand elles ont étés partagées</string>
+    <string name="screenshot_auto_clean_title">Supprimer automatiquement les captures d\'écran</string>
+    <string name="screenshot_auto_clean_note">Chaque nouvelle capture d\'écran ont une notification pour choisir de les conserver ou non. Les captures d\'écran mis en favori sont toujours à garder.</string>
+    <string name="screenshots_cleaned_count_title">Captures d\'écran supprimées</string>
+    <string name="screenshots_storage_saved_title">Stockage économisé</string>
+    <string name="feat_aod_wallpaper_desc">En utilisant un overlay</string>
+    <string name="feat_activity_launcher_title">Lanceur d\'activité</string>
+    <string name="feat_activity_launcher_desc">Ouvre/Épingle chaque activité d\'une application</string>
+    <string name="feat_lockscreen_shortcuts_title">Racc. de l\'écran de verrouillage</string>
+    <string name="island_border_outline_title">Contour de la bordure</string>
+    <string name="island_border_outline_desc">Affiche un contour fin autour de l\'Island</string>
+    <string name="island_border_outline_dynamic_title">Couleurs dynamique</string>
+    <string name="island_border_outline_hide_expanded_title">Cacher quand étendu</string>
+    <string name="island_border_outline_thickness_title">Épaisseur du contour</string>
+    <string name="island_preview_ring_title">Montrer l\'aide pour l\'alignement</string>
 </resources>
