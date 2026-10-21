@@ -18,6 +18,7 @@ import kotlin.math.sqrt
 
 class ShakeDetector(
     context: Context,
+    private val onJerk: (count: Int) -> Unit = {},
     private val onShake: () -> Unit,
 ) : SensorEventListener {
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -61,6 +62,8 @@ class ShakeDetector(
             jerkCount = 0
             lastShakeMs = nowMs
             onShake()
+        } else {
+            onJerk(jerkCount)
         }
     }
 
@@ -70,8 +73,8 @@ class ShakeDetector(
     ) = Unit
 
     private companion object {
-        const val SHAKE_THRESHOLD_G = 2.7f
-        const val MIN_JERK_GAP_MS = 120L
+        const val SHAKE_THRESHOLD_G = 1.9f
+        const val MIN_JERK_GAP_MS = 100L
         const val WINDOW_MS = 1000L
         const val REQUIRED_JERKS = 3
         const val COOLDOWN_MS = 1500L

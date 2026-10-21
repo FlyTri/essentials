@@ -37,9 +37,18 @@ fun ShakeForHelp(
     val currentView by rememberUpdatedState(view)
     val detector =
         remember(context) {
-            ShakeDetector(context) {
-                HapticUtil.performConfirmHaptic(currentView)
-                showHelp = true
+            ShakeDetector(
+                context = context,
+                onJerk = { count ->
+                    if (count == 2 && !HelpSheetTracker.isAnyOpen) {
+                        HapticUtil.performMicroHaptic(currentView)
+                    }
+                },
+            ) {
+                if (!HelpSheetTracker.isAnyOpen) {
+                    HapticUtil.performStrongDoubleHaptic(context)
+                    showHelp = true
+                }
             }
         }
 
@@ -49,7 +58,10 @@ fun ShakeForHelp(
     }
 
     if (showHelp) {
-        if (feature != null) {
+        val customHelp = feature?.let { FeatureCustomHelp.forFeature(it.id) }
+        if (customHelp != null) {
+            customHelp.sheet { showHelp = false }
+        } else if (feature != null) {
             FeatureHelpBottomSheet(
                 onDismissRequest = { showHelp = false },
                 feature = feature,
