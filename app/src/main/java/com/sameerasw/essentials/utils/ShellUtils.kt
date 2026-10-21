@@ -115,6 +115,19 @@ object ShellUtils {
         }
     }
 
+    private const val MAX_OUTPUT_CHARS = 2_000_000
+
+    private fun java.io.Reader.readCapped(limit: Int): String {
+        val sb = StringBuilder()
+        val buf = CharArray(8192)
+        while (sb.length < limit) {
+            val n = read(buf, 0, minOf(buf.size, limit - sb.length))
+            if (n < 0) break
+            sb.append(buf, 0, n)
+        }
+        return sb.toString()
+    }
+
     fun runCommandWithOutput(
         context: Context,
         command: String,
@@ -123,11 +136,13 @@ object ShellUtils {
     ): String? =
         try {
             val process = newProcess(context, arrayOf("sh", "-c", command), featureName, notifyOnError)
-            process
-                ?.inputStream
-                ?.bufferedReader()
-                ?.use { it.readText() }
-                ?.trim()
+            process?.let {
+                try {
+                    it.inputStream.bufferedReader().use { reader -> reader.readCapped(MAX_OUTPUT_CHARS) }.trim()
+                } finally {
+                    it.destroy()
+                }
+            }
         } catch (e: Exception) {
             null
         }
