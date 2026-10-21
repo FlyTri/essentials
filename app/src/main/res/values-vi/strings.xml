@@ -2007,4 +2007,6 @@ Các tiện ích trong chồng (stack) sẽ tự động chuyển đổi theo b�
     <string name="screenshot_auto_clean_note">Mỗi ảnh chụp màn hình mới đều đi kèm một thông báo kín đáo để bạn chọn giữ lại. Những ảnh chụp màn hình được gắn dấu sao sẽ luôn được lưu giữ.</string>
     <string name="screenshots_cleaned_count_title">Ảnh chụp màn hình đã được làm sạch</string>
     <string name="screenshots_storage_saved_title">Đã lưu vào bộ nhớ</string>
+    <string name="about_desc_duo">This doesn\'t fold\n\nAn iPhone Duo style status indicator to show your battery, network, media status and more in a compact, minimal UI ideally around your camera with various items to show and gestures to interact with.\n\nFor foldable devices, Ensure to turn off \'Auto-detect camera\' option if it\'s not reliable and manually align Duo with your inside and outside camera positions and then Essentials will remember your layout.</string>
+    <string name="label_shake_for_help">Shake for help</string>
 </resources>

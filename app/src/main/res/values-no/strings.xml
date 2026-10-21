@@ -1575,4 +1575,6 @@
     <string name="duo_action_horizontal_slide_title">Skyv horisontalt</string>
     <string name="feat_activity_launcher_title">Aktivitetsstarter</string>
     <string name="feat_activity_launcher_desc">Åpne eller fest skjermen til hvilket som helst app</string>
+    <string name="about_desc_duo">This doesn\'t fold\n\nAn iPhone Duo style status indicator to show your battery, network, media status and more in a compact, minimal UI ideally around your camera with various items to show and gestures to interact with.\n\nFor foldable devices, Ensure to turn off \'Auto-detect camera\' option if it\'s not reliable and manually align Duo with your inside and outside camera positions and then Essentials will remember your layout.</string>
+    <string name="label_shake_for_help">Shake for help</string>
 </resources>

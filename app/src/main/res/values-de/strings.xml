@@ -1989,4 +1989,6 @@ Wenn die Tastenbelegung eine Aktion für langes Drücken einer Lautstärketaste 
     <string name="about_desc_app_volume">Verringert die Audioausgabe einer App, ohne die Medienlautstärke für alle anderen Apps zu ändern. Wählen Sie für jede App eine Stufe aus. Diese wird jedes Mal angewendet, wenn die App Ton abspielt, auch im Hintergrund.
 
 Die Stufen können nur von der normalen Lautstärke abwärts, niemals darüber hinausgehen. Einige Spiele und Audio-Apps mit niedriger Latenz ignorieren die Stufe möglicherweise. Shizuku muss ausgeführt werden, damit neue Stufen angewendet werden. Starten Sie es daher nach einem Neustart erneut</string>
+    <string name="about_desc_duo">This doesn\'t fold\n\nAn iPhone Duo style status indicator to show your battery, network, media status and more in a compact, minimal UI ideally around your camera with various items to show and gestures to interact with.\n\nFor foldable devices, Ensure to turn off \'Auto-detect camera\' option if it\'s not reliable and manually align Duo with your inside and outside camera positions and then Essentials will remember your layout.</string>
+    <string name="label_shake_for_help">Shake for help</string>
 </resources>

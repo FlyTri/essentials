@@ -777,7 +777,7 @@ object FeatureRegistry {
                 iconRes = R.drawable.rounded_motion_play_24,
                 category = R.string.cat_interface,
                 description = R.string.duo_desc,
-                aboutDescription = R.string.duo_desc,
+                aboutDescription = R.string.about_desc_duo,
                 permissionKeys = listOf("ACCESSIBILITY"),
                 hasMoreSettings = true,
                 showToggle = true,

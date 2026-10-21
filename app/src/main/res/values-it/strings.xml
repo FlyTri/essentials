@@ -1600,4 +1600,6 @@
     <string name="feat_back_gesture_desc">Spessore del gesto indietro dei bordi e impostazione per singola app</string>
     <string name="back_gesture_add_app">Aggiungi app</string>
     <string name="back_gesture_add_app_desc">Usa una larghezza diversa mentre una app è aperta</string>
+    <string name="about_desc_duo">This doesn\'t fold\n\nAn iPhone Duo style status indicator to show your battery, network, media status and more in a compact, minimal UI ideally around your camera with various items to show and gestures to interact with.\n\nFor foldable devices, Ensure to turn off \'Auto-detect camera\' option if it\'s not reliable and manually align Duo with your inside and outside camera positions and then Essentials will remember your layout.</string>
+    <string name="label_shake_for_help">Shake for help</string>
 </resources>

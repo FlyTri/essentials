@@ -2102,4 +2102,6 @@
     <string name="watch_notif_synced_icons_count">已同步 %1$d 个应用图标到手表</string>
     <string name="watch_call_sync_title">同步通话</string>
     <string name="watch_call_sync_desc">从手表同步和控制通话</string>
+    <string name="about_desc_duo">This doesn\'t fold\n\nAn iPhone Duo style status indicator to show your battery, network, media status and more in a compact, minimal UI ideally around your camera with various items to show and gestures to interact with.\n\nFor foldable devices, Ensure to turn off \'Auto-detect camera\' option if it\'s not reliable and manually align Duo with your inside and outside camera positions and then Essentials will remember your layout.</string>
+    <string name="label_shake_for_help">Shake for help</string>
 </resources>

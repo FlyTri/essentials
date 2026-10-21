@@ -1711,4 +1711,6 @@ Cuando llegue un mensaje o alerta de una aplicación seleccionada, la Pantalla s
     <string name="translation_warning_point3_title">Solicitud de incorporación de cambios de GitHub</string>
     <string name="translation_warning_point3_desc">Los envíos crean o actualizan automáticamente una solicitud de incorporación de cambios dedicada en GitHub bajo tu cuenta.</string>
     <string name="translation_warning_do_not_show">No volver a mostrar</string>
+    <string name="about_desc_duo">This doesn\'t fold\n\nAn iPhone Duo style status indicator to show your battery, network, media status and more in a compact, minimal UI ideally around your camera with various items to show and gestures to interact with.\n\nFor foldable devices, Ensure to turn off \'Auto-detect camera\' option if it\'s not reliable and manually align Duo with your inside and outside camera positions and then Essentials will remember your layout.</string>
+    <string name="label_shake_for_help">Shake for help</string>
 </resources>
