@@ -52,20 +52,25 @@ class CalendarPlugin : BaseIslandPlugin() {
         }
         c.scope.launch {
             val next = withContext(Dispatchers.IO) {
-                val ids = settings.getStatusGlanceCalendarSelectedCalendars().mapNotNull { it.toLongOrNull() }.toSet()
+                val ids = c.settings.getStatusGlanceCalendarSelectedCalendars().mapNotNull { it.toLongOrNull() }.toSet()
                 CalendarEventUtil.queryNextUpcomingEvent(
-                    context,
-                    settings.getStatusGlanceCalendarTimeframe(),
+                    c.service,
+                    c.settings.getStatusGlanceCalendarTimeframe(),
                     ids,
-                    settings.isStatusGlanceCalendarShowAllDayEnabled(),
+                    c.settings.isStatusGlanceCalendarShowAllDayEnabled(),
                 )
             }
+            if (ctx == null) return@launch
             event = next
             render()
         }
     }
 
     private fun render() {
+        if (ctx == null) {
+            publish(null)
+            return
+        }
         val e = event
         val hiddenWhileLocked = settings.getBoolean(SettingsRepository.KEY_ISLAND_CALENDAR_HIDE_LOCKED, false) &&
             (context.getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager)?.isKeyguardLocked == true
