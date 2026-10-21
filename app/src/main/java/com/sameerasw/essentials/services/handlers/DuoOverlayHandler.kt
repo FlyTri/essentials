@@ -828,7 +828,7 @@ class DuoOverlayHandler(
             lastKnownDisplayProfile = settingsRepository.getDisplayProfileId()
             settingsRepository.markDisplayProfileSeen()
 
-            if (settingsRepository.isDuoAutoDetectEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if (settingsRepository.isDuoAutoDetectEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 @Suppress("DEPRECATION")
                 val cutout = wm.defaultDisplay.cutout
                 if (cutout != null && cutout.boundingRects.isNotEmpty()) {

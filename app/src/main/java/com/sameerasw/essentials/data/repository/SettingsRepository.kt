@@ -445,6 +445,7 @@ class SettingsRepository(
         const val KEY_MOTION_BLUR = "motion_blur"
         const val KEY_MOTION_BLUR_SCALE = "motion_blur_scale"
         const val KEY_ONLINE_HELP_MEDIA = "online_help_media"
+        const val KEY_SHAKE_FOR_HELP = "shake_for_help"
         const val KEY_SWIPE_TABS = "swipe_tabs"
         const val KEY_SENTRY_REPORT_MODE = "sentry_report_mode"
         const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"
@@ -2216,6 +2217,10 @@ class SettingsRepository(
     fun isOnlineHelpMediaEnabled(): Boolean = getBoolean(KEY_ONLINE_HELP_MEDIA, true)
 
     fun setOnlineHelpMediaEnabled(enabled: Boolean) = putBoolean(KEY_ONLINE_HELP_MEDIA, enabled)
+
+    fun isShakeForHelpEnabled(): Boolean = getBoolean(KEY_SHAKE_FOR_HELP, true)
+
+    fun setShakeForHelpEnabled(enabled: Boolean) = putBoolean(KEY_SHAKE_FOR_HELP, enabled)
 
     /**
      * Executes the set shut up attempt shizuku restart enabled operation.

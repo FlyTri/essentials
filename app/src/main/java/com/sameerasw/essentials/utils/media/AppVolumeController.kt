@@ -151,7 +151,11 @@ object AppVolumeController {
     private fun packageOf(config: AudioPlaybackConfiguration): String? {
         val uid = invoke(config, "getClientUid") as? Int ?: return null
         if (uid < Process.FIRST_APPLICATION_UID) return null
-        val packages = appContext?.packageManager?.getPackagesForUid(uid) ?: return null
+        val packages = try {
+            appContext?.packageManager?.getPackagesForUid(uid)
+        } catch (e: SecurityException) {
+            null
+        } ?: return null
         return packages.firstOrNull { it in levels } ?: packages.firstOrNull()
     }
 

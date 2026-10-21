@@ -116,9 +116,9 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 69
-        versionName = "20.1-beta.1"
+        versionName = "20.1-beta.2"
 
-        val whatsNewCounter = 7
+        val whatsNewCounter = 8
         buildConfigField("int", "WHATS_NEW_COUNTER", whatsNewCounter.toString())
         buildConfigField("int", "REQUIRED_WEAR_VERSION_CODE", "7")
 

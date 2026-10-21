@@ -87,6 +87,7 @@ import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.FeatureHelpBottomSheet
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.ShakeForHelp
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
 import com.sameerasw.essentials.ui.modifiers.scrollMotionBlur
@@ -273,6 +274,8 @@ class PixelSearchbarSettingsActivity : ComponentActivity() {
                                 viewModel = viewModel,
                             )
                         }
+
+                        ShakeForHelp(feature = pixelSearchbarFeature, viewModel = viewModel)
                     }
                 }
             }
@@ -746,10 +749,7 @@ fun PixelSearchbarSettingsUI(
                             if (tapActionEnabled) {
                                 HapticUtil.performVirtualKeyHaptic(view)
                                 val intent =
-                                    Intent(
-                                        context,
-                                        com.sameerasw.essentials.MainActivity::class.java,
-                                    ).apply {
+                                    com.sameerasw.essentials.utils.AppIconUtil.mainIntent(context).apply {
                                         putExtra(
                                             "target_tab",
                                             com.sameerasw.essentials.domain.DIYTabs.DIY.name,

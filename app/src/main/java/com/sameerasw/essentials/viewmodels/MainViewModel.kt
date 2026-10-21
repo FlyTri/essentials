@@ -591,6 +591,7 @@ class MainViewModel : ViewModel() {
     val isMotionBlurSettingEnabled = mutableStateOf(false)
     val motionBlurScale = mutableFloatStateOf(1.0f)
     val isOnlineHelpMediaEnabled = mutableStateOf(true)
+    val isShakeForHelpEnabled = mutableStateOf(true)
     val isSwipeTabsEnabled = mutableStateOf(true)
     val sentryReportMode = mutableStateOf("auto")
     val isPowerSaveModeEnabled = mutableStateOf(false)
@@ -1515,6 +1516,10 @@ class MainViewModel : ViewModel() {
                         isOnlineHelpMediaEnabled.value = settingsRepository.isOnlineHelpMediaEnabled()
                     }
 
+                    SettingsRepository.KEY_SHAKE_FOR_HELP -> {
+                        isShakeForHelpEnabled.value = settingsRepository.isShakeForHelpEnabled()
+                    }
+
                     SettingsRepository.KEY_PRIVATE_DNS_PRESETS -> {
                         dnsPresets.clear()
                         dnsPresets.addAll(settingsRepository.getPrivateDnsPresets())
@@ -2353,6 +2358,7 @@ class MainViewModel : ViewModel() {
             settingsRepository.getBoolean(SettingsRepository.KEY_SWIPE_TABS, true)
         isOnlineHelpMediaEnabled.value =
             settingsRepository.isOnlineHelpMediaEnabled()
+        isShakeForHelpEnabled.value = settingsRepository.isShakeForHelpEnabled()
         sentryReportMode.value =
             settingsRepository.getString(SettingsRepository.KEY_SENTRY_REPORT_MODE, "auto")
                 ?: "auto"
@@ -3573,6 +3579,14 @@ class MainViewModel : ViewModel() {
         isOnlineHelpMediaEnabled.value = enabled
     }
 
+    fun setShakeForHelpEnabled(
+        enabled: Boolean,
+        context: Context? = null,
+    ) {
+        settingsRepository.setShakeForHelpEnabled(enabled)
+        isShakeForHelpEnabled.value = enabled
+    }
+
     /**
      * Executes the set swipe tabs enabled operation.
      *
@@ -3725,7 +3739,7 @@ class MainViewModel : ViewModel() {
      * @param activity [Activity] Target activity.
      */
     fun requestReadPhoneStatePermission(activity: Activity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
+        com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
             activity,
             arrayOf(Manifest.permission.READ_PHONE_STATE),
             1005,
@@ -6638,7 +6652,7 @@ class MainViewModel : ViewModel() {
         var detectedXPercent = 60f
         var detectedYPercent = 2f
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             @Suppress("DEPRECATION")
             val cutout = wm.defaultDisplay?.cutout
             if (cutout != null && cutout.boundingRects.isNotEmpty()) {
@@ -8270,7 +8284,7 @@ class MainViewModel : ViewModel() {
      * @param activity [androidx.activity.ComponentActivity] Target activity.
      */
     fun requestReadPhoneStatePermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
+        com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
             activity,
             arrayOf(Manifest.permission.READ_PHONE_STATE),
             1001,
@@ -8283,7 +8297,7 @@ class MainViewModel : ViewModel() {
      * @param activity [androidx.activity.ComponentActivity] Target activity.
      */
     fun requestLocationPermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
+        com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
             activity,
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -8300,7 +8314,7 @@ class MainViewModel : ViewModel() {
      */
     fun requestBackgroundLocationPermission(activity: androidx.activity.ComponentActivity) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            androidx.core.app.ActivityCompat.requestPermissions(
+            com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
                 activity,
                 arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
                 1004,
@@ -8314,7 +8328,7 @@ class MainViewModel : ViewModel() {
      * @param activity [androidx.activity.ComponentActivity] Target activity.
      */
     fun requestBluetoothPermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
+        com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
             activity,
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
@@ -8331,7 +8345,7 @@ class MainViewModel : ViewModel() {
      * @param activity [androidx.activity.ComponentActivity] Target activity.
      */
     fun requestCalendarPermission(activity: androidx.activity.ComponentActivity) {
-        androidx.core.app.ActivityCompat.requestPermissions(
+        com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
             activity,
             arrayOf(
                 Manifest.permission.READ_CALENDAR,
@@ -8348,7 +8362,7 @@ class MainViewModel : ViewModel() {
      */
     fun requestNotificationPermission(activity: androidx.activity.ComponentActivity) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            androidx.core.app.ActivityCompat.requestPermissions(
+            com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
                 activity,
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                 1002,

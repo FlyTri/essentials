@@ -104,7 +104,7 @@ fun StatusBarIconSettingsUI(
                         dependentFeatures = listOf(R.string.smart_data_title),
                         actionLabel = R.string.permission_grant_action,
                         action = {
-                            ActivityCompat.requestPermissions(
+                            com.sameerasw.essentials.utils.PermissionUtils.requestPermissionsSafely(
                                 context as ComponentActivity,
                                 arrayOf(Manifest.permission.READ_PHONE_STATE),
                                 1001,

@@ -94,6 +94,7 @@ import com.sameerasw.essentials.ui.core.sheets.AddRepoBottomSheet
 import com.sameerasw.essentials.ui.core.sheets.GitHubAuthSheet
 import com.sameerasw.essentials.ui.core.sheets.InstructionsBottomSheet
 import com.sameerasw.essentials.ui.core.sheets.PrankBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.ShakeForHelp
 import com.sameerasw.essentials.ui.core.sheets.UpdateBottomSheet
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
@@ -402,6 +403,8 @@ class MainActivity : AppCompatActivity() {
                             onDismissRequest = { showInstructionsSheet = false },
                         )
                     }
+
+                    ShakeForHelp(viewModel = viewModel)
 
                     if (showGitHubAuthSheet) {
                         GitHubAuthSheet(

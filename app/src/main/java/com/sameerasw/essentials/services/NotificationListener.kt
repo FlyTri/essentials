@@ -1931,24 +1931,28 @@ class NotificationListener : NotificationListenerService() {
     private val progressExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private val progressRefreshRunnable =
         Runnable {
-            progressExecutor.execute {
-                val navigation =
-                    try {
-                        extractLatestNavigationNotification()
-                    } catch (e: Exception) {
-                        Log.e("NotificationListener", "Failed to extract navigation notification", e)
-                        null
-                    }
-                progressHandler.post { notifyNavigationListeners(navigation) }
-                val data =
-                    try {
-                        extractLatestProgressNotification()
-                    } catch (e: Exception) {
-                        Log.e("NotificationListener", "Failed to extract progress notification", e)
-                        return@execute
-                    }
-                HilightProgressTracker.onProgress(applicationContext, data)
-                progressHandler.post { notifyProgressListeners(data) }
+            if (progressExecutor.isShutdown) return@Runnable
+            try {
+                progressExecutor.execute {
+                    val navigation =
+                        try {
+                            extractLatestNavigationNotification()
+                        } catch (e: Exception) {
+                            Log.e("NotificationListener", "Failed to extract navigation notification", e)
+                            null
+                        }
+                    progressHandler.post { notifyNavigationListeners(navigation) }
+                    val data =
+                        try {
+                            extractLatestProgressNotification()
+                        } catch (e: Exception) {
+                            Log.e("NotificationListener", "Failed to extract progress notification", e)
+                            return@execute
+                        }
+                    HilightProgressTracker.onProgress(applicationContext, data)
+                    progressHandler.post { notifyProgressListeners(data) }
+                }
+            } catch (_: java.util.concurrent.RejectedExecutionException) {
             }
         }
 

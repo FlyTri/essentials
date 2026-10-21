@@ -15,6 +15,10 @@ import android.content.pm.PackageManager
 import com.sameerasw.essentials.domain.model.AppIcon
 
 object AppIconUtil {
+    fun mainIntent(context: Context): android.content.Intent =
+        context.packageManager.getLaunchIntentForPackage(context.packageName)
+            ?: android.content.Intent(context, com.sameerasw.essentials.MainActivity::class.java)
+
     fun setAppIcon(context: Context, targetIcon: AppIcon) {
         val packageManager = context.packageManager
 
