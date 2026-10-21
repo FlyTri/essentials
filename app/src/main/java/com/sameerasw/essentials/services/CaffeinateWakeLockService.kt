@@ -109,6 +109,7 @@ class CaffeinateWakeLockService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
+        runCatching { startForeground(2, createNotification()) }
         when (intent?.action) {
             "STOP" -> {
                 stopForeground(STOP_FOREGROUND_REMOVE)
