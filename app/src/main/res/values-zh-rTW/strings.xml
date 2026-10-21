@@ -778,7 +778,7 @@
     <string name="about_desc_essentials_on_display">簡約一覽會在您播放音樂時，以及播放狀態發生變化時，於鎖定畫面顯示「正在播放」的視窗。\n\n若您的裝置不支援在 AOD 上疊加覆蓋視窗，您可以在充電時，改為使用 Android 設定中新增的「氛圍」螢幕保護程式作為替代方案。</string>
     <string name="about_desc_notification_lighting">「通知燈效」功能會在您收到通知時，增添精美的邊框燈光效果。\n\n您可以自訂動畫風格、顏色及行為模式。即使螢幕關閉（視原廠而定）或疊加在當前應用程式上方時，此功能仍可運作。請透過提供的控制項，選擇應用程式、通知優先級，或設定應觸發此效果的條件。若您的原廠不支援在 AOD 上方疊加顯示，請使用下方提供的「環境顯示」選項。</string>
     <string name="about_desc_screen_off_widget">通過點擊一個透明的、可調整大小的小組件輕鬆關閉螢幕，該小組件不會在主畫面上新增圖示或任何雜亂。</string>
-    <string name="about_desc_statusbar_icons">完全控制您的狀態欄圖示。\n\n隱藏特定圖示如WiFi、藍牙或蜂窩資料，保持狀態欄整潔。您還可以使用一些智慧控制自訂時鐘格式和電池指示器。這些是可用的AOSP控件列表，因此您的設備作業系統可能不會尊重所有控件。</string>
+    <string name="about_desc_statusbar_icons">Take full control over your status bar.\n\nHide individual icons like WiFi, Bluetooth, or cellular data, hide all system or notification icons at once, or only hide system icons while the device is locked. Smart visibility can hide mobile data automatically when WiFi is connected or in certain modes.\n\nYou can also show seconds in the clock, change its position or hide it, show the battery percentage, hide the camera and microphone chips, or hide the entire status bar. Some advanced flags need Shizuku or Root.\n\nThese are AOSP controls, so your device OS might not respect all of them.</string>
     <string name="about_desc_caffeinate">保持喚醒可防止螢幕自動關閉。\n\n在特定時長或無限期內保持螢幕喚醒。適用於閱讀長文章或參考食譜時。</string>
     <string name="about_desc_maps_power_saving">在任何Android設備上取得Pixel 10系列獨有的Google Maps省電模式，在鎖定畫面上顯示極簡純黑背景。開始導航會話，關閉螢幕再重新開啟即可。</string>
     <string name="about_desc_flashlight_pulse">收到通知時讓閃光燈呼吸閃爍。\n\n如果裝置硬體支援手電筒亮度調節，閃爍效果將呈現平滑的漸層動畫。</string>

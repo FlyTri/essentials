@@ -863,7 +863,7 @@
     <string name="about_desc_essentials_on_display">Essentials 息屏显示会在播放音乐且播放内容变化时，在锁屏上显示 Now Playing 浮层。\n\n如果你的设备不支持在 AOD 上叠加浮层，你可以选择在 Android 设置中添加的 Ambience 屏保作为充电时的替代方案。</string>
     <string name="about_desc_notification_lighting">通知灯光会在你收到通知时添加美丽的边缘灯光效果。\n\n你可以自定义动画样式、颜色和行为。即使熄屏（取决于 OEM）或显示在当前应用之上也能工作。从给定的控件中选择应用、通知优先级或触发行为。如果你的 OEM 不支持在 AOD 之上叠加浮层，请使用下方找到的 Ambient display 选项。</string>
     <string name="about_desc_screen_off_widget">轻点透明的可调整大小的小部件即可轻松关闭屏幕，不会在主屏幕上添加图标或任何杂乱内容。</string>
-    <string name="about_desc_statusbar_icons">完全控制你的状态栏图标。\n\n隐藏 WiFi、蓝牙或蜂窝数据等特定图标，让状态栏保持整洁。你还可以通过一些智能控制自定义时钟格式和电池指示器。这些是可用的 AOSP 控制列表，因此你的设备系统可能不会遵循所有控制。</string>
+    <string name="about_desc_statusbar_icons">Take full control over your status bar.\n\nHide individual icons like WiFi, Bluetooth, or cellular data, hide all system or notification icons at once, or only hide system icons while the device is locked. Smart visibility can hide mobile data automatically when WiFi is connected or in certain modes.\n\nYou can also show seconds in the clock, change its position or hide it, show the battery percentage, hide the camera and microphone chips, or hide the entire status bar. Some advanced flags need Shizuku or Root.\n\nThese are AOSP controls, so your device OS might not respect all of them.</string>
     <string name="about_desc_caffeinate">Caffeinate 可防止屏幕自动关闭。\n\n在特定时间内或无限期保持屏幕唤醒。在阅读长文章或参考食谱时非常有用。</string>
     <string name="about_desc_maps_power_saving">在受支持的 Android 设备上，使用极简纯黑背景的 Google 地图省电模式覆盖在锁屏上显示。开始导航会话，关闭屏幕再重新打开。</string>
     <string name="about_desc_flashlight_pulse">收到通知时脉冲闪光灯。\n\n对于硬件支持闪光灯调光的设备，脉冲将平滑动画。</string>
