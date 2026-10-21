@@ -2563,7 +2563,7 @@
     <string name="feat_standby_apps_desc">Optimize app background activities</string>
     <string name="about_desc_networks">Configure network download speed limits, keep mobile data continuously active even when connected to Wi-Fi, and enable wireless display certification settings.</string>
     <string name="about_desc_standby_apps">Manage Android App Standby Buckets to control background app execution, network usage, and battery consumption.\n\n• Active - App in use or used very recently.\n• Working set - Used regularly or daily; jobs and alarms mildly deferred.\n• Frequent - Used weekly; background work deferred more.\n• Rare - Seldom used; jobs, alarms and background internet heavily limited.\n• Restricted - Lowest priority (Android 12+); about once-daily batched jobs and one alarm per day. Best battery saving, breaks timely notifications.</string>
-    <string name="about_desc_other_customizations">Advanced display and system UI customizations including gesture bar visibility, circle to search height, rotation suggestions, setting overlays, transparent navigation bar, and GPU screen compositing.</string>
+    <string name="about_desc_other_customizations">Extra display and system UI tweaks in one place.\n\nHide the gesture bar (optionally keeping it on the launcher), change the Circle to Search gesture, make the navigation bar transparent, disable the rotation suggestion button, allow overlays over system Settings, and prefer GPU for screen composing, which resets on reboot.\n\nSome options need Shizuku or accessibility permission, and results may vary by device and OS version.</string>
     <string name="standby_bucket_active">Active</string>
     <string name="standby_bucket_working_set">Working set</string>
     <string name="standby_bucket_frequent">Frequent</string>
@@ -2673,6 +2673,7 @@
     <!-- Pocket Mode -->
     <string name="feat_pocket_mode_title">Pocket mode</string>
     <string name="feat_pocket_mode_desc">Prevent accidental touches while in pocket</string>
+    <string name="about_desc_pocket_mode">Prevents accidental touches while your phone is in your pocket or bag.\n\nWhen the proximity sensor is covered, Pocket mode shows a blocking screen so stray touches do nothing. Press any volume key to dismiss it. You can also use the light sensor along with proximity for better accuracy, add a trigger delay, and choose to only trigger while the device is locked.\n\nExclude apps where it should not trigger. It does not work while streaming or gaming by default.\n\nAccessibility permission is required. On some devices with missing sensors, enabling it may break deep sleep and cause higher battery drain.</string>
     <string name="pocket_mode_use_light_title">Use light sensor</string>
     <string name="pocket_mode_use_light_desc">Use ambient light level in addition to proximity for better accuracy</string>
     <string name="pocket_mode_active">Pocket mode active</string>

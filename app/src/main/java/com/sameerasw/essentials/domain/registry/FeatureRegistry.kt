@@ -2266,9 +2266,10 @@ object FeatureRegistry {
                 category = R.string.cat_display,
                 description = R.string.feat_pocket_mode_desc,
                 permissionKeys = listOf("ACCESSIBILITY"),
-                aboutDescription = R.string.feat_pocket_mode_desc,
+                aboutDescription = R.string.about_desc_pocket_mode,
                 parentFeatureId = "Display",
                 hasMoreSettings = true,
+                contributors = listOf("Mudit200408"),
             ) {
                 override fun isEnabled(viewModel: MainViewModel) = viewModel.isPocketModeEnabled.value
 
