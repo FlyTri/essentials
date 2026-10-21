@@ -2956,7 +2956,7 @@ object FeatureRegistry {
                 iconRes = R.drawable.rounded_face_24,
                 category = R.string.cat_tools,
                 description = R.string.feat_face_unlock_brightness_desc,
-                aboutDescription = R.string.feat_face_unlock_brightness_desc,
+                aboutDescription = R.string.about_desc_face_illumination,
                 permissionKeys = listOf("ACCESSIBILITY"),
                 searchableSettings =
                     listOf(
@@ -3058,6 +3058,7 @@ object FeatureRegistry {
                 category = R.string.cat_tools,
                 description = R.string.tile_lockdown_mode_desc,
                 aboutDescription = R.string.tile_lockdown_mode_about_desc,
+                contributors = listOf("thekrdev"),
                 permissionKeys = listOf("DEVICE_ADMIN"),
                 showToggle = true,
                 isVisibleInMain = true,
