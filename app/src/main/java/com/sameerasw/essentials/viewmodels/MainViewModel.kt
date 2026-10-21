@@ -6652,7 +6652,7 @@ class MainViewModel : ViewModel() {
         var detectedXPercent = 60f
         var detectedYPercent = 2f
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             @Suppress("DEPRECATION")
             val cutout = wm.defaultDisplay?.cutout
             if (cutout != null && cutout.boundingRects.isNotEmpty()) {
