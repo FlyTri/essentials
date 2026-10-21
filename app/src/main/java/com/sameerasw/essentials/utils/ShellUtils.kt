@@ -72,11 +72,26 @@ object ShellUtils {
             ShizukuUtils.hasPermission()
         }
 
+    private val commandExecutor = java.util.concurrent.Executors.newSingleThreadExecutor { r -> Thread(r, "shell-commands") }
+
     fun runCommand(
         context: Context,
         command: String,
         featureName: String? = null,
         notifyOnError: Boolean = true,
+    ) {
+        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+            commandExecutor.execute { runCommandBlocking(context, command, featureName, notifyOnError) }
+        } else {
+            runCommandBlocking(context, command, featureName, notifyOnError)
+        }
+    }
+
+    private fun runCommandBlocking(
+        context: Context,
+        command: String,
+        featureName: String?,
+        notifyOnError: Boolean,
     ) {
         if (isRootEnabled(context)) {
             RootUtils.runCommand(command)
