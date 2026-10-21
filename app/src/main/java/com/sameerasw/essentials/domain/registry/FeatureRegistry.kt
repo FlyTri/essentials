@@ -1474,7 +1474,7 @@ object FeatureRegistry {
                 iconRes = R.drawable.rounded_flashlight_on_24,
                 category = R.string.cat_interaction,
                 description = R.string.feat_flashlight_desc,
-                aboutDescription = R.string.about_desc_flashlight_tile,
+                aboutDescription = R.string.about_desc_flashlight,
                 parentFeatureId = "Input",
                 showToggle = false,
                 hasMoreSettings = true,
@@ -1769,7 +1769,6 @@ object FeatureRegistry {
             },
             object : Feature(
                 id = "Button remap",
-                contributors = listOf("jawzf"),
                 title = R.string.feat_button_remap_title,
                 iconRes = R.drawable.rounded_switch_access_3_24,
                 category = R.string.cat_interaction,

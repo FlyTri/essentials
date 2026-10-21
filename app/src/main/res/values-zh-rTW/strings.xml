@@ -450,7 +450,7 @@
     <string name="feat_link_actions_title">連結操作</string>
     <string name="feat_link_actions_desc">使用多個應用程式處理連結</string>
     <string name="feat_flashlight_title">Flashlight</string>
-    <string name="feat_flashlight_desc">Improve flashlight behavior</string>
+    <string name="feat_flashlight_desc">Brightness, fading and safety controls</string>
     <string name="label_restore_mode">Restore mode</string>
     <string name="feat_snooze_notifications_title">延遲系統通知</string>
     <string name="feat_snooze_notifications_desc">暫時關閉常駐通知</string>
@@ -781,7 +781,7 @@
     <string name="about_desc_statusbar_icons">Take full control over your status bar.\n\nHide individual icons like WiFi, Bluetooth, or cellular data, hide all system or notification icons at once, or only hide system icons while the device is locked. Smart visibility can hide mobile data automatically when WiFi is connected or in certain modes.\n\nYou can also show seconds in the clock, change its position or hide it, show the battery percentage, hide the camera and microphone chips, or hide the entire status bar. Some advanced flags need Shizuku or Root.\n\nThese are AOSP controls, so your device OS might not respect all of them.</string>
     <string name="about_desc_caffeinate">保持喚醒可防止螢幕自動關閉。\n\n在特定時長或無限期內保持螢幕喚醒。適用於閱讀長文章或參考食譜時。</string>
     <string name="about_desc_maps_power_saving">在任何Android設備上取得Pixel 10系列獨有的Google Maps省電模式，在鎖定畫面上顯示極簡純黑背景。開始導航會話，關閉螢幕再重新開啟即可。</string>
-    <string name="about_desc_flashlight_pulse">收到通知時讓閃光燈呼吸閃爍。\n\n如果裝置硬體支援手電筒亮度調節，閃爍效果將呈現平滑的漸層動畫。</string>
+    <string name="about_desc_flashlight_pulse">Pulse the flashlight when you receive a notification.\n\nOn devices with hardware support for flashlight dimming, the pulse is smoothly animated.</string>
     <string name="about_desc_snooze_notifications">暫時關閉那些原廠無法變更的煩人常駐通知。\n\n當常駐通知出現時，這個功能頁面會列出其通知頻道。點選後，那個常駐通知就會被暫時關閉。\n\n你仍然可以在 Android 的通知紀錄中找到任何暫時被關閉的常駐通知。</string>
     <string name="about_desc_quick_settings_tiles">向快速設定面板新增自訂磁貼。\n\n長按其中任何一個以瞭解它們的作用。</string>
     <string name="about_desc_button_remap">重映射硬體按鈕以執行不同的操作和快捷方式。\n\n自訂在特定條件下長按音量鍵時發生的情況。\n\n某些行為，如螢幕關閉觸發或手電筒控制，可能取決於OEM的實現方式，並非在所有設備上都能按預期工作。某些場景可以使用Shizuku權限解決，但由於實現方式不同，可能無法提供相同的體驗。</string>
@@ -1496,4 +1496,5 @@
     <string name="label_shake_for_help">Shake for help</string>
     <string name="about_desc_island">A dynamic island for your Android, around your camera cutout.\n\nIt brings live info together in one compact, expandable space: notifications with quick replies, media with album art and controls, calls, timers and stopwatches, alarms, calendar events, navigation, progress updates, hotspot and network status, connected devices, flashlight, sound mode, caffeinate, travel info and time and battery.\n\nThird party apps can pair with the island to show their own live content, and you choose which ones are allowed.\n\nInteract with simple gestures like tapping, swiping up and sliding along the island for volume, brightness and more, and assign your own tap actions.\n\nCustomize almost everything, including camera position and size with auto detect, width, placement, visuals like glow, outlines and pulse shadows, expanded size and roundness, display durations, what shows and when, hiding system heads up and status bar icons, and privacy options for locked screens.\n\nIt can also be combined with Duo for a single unified camera area.</string>
     <string name="about_desc_pocket_mode">Prevents accidental touches while your phone is in your pocket or bag.\n\nWhen the proximity sensor is covered, Pocket mode shows a blocking screen so stray touches do nothing. Press any volume key to dismiss it. You can also use the light sensor along with proximity for better accuracy, add a trigger delay, and choose to only trigger while the device is locked.\n\nExclude apps where it should not trigger. It does not work while streaming or gaming by default.\n\nAccessibility permission is required. On some devices with missing sensors, enabling it may break deep sleep and cause higher battery drain.</string>
+    <string name="about_desc_flashlight">Get more control over your flashlight.\n\nAdjust the brightness, fade it in and out smoothly, and use the volume keys to change the intensity. Show the brightness as a live update in the status bar.\n\nTurn it off automatically when your phone is in a pocket, lower the brightness during long use to prevent overheating, or always turn it off, even while the display is on.\n\nBrightness control needs hardware support that some devices lack.</string>
 </resources>
