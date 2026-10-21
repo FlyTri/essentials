@@ -591,6 +591,7 @@ class MainViewModel : ViewModel() {
     val isMotionBlurSettingEnabled = mutableStateOf(false)
     val motionBlurScale = mutableFloatStateOf(1.0f)
     val isOnlineHelpMediaEnabled = mutableStateOf(true)
+    val isShakeForHelpEnabled = mutableStateOf(true)
     val isSwipeTabsEnabled = mutableStateOf(true)
     val sentryReportMode = mutableStateOf("auto")
     val isPowerSaveModeEnabled = mutableStateOf(false)
@@ -1515,6 +1516,10 @@ class MainViewModel : ViewModel() {
                         isOnlineHelpMediaEnabled.value = settingsRepository.isOnlineHelpMediaEnabled()
                     }
 
+                    SettingsRepository.KEY_SHAKE_FOR_HELP -> {
+                        isShakeForHelpEnabled.value = settingsRepository.isShakeForHelpEnabled()
+                    }
+
                     SettingsRepository.KEY_PRIVATE_DNS_PRESETS -> {
                         dnsPresets.clear()
                         dnsPresets.addAll(settingsRepository.getPrivateDnsPresets())
@@ -2353,6 +2358,7 @@ class MainViewModel : ViewModel() {
             settingsRepository.getBoolean(SettingsRepository.KEY_SWIPE_TABS, true)
         isOnlineHelpMediaEnabled.value =
             settingsRepository.isOnlineHelpMediaEnabled()
+        isShakeForHelpEnabled.value = settingsRepository.isShakeForHelpEnabled()
         sentryReportMode.value =
             settingsRepository.getString(SettingsRepository.KEY_SENTRY_REPORT_MODE, "auto")
                 ?: "auto"
@@ -3571,6 +3577,14 @@ class MainViewModel : ViewModel() {
     ) {
         settingsRepository.setOnlineHelpMediaEnabled(enabled)
         isOnlineHelpMediaEnabled.value = enabled
+    }
+
+    fun setShakeForHelpEnabled(
+        enabled: Boolean,
+        context: Context? = null,
+    ) {
+        settingsRepository.setShakeForHelpEnabled(enabled)
+        isShakeForHelpEnabled.value = enabled
     }
 
     /**

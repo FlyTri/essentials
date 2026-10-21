@@ -2447,6 +2447,7 @@
     <string name="label_motion_blur">Motion blur</string>
     <string name="label_motion_blur_amount">Amount</string>
     <string name="label_online_help_media">Online help media</string>
+    <string name="label_shake_for_help">Shake for help</string>
     <string name="msg_blur_compatibility_error">Blur is disabled on this device to prevent a known display bug on Samsung devices with Android 15 or below.</string>
     <string name="setting_swipe_tabs_title">Swipe between tabs</string>
     <string name="setting_swipe_tabs_desc">In home screen</string>

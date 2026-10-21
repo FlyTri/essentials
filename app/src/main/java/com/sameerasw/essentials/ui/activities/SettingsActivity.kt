@@ -115,6 +115,7 @@ import com.sameerasw.essentials.ui.core.sheets.GitHubAuthSheet
 import com.sameerasw.essentials.ui.core.sheets.ImportConfigConfirmationSheet
 import com.sameerasw.essentials.ui.core.sheets.InstructionsBottomSheet
 import com.sameerasw.essentials.ui.core.sheets.PreReleaseConfirmationSheet
+import com.sameerasw.essentials.ui.core.sheets.ShakeForHelp
 import com.sameerasw.essentials.ui.core.sheets.UnsupportedFeaturesConfirmationSheet
 import com.sameerasw.essentials.ui.core.sheets.UpdateBottomSheet
 import androidx.compose.ui.geometry.Offset
@@ -548,6 +549,8 @@ fun SettingsContent(
         )
     }
 
+    ShakeForHelp(viewModel = viewModel)
+
     if (showHiddenDebuggingHelpSheet) {
         com.sameerasw.essentials.ui.core.sheets.HiddenDebuggingHelpBottomSheet(
             onDismissRequest = { showHiddenDebuggingHelpSheet = false },
@@ -834,6 +837,13 @@ fun SettingsContent(
                 title = stringResource(R.string.label_online_help_media),
                 isChecked = viewModel.isOnlineHelpMediaEnabled.value,
                 onCheckedChange = { viewModel.setOnlineHelpMediaEnabled(it, context) },
+            )
+
+            IconToggleItem(
+                iconRes = R.drawable.rounded_mobile_vibrate_24,
+                title = stringResource(R.string.label_shake_for_help),
+                isChecked = viewModel.isShakeForHelpEnabled.value,
+                onCheckedChange = { viewModel.setShakeForHelpEnabled(it, context) },
             )
         }
 

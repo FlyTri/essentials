@@ -64,6 +64,7 @@ import com.sameerasw.essentials.ui.components.linkActions.LinkPickerScreen
 import com.sameerasw.essentials.ui.core.cards.FeatureCard
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.ShakeForHelp
 import com.sameerasw.essentials.ui.features.battery.BatteriesSettingsUI
 import com.sameerasw.essentials.ui.features.consciousgate.CONSCIOUS_GATE_FEATURE_ID
 import com.sameerasw.essentials.ui.features.security.AppLockSettingsUI
@@ -512,6 +513,8 @@ class FeatureSettingsActivity : AppCompatActivity() {
                             onDismissRequest = { showWatchInstallHelpSheet = false },
                         )
                     }
+
+                    ShakeForHelp(feature = featureObj, viewModel = viewModel)
 
                     val pageTitle =
                         if (featureObj != null) stringResource(featureObj.title) else featureId
