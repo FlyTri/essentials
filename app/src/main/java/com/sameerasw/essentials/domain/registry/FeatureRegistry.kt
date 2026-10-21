@@ -348,6 +348,7 @@ object FeatureRegistry {
                 permissionKeys = listOf("ACCESSIBILITY", "NOTIFICATION_LISTENER"),
                 hasMoreSettings = true,
                 showToggle = true,
+                isLegacy = true,
                 parentFeatureId = "Display",
                 animationRes = R.raw.aod_animation,
             ) {
