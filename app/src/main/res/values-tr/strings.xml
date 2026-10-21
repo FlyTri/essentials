@@ -1847,4 +1847,5 @@ Düğme yeniden eşleme bir ses seviyesi tuşu için uzun basma eylemi varsa, o 
     <string name="island_preview_ring_title">Hizalama ipucunu göster</string>
     <string name="island_camera_position_center">Orta</string>
     <string name="icon_network_speed">İnternet Hızı</string>
+    <string name="feat_navigation_desc">Hareket çubuğu, gezinme hareketleri ve gezinme çubuğu ince ayarları</string>
 </resources>
