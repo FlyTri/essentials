@@ -175,7 +175,7 @@ class CaffeinateWakeLockService : Service() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
         val mainIntent =
-            Intent(this, MainActivity::class.java).apply { putExtra("feature", "Caffeinate") }
+            com.sameerasw.essentials.utils.AppIconUtil.mainIntent(this).apply { putExtra("feature", "Caffeinate") }
         val mainPendingIntent =
             PendingIntent.getActivity(
                 this,

@@ -151,7 +151,7 @@ class CaffeinatePlugin : BaseIslandPlugin() {
     private fun open() {
         try {
             context.startActivity(
-                Intent(context, MainActivity::class.java)
+                com.sameerasw.essentials.utils.AppIconUtil.mainIntent(context)
                     .putExtra("feature", "Caffeinate")
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             )

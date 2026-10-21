@@ -749,10 +749,7 @@ fun PixelSearchbarSettingsUI(
                             if (tapActionEnabled) {
                                 HapticUtil.performVirtualKeyHaptic(view)
                                 val intent =
-                                    Intent(
-                                        context,
-                                        com.sameerasw.essentials.MainActivity::class.java,
-                                    ).apply {
+                                    com.sameerasw.essentials.utils.AppIconUtil.mainIntent(context).apply {
                                         putExtra(
                                             "target_tab",
                                             com.sameerasw.essentials.domain.DIYTabs.DIY.name,
