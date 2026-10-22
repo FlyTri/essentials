@@ -1076,11 +1076,6 @@ object FeatureRegistry {
                             "island_notif_keep_progress",
                         ),
                         SearchSetting(
-                            R.string.island_notif_compact_heads_up_title,
-                            R.string.island_notif_compact_heads_up_desc,
-                            "island_notif_compact_heads_up",
-                        ),
-                        SearchSetting(
                             R.string.island_notif_condensed_info_title,
                             R.string.island_notif_peek_style_search_desc,
                             "island_notif_peek_style",

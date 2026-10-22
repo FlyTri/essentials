@@ -280,7 +280,6 @@ class MainViewModel : ViewModel() {
     val isIslandMediaKeepWhenPaused = mutableStateOf(true)
     val isIslandMediaShowPrevious = mutableStateOf(false)
     val isIslandMediaShowLike = mutableStateOf(true)
-    val isIslandNotifCompactHeadsUp = mutableStateOf(true)
     val islandNotifPeekStyle = mutableStateOf(SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_FULL)
     val isIslandNotifKeepProgress = mutableStateOf(true)
     val isIslandNotifQueue = mutableStateOf(true)
@@ -963,9 +962,6 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_ISLAND_MEDIA_SHOW_LIKE ->
                         isIslandMediaShowLike.value = settingsRepository.isIslandMediaShowLikeEnabled()
-
-                    SettingsRepository.KEY_ISLAND_NOTIF_COMPACT_HEADS_UP ->
-                        isIslandNotifCompactHeadsUp.value = settingsRepository.isIslandNotifCompactHeadsUpEnabled()
 
                     SettingsRepository.KEY_ISLAND_NOTIF_PEEK_STYLE ->
                         islandNotifPeekStyle.value = settingsRepository.getIslandNotifPeekStyle()
@@ -2563,7 +2559,6 @@ class MainViewModel : ViewModel() {
         isIslandMediaKeepWhenPaused.value = settingsRepository.isIslandMediaKeepWhenPausedEnabled()
         isIslandMediaShowPrevious.value = settingsRepository.isIslandMediaShowPreviousEnabled()
         isIslandMediaShowLike.value = settingsRepository.isIslandMediaShowLikeEnabled()
-        isIslandNotifCompactHeadsUp.value = settingsRepository.isIslandNotifCompactHeadsUpEnabled()
         islandNotifPeekStyle.value = settingsRepository.getIslandNotifPeekStyle()
         isIslandNotifKeepProgress.value = settingsRepository.isIslandNotifKeepProgressEnabled()
         isIslandNotifQueue.value = settingsRepository.isIslandNotifQueueEnabled()
@@ -6138,11 +6133,6 @@ class MainViewModel : ViewModel() {
             isDuoShowProgress.value = false
             settingsRepository.setDuoShowProgressEnabled(false)
         }
-    }
-
-    fun setIslandNotifCompactHeadsUp(enabled: Boolean) {
-        isIslandNotifCompactHeadsUp.value = enabled
-        settingsRepository.setIslandNotifCompactHeadsUpEnabled(enabled)
     }
 
     fun setIslandNotifPeekStyle(style: String) {

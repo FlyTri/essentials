@@ -57,7 +57,6 @@ import com.sameerasw.essentials.ui.features.display.actions.horizontalSlideDescr
 import com.sameerasw.essentials.ui.features.display.sheets.IslandAlarmOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBorderOutlineOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandNotificationHubOptionsBottomSheet
-import com.sameerasw.essentials.ui.features.display.sheets.IslandNotificationQueueOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandBriefOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandCallOptionsBottomSheet
 import com.sameerasw.essentials.ui.features.display.sheets.IslandDevicesBatteryBottomSheet
@@ -938,12 +937,6 @@ fun IslandNotificationSettingsUI(
     var showFilterAppsSheet by remember { mutableStateOf(false) }
     var showHubSheet by remember { mutableStateOf(false) }
     var showOtpPermissions by remember { mutableStateOf(false) }
-    var showQueueSheet by remember {
-        mutableStateOf(
-            viewModel.isIslandNotifQueue.value &&
-                highlightSetting == "island_notif_queue_inline",
-        )
-    }
     var lockedDisabled by remember {
         mutableStateOf(
             SettingsRepository(context).getBoolean(SettingsRepository.KEY_ISLAND_NOTIF_DISABLE_LOCKED, true)
@@ -956,7 +949,6 @@ fun IslandNotificationSettingsUI(
     }
     // A notification can only peek as a line while Behavior's island-wide Line peek is on.
     val linePeekOn = viewModel.isIslandLineStageEnabled.value
-    val compactHeadsUpOn = linePeekOn && viewModel.isIslandNotifCompactHeadsUp.value
 
     Column(
         modifier = modifier
@@ -980,31 +972,34 @@ fun IslandNotificationSettingsUI(
             )
 
             IconToggleItem(
+                iconRes = R.drawable.rounded_touch_app_24,
+                title = stringResource(R.string.island_notif_tap_to_open_title),
+                description = stringResource(R.string.island_notif_tap_to_open_desc),
+                isChecked = viewModel.isIslandNotifTapToOpen.value,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    viewModel.setIslandNotifTapToOpen(checked)
+                },
+                modifier = Modifier.highlight(highlightSetting == "island_notif_tap_to_open"),
+            )
+        }
+
+        RoundedCardContainer(
+            spacing = 2.dp,
+            cornerRadius = 24.dp,
+        ) {
+            IconToggleItem(
                 iconRes = R.drawable.outline_circle_notifications_24,
                 title = stringResource(R.string.island_notif_hub_title),
+                description = stringResource(R.string.island_notif_hub_desc),
                 isChecked = viewModel.isIslandNotifHub.value,
                 onCheckedChange = { checked ->
                     HapticUtil.performVirtualKeyHaptic(view)
                     viewModel.setIslandNotifHub(checked)
                 },
+                onSettingsClick = { showHubSheet = true },
                 modifier = Modifier.highlight(highlightSetting == "island_notif_hub"),
             )
-
-            AnimatedVisibility(
-                visible = viewModel.isIslandNotifHub.value,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically(),
-            ) {
-                IconToggleItem(
-                    iconRes = R.drawable.rounded_settings_24,
-                    title = stringResource(R.string.island_hide_icon_notifications),
-                    showToggle = false,
-                    onClick = {
-                        HapticUtil.performVirtualKeyHaptic(view)
-                        showHubSheet = true
-                    },
-                )
-            }
         }
 
         IslandSettingsSection(R.string.island_notif_section_sources) {
@@ -1073,40 +1068,15 @@ fun IslandNotificationSettingsUI(
             )
         }
 
-        IslandSettingsSection(R.string.island_notif_section_heads_up) {
-            IconToggleItem(
-                iconRes = R.drawable.rounded_notification_sound_24,
-                title = stringResource(R.string.island_notif_compact_heads_up_title),
-                description = stringResource(
-                    if (linePeekOn) R.string.island_notif_compact_heads_up_desc
-                    else R.string.island_notif_compact_heads_up_needs_line_peek,
-                ),
-                isChecked = compactHeadsUpOn,
-                onCheckedChange = { checked ->
-                    HapticUtil.performVirtualKeyHaptic(view)
-                    viewModel.setIslandNotifCompactHeadsUp(checked)
-                },
-                enabled = linePeekOn,
-                onDisabledClick = {
-                    context.startActivity(
-                        Intent(context, FeatureSettingsActivity::class.java).apply {
-                            putExtra("feature", ISLAND_BEHAVIOR_FEATURE_ID)
-                            putExtra("highlight_setting", "island_line_stage_enabled")
-                        },
-                    )
-                },
-                modifier = Modifier.highlight(highlightSetting == "island_notif_compact_heads_up"),
-            )
-
-            AnimatedVisibility(
-                visible = compactHeadsUpOn,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically(),
-            ) {
+        AnimatedVisibility(
+            visible = linePeekOn,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically(),
+        ) {
+            IslandSettingsSection(R.string.island_notif_section_heads_up) {
                 val peekStyle = viewModel.islandNotifPeekStyle.value
                 val fullLabel = stringResource(R.string.island_notif_peek_style_full)
                 val compactLabel = stringResource(R.string.island_notif_peek_style_compact)
-                val minimalLabel = stringResource(R.string.island_notif_peek_style_minimal)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1124,9 +1094,6 @@ fun IslandNotificationSettingsUI(
                         text = stringResource(
                             when (peekStyle) {
                                 SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_COMPACT -> R.string.island_notif_condensed_info_desc
-                                SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_MINIMAL ->
-                                    if (viewModel.isIslandCatchUpEnabled.value) R.string.island_notif_peek_style_minimal_catch_up_desc
-                                    else R.string.island_notif_peek_style_minimal_desc
                                 else -> R.string.island_notif_peek_style_full_desc
                             },
                         ),
@@ -1138,14 +1105,12 @@ fun IslandNotificationSettingsUI(
                         items = listOf(
                             SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_FULL,
                             SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_COMPACT,
-                            SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_MINIMAL,
                         ),
                         selectedItem = peekStyle,
                         onItemSelected = { viewModel.setIslandNotifPeekStyle(it) },
                         labelProvider = {
                             when (it) {
                                 SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_COMPACT -> compactLabel
-                                SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_MINIMAL -> minimalLabel
                                 else -> fullLabel
                             }
                         },
@@ -1167,21 +1132,26 @@ fun IslandNotificationSettingsUI(
                     viewModel.setIslandNotifQueue(checked)
                 },
                 enabled = !viewModel.isIslandNotifHub.value,
-                onSettingsClick = { showQueueSheet = true },
                 modifier = Modifier.highlight(highlightSetting == "island_notif_queue"),
             )
 
-            IconToggleItem(
-                iconRes = R.drawable.rounded_touch_app_24,
-                title = stringResource(R.string.island_notif_tap_to_open_title),
-                description = stringResource(R.string.island_notif_tap_to_open_desc),
-                isChecked = viewModel.isIslandNotifTapToOpen.value,
-                onCheckedChange = { checked ->
-                    HapticUtil.performVirtualKeyHaptic(view)
-                    viewModel.setIslandNotifTapToOpen(checked)
-                },
-                modifier = Modifier.highlight(highlightSetting == "island_notif_tap_to_open"),
-            )
+            AnimatedVisibility(
+                visible = viewModel.isIslandNotifQueue.value && !viewModel.isIslandNotifHub.value,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically(),
+            ) {
+                IconToggleItem(
+                    iconRes = R.drawable.rounded_fullscreen_portrait_24,
+                    title = stringResource(R.string.island_notif_queue_inline_title),
+                    description = stringResource(R.string.island_notif_queue_inline_desc),
+                    isChecked = viewModel.isIslandNotifQueueInline.value,
+                    onCheckedChange = { checked ->
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        viewModel.setIslandNotifQueueInline(checked)
+                    },
+                    modifier = Modifier.highlight(highlightSetting == "island_notif_queue_inline"),
+                )
+            }
 
             IconToggleItem(
                 iconRes = R.drawable.rounded_notifications_unread_24,
@@ -1351,13 +1321,6 @@ fun IslandNotificationSettingsUI(
         IslandNotificationHubOptionsBottomSheet(
             viewModel = viewModel,
             onDismissRequest = { showHubSheet = false },
-        )
-    }
-
-    if (showQueueSheet) {
-        IslandNotificationQueueOptionsBottomSheet(
-            viewModel = viewModel,
-            onDismissRequest = { showQueueSheet = false },
         )
     }
 

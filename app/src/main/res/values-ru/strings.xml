@@ -1710,8 +1710,6 @@
     <string name="status_glance_hide_in_quick_settings_title">Скрыть в быстрых настройках</string>
     <string name="island_notif_queue_title">Очередь уведомлений</string>
     <string name="island_notif_keep_progress_title">Сохраняйте уведомления о ходе выполнения</string>
-    <string name="island_notif_compact_heads_up_title">Компактные напоминания</string>
-    <string name="island_notif_compact_heads_up_desc">Показывает новые уведомления в строку</string>
     <string name="island_catch_up_title">Удержание</string>
     <string name="island_catch_up_desc">Держать последнее уведомление в острове дольше</string>
     <string name="island_catch_up_timeout_title">Время удержания </string>

@@ -503,7 +503,7 @@ class IslandCoordinator(
         mainHandler.post {
             if (!running) return@post
             mainHandler.removeCallbacks(endQueuePreview)
-            val minimal = settings.isIslandLineStageEnabled() && settings.isIslandNotifCompactHeadsUpEnabled() &&
+            val minimal = settings.isIslandLineStageEnabled() &&
                 settings.getIslandNotifPeekStyle() == SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_MINIMAL
             val layout = when {
                 !minimal -> QueuePreviewLayout.Peek

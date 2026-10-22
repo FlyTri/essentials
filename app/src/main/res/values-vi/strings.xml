@@ -1797,8 +1797,6 @@ Cần có quyền quản trị thiết bị nếu sử dụng chế độ khóa.
     <string name="island_hide_in_owner_app_title">Ẩn thông báo lỗi bên trong ứng dụng</string>
     <string name="island_hide_on_shade_title">Ẩn khi thanh trạng thái được mở rộng</string>
     <string name="island_dismiss_on_outside_title">Bỏ qua khi chạm bên ngoài</string>
-    <string name="island_notif_compact_heads_up_title">Thông tin nhỏ gọn</string>
-    <string name="island_notif_compact_heads_up_desc">Hiển thị thông báo mới dưới dạng xem trước dòng</string>
     <string name="island_notif_keep_progress_title">Giữ lại thông báo tiến độ</string>
     <string name="island_notif_queue_title">Hàng đợi thông báo</string>
     <string name="island_notif_tap_to_open_title">Chạm để mở thông báo</string>

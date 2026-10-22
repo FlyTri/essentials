@@ -1568,7 +1568,6 @@
     <string name="island_notif_tap_to_open_title">toque para abrir a notificação</string>
     <string name="island_notif_queue_title">Fila de notificações</string>
     <string name="island_notif_keep_progress_title">manter processo de notificações</string>
-    <string name="island_notif_compact_heads_up_title">Cabeças compactas</string>
     <string name="button_remap_pause_on_volume_dialog_title">Desativa remapeamento de tecla temporáriamente quando a caixa de diálogo do volume é aberta</string>
     <string name="screen_locked_disable_notification_interactions_title">desativar interações de notificações </string>
     <string name="screen_locked_disable_notification_interactions_desc">Impeça que a barra de notificações e as Configurações Rápidas sejam exibidas enquanto o dispositivo estiver bloqueado.</string>
