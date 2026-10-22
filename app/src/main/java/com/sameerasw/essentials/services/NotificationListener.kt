@@ -1085,7 +1085,9 @@ class NotificationListener : NotificationListenerService() {
             scheduleProgressRefresh()
         }
 
-        if (!isRepost && isHeadsUpNotification(sbn, rankingMap, allowSilent = true)) {
+        if (isHandledAsProgress(sbn)) {
+            // Shown by the progress plugin instead
+        } else if (!isRepost && isHeadsUpNotification(sbn, rankingMap, allowSilent = true)) {
             val alert = extractNotificationAlert(sbn)?.copy(
                 isSilent = isSilentNotification(sbn, rankingMap),
                 blockedByDnd = isBlockedByDnd(sbn, rankingMap),
@@ -2098,6 +2100,7 @@ class NotificationListener : NotificationListenerService() {
 
     private fun hubAlertOf(sbn: StatusBarNotification, rankingMap: RankingMap?): ActiveNotificationAlert? {
         if (sbn.packageName == packageName || !hasReadableExtras(sbn) || isMediaNotification(sbn)) return null
+        if (isHandledAsProgress(sbn)) return null
         if ((sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0 && !isStandaloneSummary(sbn)) return null
         return extractNotificationAlert(sbn)?.copy(
             isSilent = isSilentNotification(sbn, rankingMap),
@@ -2107,6 +2110,13 @@ class NotificationListener : NotificationListenerService() {
             hubOnly = true,
             timestamp = if (sbn.postTime > 0) sbn.postTime else System.currentTimeMillis(),
         )
+    }
+
+    private fun isHandledAsProgress(sbn: StatusBarNotification): Boolean {
+        if (!SettingsRepository(applicationContext).isIslandNotifKeepProgressEnabled()) return false
+        val extras = sbn.notification?.extras ?: return false
+        return extras.getInt(Notification.EXTRA_PROGRESS_MAX, 0) > 0 ||
+            extras.getBoolean(Notification.EXTRA_PROGRESS_INDETERMINATE, false)
     }
 
     fun hubAlerts(): List<ActiveNotificationAlert> =
