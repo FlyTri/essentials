@@ -265,7 +265,22 @@ fun FeatureHelpBottomSheet(
             }
 
             val resetPrefixes = FeatureResetRegistry.prefixesFor(feature.id)
-            if (resetPrefixes != null) {
+            if (feature.id == "Lock screen clock") {
+                HoldToContinueButton(
+                    waitTimeProgress = 1f,
+                    onContinue = {
+                        viewModel.resetLockScreenClock(context)
+                        Toast.makeText(context, R.string.feature_reset_done, Toast.LENGTH_SHORT).show()
+                    },
+                    onHoldingChange = {},
+                    modifier = Modifier.fillMaxWidth(),
+                    holdDurationMillis = 2_000L,
+                    holdLabel = stringResource(R.string.feature_reset_hold),
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    progressColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            } else if (resetPrefixes != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(2.dp),
