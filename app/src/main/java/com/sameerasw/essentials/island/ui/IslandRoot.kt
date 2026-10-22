@@ -68,6 +68,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import com.sameerasw.essentials.island.ui.components.LocalIslandIconColor
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -135,6 +136,31 @@ private enum class SwipeIntent { Hide, Dismiss }
 // Only the surface's width/height/corner animate, read in layout/draw so frames don't recompose.
 @Composable
 fun IslandRoot(
+    state: IslandUiState,
+    targetSpec: IslandLayoutSpec,
+    actions: IslandActions,
+    onTargetBoundsChanged: (IntRect) -> Unit,
+    registerCollapseAnimator: (((() -> Unit) -> Unit)?) -> Unit = {},
+    showCameraRing: Boolean = false,
+) {
+    val primary = MaterialTheme.colorScheme.primary
+    val focused = state.items[state.focusedKey]
+    val dynamicAccent = (focused?.outlineAccent ?: focused?.accent)
+        ?: state.arrangement.visibleItems.firstNotNullOfOrNull { key -> state.items[key]?.let { it.outlineAccent ?: it.accent } }
+    val iconBase = if (targetSpec.iconMaterialYou) primary else Color.White
+    val iconTarget = if (targetSpec.iconDynamic) {
+        dynamicAccent ?: iconBase
+    } else {
+        targetSpec.iconColorCustom ?: iconBase
+    }
+    val iconColor by animateColorAsState(iconTarget, label = "islandIconColor")
+    CompositionLocalProvider(LocalIslandIconColor provides iconColor) {
+        IslandRootContent(state, targetSpec, actions, onTargetBoundsChanged, registerCollapseAnimator, showCameraRing)
+    }
+}
+
+@Composable
+private fun IslandRootContent(
     state: IslandUiState,
     targetSpec: IslandLayoutSpec,
     actions: IslandActions,

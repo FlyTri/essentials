@@ -40,6 +40,9 @@ data class IslandLayoutSpec(
     val pulseDurationMs: Int = 1450,
     val queueStyle: QueueStyle = QueueStyle.Stack,
     val queueInline: Boolean = false,
+    val iconColorCustom: Color? = null,
+    val iconDynamic: Boolean = true,
+    val iconMaterialYou: Boolean = true,
 ) {
     val compactHeight: Dp get() = cameraDiameter + verticalGap * 2
     val cameraSlotWidth: Dp get() = (cameraDiameter + cameraGap * 2) * cameraPresence

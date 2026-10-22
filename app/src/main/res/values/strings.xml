@@ -3174,6 +3174,10 @@
     <string name="island_action_tap_desc">Open app</string>
     <string name="island_tap_action_title">Tap action</string>
     <string name="island_show_time_title">Time</string>
+    <string name="island_section_icon_color">Icon color</string>
+    <string name="island_icon_color_dynamic">Dynamic</string>
+    <string name="island_icon_color_custom">Custom</string>
+    <string name="island_icon_material_you_title">Use Material You colors</string>
     <string name="island_time_format_title">Time format</string>
     <string name="island_time_format_system">System</string>
     <string name="island_time_format_12h">12 hr</string>

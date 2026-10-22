@@ -24,6 +24,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sameerasw.essentials.island.ui.IslandTextStyles
+import com.sameerasw.essentials.island.ui.components.resolveIconTint
 
 private const val LABEL_SHIFT_X = 0.15f
 private const val LABEL_SHIFT_Y = 0.15f
@@ -64,7 +65,8 @@ fun SignalBars(level: Int, color: Color, label: String?, modifier: Modifier = Mo
 }
 
 @Composable
-fun SignalIndicator(wifiLevel: Int?, mobileLevel: Int, color: Color, label: String?, modifier: Modifier = Modifier) {
+fun SignalIndicator(wifiLevel: Int?, mobileLevel: Int, rawColor: Color, label: String?, modifier: Modifier = Modifier) {
+    val color = resolveIconTint(rawColor)
     AnimatedContent(
         targetState = wifiLevel,
         transitionSpec = {
