@@ -147,6 +147,33 @@ class IslandItem(
 ) {
     var userPriority: Int? = null
 
+    fun withInlineBubble(cell: CompactCell) = IslandItem(
+        key = key,
+        priority = priority,
+        placement = placement,
+        compact = listOf(cell) + compact.take(1),
+        line = line,
+        expanded = expanded,
+        accent = accent,
+        outlineAccent = outlineAccent,
+        dismissible = dismissible,
+        onDismiss = onDismiss,
+        onOpen = onOpen,
+        interactions = interactions,
+        queue = queue,
+        sourcePackage = sourcePackage,
+        priorityOverride = priorityOverride,
+        contentId = contentId,
+        compactVisible = true,
+        needsCompanyAtCenter = needsCompanyAtCenter,
+        sideBubble = null,
+        companionOnly = companionOnly,
+        bypassLauncherOnly = bypassLauncherOnly,
+        stack = stack,
+        queued = queued,
+        priorityGroup = priorityGroup,
+    ).also { it.userPriority = userPriority }
+
     val effectivePriority: Int get() = priorityOverride ?: userPriority ?: priority
 
     init {

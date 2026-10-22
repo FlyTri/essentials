@@ -41,7 +41,6 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     override val settingKeys = setOf(
         SettingsRepository.KEY_ISLAND_CATCH_UP_ENABLED,
-        SettingsRepository.KEY_ISLAND_NOTIF_COMPACT_HEADS_UP,
         SettingsRepository.KEY_ISLAND_NOTIF_PEEK_STYLE,
         SettingsRepository.KEY_ISLAND_NOTIF_QUEUE_STYLE,
         SettingsRepository.KEY_ISLAND_NOTIF_QUEUE_INLINE,
@@ -397,7 +396,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         val c = ctx ?: return
         if (minimal()) return
         val otpNeedsExpand = currentAlert()?.let(::isOtp) == true && !settings.isIslandOtpTapToCopyEnabled()
-        val lineAvailable = settings.isIslandLineStageEnabled() && settings.isIslandNotifCompactHeadsUpEnabled() && !otpNeedsExpand
+        val lineAvailable = settings.isIslandLineStageEnabled() && !otpNeedsExpand
         markSeen()
         c.request(
             if (lineAvailable) PluginRequest.Peek(ITEM_KEY, timeoutMs(), sticky = true)
@@ -690,7 +689,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
     }
 
     private fun peekStyle(): String =
-        if (settings.isIslandLineStageEnabled() && settings.isIslandNotifCompactHeadsUpEnabled()) {
+        if (settings.isIslandLineStageEnabled()) {
             settings.getIslandNotifPeekStyle()
         } else {
             SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_FULL

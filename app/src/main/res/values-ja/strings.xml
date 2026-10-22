@@ -1768,8 +1768,6 @@
     <string name="island_expanded_timeout_desc">折りたたまれたピルに戻るまでの時間（0は無限大）</string>
     <string name="island_show_glow_title">アクセントの輝きを表示する</string>
     <string name="island_tap_action_title">タップ操作</string>
-    <string name="island_suppress_system_heads_up_title">システムのヘッドアップ通知を非表示にする</string>
-    <string name="island_dynamic_hide_status_bar_title">ステータスバーの項目を動的に非表示にする</string>
     <string name="island_catch_up_title">追いつく</string>
     <string name="island_catch_up_desc">最後の通知をアイランドに長時間表示する</string>
     <string name="diy_action_media_play_pause">メディアの一時停止または再生</string>
@@ -1854,8 +1852,6 @@
     <string name="island_hide_in_owner_app_title">アプリ内でコンプリケーションを非表示</string>
     <string name="island_dismiss_on_outside_title">アプリ外アクティビティ時に非表示</string>
     <string name="island_notif_conceal_locked_title">通知の内容を非表示</string>
-    <string name="island_notif_compact_heads_up_title">ヘッドアップ通知はコンパクトにする</string>
-    <string name="island_notif_compact_heads_up_desc">新しい通知はラインピークで表示する</string>
     <string name="island_notif_keep_progress_title">進捗通知は維持する</string>
     <string name="island_notif_queue_title">通知キュー</string>
     <string name="island_notif_tap_to_open_title">タップして通知を開く</string>

@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import android.text.format.DateFormat
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -38,6 +39,7 @@ import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
 import com.sameerasw.essentials.ui.core.cards.ConfigPickerItem
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -51,6 +53,18 @@ fun IslandTimeOptionsBottomSheet(
     val view = LocalView.current
     val settings = remember { SettingsRepository(context) }
     var showSeconds by remember { mutableStateOf(settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_SHOW_SECONDS, false)) }
+    var timeFormat by remember {
+        mutableStateOf(settings.getString(SettingsRepository.KEY_ISLAND_TIME_FORMAT, null) ?: SettingsRepository.ISLAND_TIME_FORMAT_SYSTEM)
+    }
+    var period by remember {
+        mutableStateOf(settings.getString(SettingsRepository.KEY_ISLAND_TIME_PERIOD, null) ?: SettingsRepository.ISLAND_TIME_PERIOD_NONE)
+    }
+    var leadingZero by remember { mutableStateOf(settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO, false)) }
+    val is12h = when (timeFormat) {
+        SettingsRepository.ISLAND_TIME_FORMAT_12H -> true
+        SettingsRepository.ISLAND_TIME_FORMAT_24H -> false
+        else -> !DateFormat.is24HourFormat(context)
+    }
     EssentialsBottomSheet(onDismissRequest = onDismissRequest) {
         Column(
             modifier = Modifier
@@ -60,6 +74,63 @@ fun IslandTimeOptionsBottomSheet(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            RoundedCardContainer(spacing = 2.dp, cornerRadius = 24.dp) {
+                val formatLabels = mapOf(
+                    SettingsRepository.ISLAND_TIME_FORMAT_SYSTEM to stringResource(R.string.island_time_format_system),
+                    SettingsRepository.ISLAND_TIME_FORMAT_12H to stringResource(R.string.island_time_format_12h),
+                    SettingsRepository.ISLAND_TIME_FORMAT_24H to stringResource(R.string.island_time_format_24h),
+                )
+                SegmentedPicker(
+                    items = formatLabels.keys.toList(),
+                    selectedItem = timeFormat,
+                    onItemSelected = {
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        timeFormat = it
+                        settings.putString(SettingsRepository.KEY_ISLAND_TIME_FORMAT, it)
+                    },
+                    labelProvider = { formatLabels[it].orEmpty() },
+                    title = R.string.island_time_format_title,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                AnimatedVisibility(
+                    visible = is12h,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut(),
+                ) {
+                    val periodLabels = mapOf(
+                        SettingsRepository.ISLAND_TIME_PERIOD_NONE to stringResource(R.string.island_time_period_none),
+                        SettingsRepository.ISLAND_TIME_PERIOD_AM_PM to stringResource(R.string.island_time_period_am_pm),
+                    )
+                    SegmentedPicker(
+                        items = periodLabels.keys.toList(),
+                        selectedItem = period,
+                        onItemSelected = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            period = it
+                            settings.putString(SettingsRepository.KEY_ISLAND_TIME_PERIOD, it)
+                        },
+                        labelProvider = { periodLabels[it].orEmpty() },
+                        title = R.string.island_time_period_title,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                AnimatedVisibility(
+                    visible = is12h,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut(),
+                ) {
+                    IconToggleItem(
+                        iconRes = R.drawable.rounded_schedule_24,
+                        title = stringResource(R.string.island_time_leading_zero_title),
+                        isChecked = leadingZero,
+                        onCheckedChange = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            leadingZero = it
+                            settings.putBoolean(SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO, it)
+                        },
+                    )
+                }
+            }
             RoundedCardContainer {
                 IconToggleItem(
                     iconRes = R.drawable.rounded_schedule_24,

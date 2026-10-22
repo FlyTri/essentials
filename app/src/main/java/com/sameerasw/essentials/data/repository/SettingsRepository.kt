@@ -560,6 +560,14 @@ class SettingsRepository(
         const val KEY_ISLAND_SHOW_CONSCIOUS_GATE = "island_show_conscious_gate"
         const val KEY_ISLAND_SHOW_TIME_BATTERY = "island_show_time_battery"
         const val KEY_ISLAND_TIME_SHOW_SECONDS = "island_time_show_seconds"
+        const val KEY_ISLAND_TIME_FORMAT = "island_time_format"
+        const val KEY_ISLAND_TIME_PERIOD = "island_time_period"
+        const val KEY_ISLAND_TIME_LEADING_ZERO = "island_time_leading_zero"
+        const val ISLAND_TIME_FORMAT_SYSTEM = "system"
+        const val ISLAND_TIME_FORMAT_12H = "12h"
+        const val ISLAND_TIME_FORMAT_24H = "24h"
+        const val ISLAND_TIME_PERIOD_NONE = "none"
+        const val ISLAND_TIME_PERIOD_AM_PM = "am_pm"
         const val KEY_ISLAND_SHOW_BATTERY = "island_show_battery"
         const val KEY_ISLAND_SHOW_FLASHLIGHT = "island_show_flashlight"
         const val KEY_ISLAND_BATTERY_STYLE = "island_battery_style"
@@ -660,7 +668,6 @@ class SettingsRepository(
         const val KEY_ISLAND_MEDIA_KEEP_WHEN_PAUSED = "island_media_keep_when_paused"
         const val KEY_ISLAND_MEDIA_SHOW_PREVIOUS = "island_media_show_previous"
         const val KEY_ISLAND_MEDIA_SHOW_LIKE = "island_media_show_like"
-        const val KEY_ISLAND_NOTIF_COMPACT_HEADS_UP = "island_notif_compact_heads_up"
         const val KEY_ISLAND_NOTIF_CONDENSED_INFO = "island_notif_condensed_info"
         const val KEY_ISLAND_NOTIF_PEEK_STYLE = "island_notif_peek_style"
         const val ISLAND_NOTIF_PEEK_STYLE_FULL = "full"
@@ -4446,12 +4453,13 @@ class SettingsRepository(
     fun getIslandOtpTimeoutMs(): Long = getLong(KEY_ISLAND_OTP_TIMEOUT_MS, 60_000L)
     fun setIslandOtpTimeoutMs(ms: Long) = putLong(KEY_ISLAND_OTP_TIMEOUT_MS, ms)
 
-    fun isIslandNotifCompactHeadsUpEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_COMPACT_HEADS_UP, true)
-    fun setIslandNotifCompactHeadsUpEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_COMPACT_HEADS_UP, enabled)
 
     fun getIslandNotifPeekStyle(): String =
-        getString(KEY_ISLAND_NOTIF_PEEK_STYLE, null)
-            ?: if (getBoolean(KEY_ISLAND_NOTIF_CONDENSED_INFO, false)) ISLAND_NOTIF_PEEK_STYLE_COMPACT else ISLAND_NOTIF_PEEK_STYLE_FULL
+        when (getString(KEY_ISLAND_NOTIF_PEEK_STYLE, null)) {
+            ISLAND_NOTIF_PEEK_STYLE_COMPACT -> ISLAND_NOTIF_PEEK_STYLE_COMPACT
+            null -> if (getBoolean(KEY_ISLAND_NOTIF_CONDENSED_INFO, false)) ISLAND_NOTIF_PEEK_STYLE_COMPACT else ISLAND_NOTIF_PEEK_STYLE_FULL
+            else -> ISLAND_NOTIF_PEEK_STYLE_FULL
+        }
     fun setIslandNotifPeekStyle(style: String) = putString(KEY_ISLAND_NOTIF_PEEK_STYLE, style)
 
     fun isIslandNotifKeepProgressEnabled(): Boolean = getBoolean(KEY_ISLAND_NOTIF_KEEP_PROGRESS, true)

@@ -1568,7 +1568,6 @@
     <string name="island_notif_tap_to_open_title">toque para abrir a notificação</string>
     <string name="island_notif_queue_title">Fila de notificações</string>
     <string name="island_notif_keep_progress_title">manter processo de notificações</string>
-    <string name="island_notif_compact_heads_up_title">Cabeças compactas</string>
     <string name="button_remap_pause_on_volume_dialog_title">Desativa remapeamento de tecla temporáriamente quando a caixa de diálogo do volume é aberta</string>
     <string name="screen_locked_disable_notification_interactions_title">desativar interações de notificações </string>
     <string name="screen_locked_disable_notification_interactions_desc">Impeça que a barra de notificações e as Configurações Rápidas sejam exibidas enquanto o dispositivo estiver bloqueado.</string>
@@ -1710,11 +1709,6 @@
     <string name="island_hide_on_shade_title">Ocultar quando a barra de status estiver expandida</string>
     <string name="keep_in_full_screen_title">Manter em tela cheia</string>
     <string name="disable_interactions_in_full_screen_title">Desativar interações em tela cheia</string>
-    <string name="island_suppress_system_heads_up_title">Ocultar avisos do sistema</string>
-    <string name="island_hide_live_updates_title">Ocultar atualizações ao vivo dinamicamente</string>
-    <string name="island_compact_hide_status_bar_title">Ocultar todos os itens para ilha compacta</string>
-    <string name="island_hide_icons_title">Ocultar dinamicamente os ícones da barra de status</string>
-    <string name="island_dynamic_hide_status_bar_title">Ocultar tudo quando expandido</string>
     <string name="island_dismiss_on_outside_title">Dispensar atividades externas</string>
     <string name="status_glance_calendar_show_all_day_title">Mostrar todos os eventos do dia</string>
     <string name="island_calendar_priority_title">Prioridade ao fechar</string>

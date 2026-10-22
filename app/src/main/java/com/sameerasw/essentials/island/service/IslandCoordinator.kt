@@ -503,7 +503,7 @@ class IslandCoordinator(
         mainHandler.post {
             if (!running) return@post
             mainHandler.removeCallbacks(endQueuePreview)
-            val minimal = settings.isIslandLineStageEnabled() && settings.isIslandNotifCompactHeadsUpEnabled() &&
+            val minimal = settings.isIslandLineStageEnabled() &&
                 settings.getIslandNotifPeekStyle() == SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_MINIMAL
             val layout = when {
                 !minimal -> QueuePreviewLayout.Peek
@@ -716,6 +716,7 @@ class IslandCoordinator(
         controller.maxCells = settings.getIslandMaxItems() * 2
         controller.balanceCompact = settings.isIslandBalanceCompactEnabled()
         controller.secondaryBubbleEnabled = settings.isIslandSecondaryBubbleEnabled()
+        controller.secondaryBubbleOverlap = settings.getIslandNotifQueueStyle() == SettingsRepository.ISLAND_NOTIF_QUEUE_STYLE_OVERLAP
         controller.relayout()
         controller.expandedTimeoutMs = settings.getIslandExpandedTimeoutMs()
         applyPreviewRing()

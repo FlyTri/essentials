@@ -1,6 +1,7 @@
 package com.sameerasw.essentials.island.state
 
 import com.sameerasw.essentials.island.model.SideBubble
+import com.sameerasw.essentials.island.ui.inlineBubbleCell
 import com.sameerasw.essentials.island.model.CompactPlacement
 import com.sameerasw.essentials.island.model.IslandItem
 import com.sameerasw.essentials.island.model.IslandStage
@@ -38,6 +39,7 @@ class IslandController(
     var maxCells: Int = CompactLayoutEngine.MAX_CELLS
     var balanceCompact: Boolean = true
     var secondaryBubbleEnabled: Boolean = true
+    var secondaryBubbleOverlap: Boolean = false
     private var feedbackActive = false
 
     fun setFeedbackActive(active: Boolean) {
@@ -265,7 +267,14 @@ class IslandController(
                 }
             }
             .filter { hiddenPackage == null || it.sourcePackage != hiddenPackage }
+            .map(::inlineBubbleIfDisabled)
             .associateBy { it.key }
+
+    private fun inlineBubbleIfDisabled(item: IslandItem): IslandItem {
+        val bubble = item.sideBubble
+        if (secondaryBubbleEnabled || bubble == null || bubble.whenOccupiedOnly) return item
+        return item.withInlineBubble(inlineBubbleCell(bubble, secondaryBubbleOverlap))
+    }
 
     private fun recompute() {
         val items = if (suppressed) emptyMap() else allItems()

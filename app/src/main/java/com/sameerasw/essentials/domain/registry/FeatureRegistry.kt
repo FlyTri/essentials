@@ -1025,6 +1025,11 @@ object FeatureRegistry {
                             "island_secondary_bubble",
                         ),
                         SearchSetting(
+                            R.string.island_secondary_style_title,
+                            R.string.island_notif_queue_style_search_desc,
+                            "island_secondary_style",
+                        ),
+                        SearchSetting(
                             R.string.island_balance_compact_title,
                             R.string.island_section_behavior,
                             "island_balance_compact",
@@ -1071,11 +1076,6 @@ object FeatureRegistry {
                             "island_notif_keep_progress",
                         ),
                         SearchSetting(
-                            R.string.island_notif_compact_heads_up_title,
-                            R.string.island_notif_compact_heads_up_desc,
-                            "island_notif_compact_heads_up",
-                        ),
-                        SearchSetting(
                             R.string.island_notif_condensed_info_title,
                             R.string.island_notif_peek_style_search_desc,
                             "island_notif_peek_style",
@@ -1084,11 +1084,6 @@ object FeatureRegistry {
                             R.string.island_notif_queue_title,
                             R.string.island_notif_queue_desc,
                             "island_notif_queue",
-                        ),
-                        SearchSetting(
-                            R.string.island_notif_queue_style_title,
-                            R.string.island_notif_queue_style_search_desc,
-                            "island_notif_queue_style",
                         ),
                         SearchSetting(
                             R.string.island_notif_queue_inline_title,
