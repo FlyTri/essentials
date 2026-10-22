@@ -10,6 +10,15 @@
 package com.sameerasw.essentials.ui.core.sheets
 
 import android.content.Intent
+import android.widget.Toast
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.TextButton
+import com.sameerasw.essentials.data.repository.SettingsRepository
+import com.sameerasw.essentials.domain.registry.FeatureResetRegistry
+import com.sameerasw.essentials.ui.features.consciousgate.HoldToContinueButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -77,7 +86,19 @@ fun FeatureHelpBottomSheet(
     val isUnsupported = !feature.isDeviceSupported(context)
     val customHelp = FeatureCustomHelp.forFeature(feature.id)
     var showCustomHelp by remember { mutableStateOf(false) }
+    var showResetInfo by remember { mutableStateOf(false) }
     HelpSheetTracker.TrackOpen()
+
+    if (showResetInfo) {
+        AlertDialog(
+            onDismissRequest = { showResetInfo = false },
+            title = { Text(stringResource(R.string.feature_reset_info_title)) },
+            text = { Text(stringResource(R.string.feature_reset_info_desc)) },
+            confirmButton = {
+                TextButton(onClick = { showResetInfo = false }) { Text(stringResource(android.R.string.ok)) }
+            },
+        )
+    }
 
     if (showCustomHelp && customHelp != null) {
         customHelp.sheet { showCustomHelp = false }
@@ -239,6 +260,48 @@ fun FeatureHelpBottomSheet(
                                 border = AssistChipDefaults.assistChipBorder(true),
                             )
                         }
+                    }
+                }
+            }
+
+            val resetPrefixes = FeatureResetRegistry.prefixesFor(feature.id)
+            if (resetPrefixes != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    HoldToContinueButton(
+                        waitTimeProgress = 1f,
+                        onContinue = {
+                            SettingsRepository(context).resetKeysWithPrefixes(resetPrefixes)
+                            viewModel.check(context)
+                            Toast.makeText(context, R.string.feature_reset_done, Toast.LENGTH_SHORT).show()
+                        },
+                        onHoldingChange = {},
+                        modifier = Modifier.weight(1f),
+                        holdDurationMillis = 2_000L,
+                        holdLabel = stringResource(R.string.feature_reset_hold),
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        progressColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        shape = RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp, topEnd = 4.dp, bottomEnd = 4.dp),
+                    )
+                    FilledTonalIconButton(
+                        onClick = {
+                            HapticUtil.performUIHaptic(view)
+                            showResetInfo = true
+                        },
+                        modifier = Modifier.size(width = 58.dp, height = 58.dp),
+                        shape = RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp, topEnd = 24.dp, bottomEnd = 24.dp),
+                        colors =
+                            IconButtonDefaults.filledTonalIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                            ),
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_info_24),
+                            contentDescription = stringResource(R.string.feature_reset_info_title),
+                        )
                     }
                 }
             }
