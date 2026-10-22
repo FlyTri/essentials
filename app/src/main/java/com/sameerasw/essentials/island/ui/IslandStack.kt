@@ -1,6 +1,7 @@
 package com.sameerasw.essentials.island.ui
 
 import com.sameerasw.essentials.island.model.SideBubble
+import com.sameerasw.essentials.island.model.CompactCell
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.scaleIn
@@ -440,5 +441,17 @@ fun IslandSideBubble(
                 }
             }
         }
+    }
+}
+
+fun inlineBubbleCell(bubble: SideBubble, overlap: Boolean): CompactCell = CompactCell("bubble.inline") {
+    val tap = Modifier.pointerInput(bubble) { detectTapGestures { bubble.onOpen() } }
+    val content = bubble.content
+    when {
+        content != null -> Box(tap.size(22.dp).clip(CircleShape).background(Color.Black), contentAlignment = Alignment.Center) {
+            content(16.dp)
+        }
+        overlap -> IslandStackOverlap(bubble.icons, 22.dp, modifier = tap)
+        else -> IslandStackBubble(bubble.icons, 26.dp, modifier = tap)
     }
 }

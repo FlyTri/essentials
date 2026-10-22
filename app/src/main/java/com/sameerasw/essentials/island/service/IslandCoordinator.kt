@@ -716,6 +716,7 @@ class IslandCoordinator(
         controller.maxCells = settings.getIslandMaxItems() * 2
         controller.balanceCompact = settings.isIslandBalanceCompactEnabled()
         controller.secondaryBubbleEnabled = settings.isIslandSecondaryBubbleEnabled()
+        controller.secondaryBubbleOverlap = settings.getIslandNotifQueueStyle() == SettingsRepository.ISLAND_NOTIF_QUEUE_STYLE_OVERLAP
         controller.relayout()
         controller.expandedTimeoutMs = settings.getIslandExpandedTimeoutMs()
         applyPreviewRing()
