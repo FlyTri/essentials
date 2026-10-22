@@ -719,6 +719,7 @@ class IslandCoordinator(
                 null
             },
             iconDynamic = !iconCustomMode,
+            themedText = settings.getBoolean(SettingsRepository.KEY_ISLAND_THEMED_TEXT, false),
             iconMaterialYou = iconMaterialYou,
         )
         windowHost.maxWidthPx = (maxOf(lineWidth, expandedWidth * scale) * density).toInt()
@@ -833,6 +834,7 @@ class IslandCoordinator(
             SettingsRepository.KEY_ISLAND_ICON_COLOR_MODE,
             SettingsRepository.KEY_ISLAND_ICON_COLOR_CUSTOM,
             SettingsRepository.KEY_ISLAND_ICON_MATERIAL_YOU,
+            SettingsRepository.KEY_ISLAND_THEMED_TEXT,
             SettingsRepository.KEY_ISLAND_BORDER_OUTLINE_ENABLED,
             SettingsRepository.KEY_ISLAND_BORDER_OUTLINE_COLOR,
             SettingsRepository.KEY_ISLAND_BORDER_OUTLINE_DYNAMIC,

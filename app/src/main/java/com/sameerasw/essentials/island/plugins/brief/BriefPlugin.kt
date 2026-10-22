@@ -109,6 +109,7 @@ import com.sameerasw.essentials.island.model.IslandItem
 import com.sameerasw.essentials.island.model.IslandPriority
 import com.sameerasw.essentials.island.plugins.BaseIslandPlugin
 import com.sameerasw.essentials.island.ui.IslandTextStyles
+import com.sameerasw.essentials.island.ui.islandTextColor
 import com.sameerasw.essentials.island.ui.components.BatteryGlyph
 import com.sameerasw.essentials.island.ui.components.BatteryRing
 import com.sameerasw.essentials.island.ui.components.CameraRow
@@ -584,7 +585,7 @@ private fun BriefEventRow(event: UpcomingCalendarEvent, now: Long, accent: Color
         Column(Modifier.weight(1f)) {
             Text(
                 text = event.title,
-                style = IslandTextStyles.body.copy(color = Color.White, fontSize = 15.sp),
+                style = IslandTextStyles.body.copy(color = islandTextColor(), fontSize = 15.sp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -628,7 +629,7 @@ private fun BriefPlayer(media: MediaSnapshot, artwork: ImageBitmap?, onClick: ()
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            MarqueeText(text = media.title, style = IslandTextStyles.body.copy(color = Color.White, fontSize = 15.sp))
+            MarqueeText(text = media.title, style = IslandTextStyles.body.copy(color = islandTextColor(), fontSize = 15.sp))
             MarqueeText(text = media.artist, style = IslandTextStyles.body)
         }
         media.actions.like?.let {

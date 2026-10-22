@@ -35,6 +35,7 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.island.model.IslandExpandedScope
 import com.sameerasw.essentials.island.plugins.soften
 import com.sameerasw.essentials.island.ui.IslandTextStyles
+import com.sameerasw.essentials.island.ui.islandTextColor
 import com.sameerasw.essentials.island.ui.components.CameraRow
 import com.sameerasw.essentials.island.ui.components.ConnectedButtonRow
 import com.sameerasw.essentials.island.ui.components.ConnectedItem
@@ -68,7 +69,7 @@ fun CalendarExpanded(
             "${timeFormat.format(Date(event.startTimeMillis))} – ${timeFormat.format(Date(event.endTimeMillis))}"
         else -> timeFormat.format(Date(event.startTimeMillis))
     }
-    val detailStyle = IslandTextStyles.body.copy(color = Color.White, fontSize = 15.sp, lineHeight = 20.sp)
+    val detailStyle = IslandTextStyles.body.copy(color = islandTextColor(), fontSize = 15.sp, lineHeight = 20.sp)
 
     Box(propagateMinConstraints = true) {
         if (drawBackground && !SurfaceBackdrop { Box(Modifier.fillMaxSize().accentGlow(calendarColor, showGlow, scope.cameraClearance)) }) {

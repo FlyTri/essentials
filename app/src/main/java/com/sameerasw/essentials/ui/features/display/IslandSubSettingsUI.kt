@@ -536,6 +536,18 @@ fun IslandVisualsSettingsUI(
                     colors = ISLAND_ICON_PASTEL_COLORS,
                 )
             }
+
+            var themedText by remember { mutableStateOf(iconSettings.getBoolean(SettingsRepository.KEY_ISLAND_THEMED_TEXT, false)) }
+            IconToggleItem(
+                iconRes = R.drawable.rounded_palette_24,
+                title = stringResource(R.string.island_themed_text_title),
+                isChecked = themedText,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    themedText = checked
+                    iconSettings.putBoolean(SettingsRepository.KEY_ISLAND_THEMED_TEXT, checked)
+                },
+            )
         }
     }
 
