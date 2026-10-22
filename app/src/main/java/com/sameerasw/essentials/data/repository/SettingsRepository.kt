@@ -1892,6 +1892,23 @@ class SettingsRepository(
         }
     }
 
+    fun resetKeysWithPrefixes(prefixes: List<String>) {
+        val protected =
+            setOf(
+                KEY_GITHUB_ACCESS_TOKEN,
+                KEY_GITHUB_WORKFLOW_TOKEN,
+                KEY_SHIZUKU_AUTH_TOKEN,
+                KEY_SNOOZE_DISCOVERED_CHANNELS,
+                KEY_MAPS_DISCOVERED_CHANNELS,
+                KEY_SHUT_UP_ORIGINAL_SETTINGS,
+            )
+        val editor = prefs.edit()
+        prefs.all.keys
+            .filter { key -> key !in protected && prefixes.any { key.startsWith(it) } }
+            .forEach { editor.remove(it) }
+        editor.apply()
+    }
+
     /**
      * Executes the export configs operation.
      *

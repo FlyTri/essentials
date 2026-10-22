@@ -535,7 +535,6 @@
     <string name="app_colors_reset_all">Reset all to auto</string>
     <string name="app_colors_auto">Auto</string>
     <string name="app_colors_custom">Custom</string>
-    <string name="lock_screen_clock_reset">Reset clock face</string>
     <string name="island_dynamic_hide_status_bar_title">Hide statusbar items when expanded</string>
     <string name="island_hide_icons_title">Hide statusbar icons when island present</string>
     <string name="island_hide_icon_system">System icons</string>
@@ -3580,4 +3579,8 @@
     <string name="about_desc_call_sync">Sync call status between your phone and your watch.\n\nThis is only used for the launcher and is not a full call handler.</string>
     <string name="about_desc_mono_audio_tile">Quick Settings tile to toggle mono audio.\n\nMono audio plays the same sound in both ears, which helps when using a single earbud or if you have hearing difficulty in one ear.</string>
     <string name="about_desc_back_gesture">Fine tune the system back gesture.\n\nAdjust the edge widths for the left and right gesture areas and set up per-app back gesture behavior. Requires secure settings permission.</string>
+    <string name="feature_reset_hold">Hold to reset</string>
+    <string name="feature_reset_done">Settings reset</string>
+    <string name="feature_reset_info_title">Reset this feature</string>
+    <string name="feature_reset_info_desc">Resets every Essentials setting for this feature to its default. System settings and permissions are not changed.</string>
 </resources>
