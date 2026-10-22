@@ -42,6 +42,7 @@ data class IslandLayoutSpec(
     val queueInline: Boolean = false,
     val iconColorCustom: Color? = null,
     val iconDynamic: Boolean = true,
+    val themedText: Boolean = false,
     val iconMaterialYou: Boolean = true,
 ) {
     val compactHeight: Dp get() = cameraDiameter + verticalGap * 2

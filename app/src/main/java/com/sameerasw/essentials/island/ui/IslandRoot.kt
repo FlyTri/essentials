@@ -154,7 +154,10 @@ fun IslandRoot(
         targetSpec.iconColorCustom ?: iconBase
     }
     val iconColor by animateColorAsState(iconTarget, label = "islandIconColor")
-    CompositionLocalProvider(LocalIslandIconColor provides iconColor) {
+    CompositionLocalProvider(
+        LocalIslandIconColor provides iconColor,
+        LocalIslandTextColor provides if (targetSpec.themedText) pastelOf(iconColor) else null,
+    ) {
         IslandRootContent(state, targetSpec, actions, onTargetBoundsChanged, registerCollapseAnimator, showCameraRing)
     }
 }
