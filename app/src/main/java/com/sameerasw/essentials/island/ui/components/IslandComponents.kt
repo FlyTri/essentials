@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.runtime.setValue
@@ -87,9 +88,18 @@ fun IslandBitmap(
     }
 }
 
+val LocalIslandIconColor = compositionLocalOf<Color?> { null }
+
+@Composable
+fun resolveIconTint(tint: Color): Color {
+    val override = LocalIslandIconColor.current ?: return tint
+    if (tint.red == 0f && tint.green == 0f && tint.blue == 0f) return tint
+    return override.copy(alpha = override.alpha * tint.alpha)
+}
+
 @Composable
 fun IslandIcon(res: Int, tint: Color = Color.White, size: Dp = 20.dp, modifier: Modifier = Modifier) {
-    Icon(painterResource(res), contentDescription = null, tint = tint, modifier = modifier.squareFit(size))
+    Icon(painterResource(res), contentDescription = null, tint = resolveIconTint(tint), modifier = modifier.squareFit(size))
 }
 
 @Composable
@@ -131,7 +141,7 @@ fun EqualizerBars(
 @Composable
 fun BatteryRing(level: Int, color: Color, modifier: Modifier = Modifier, showLevel: Boolean = false, size: Dp = if (showLevel) 24.dp else 18.dp) {
     val sweep by animateFloatAsState(360f * level.coerceIn(0, 100) / 100f, IslandMotion.float(), label = "batterySweep")
-    val ringColor by animateColorAsState(color, label = "batteryColor")
+    val ringColor by animateColorAsState(resolveIconTint(color), label = "batteryColor")
     var ringPx by remember { mutableStateOf(0) }
     val density = LocalDensity.current
     Box(modifier.squareFit(size).onSizeChanged { ringPx = minOf(it.width, it.height) }, contentAlignment = Alignment.Center) {

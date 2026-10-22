@@ -47,6 +47,7 @@ import com.sameerasw.essentials.ui.components.sliders.ConfigSliderItem
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.ColorSwatchPicker
+import com.sameerasw.essentials.ui.core.pickers.ISLAND_ICON_PASTEL_COLORS
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.AppSelectionSheet
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
@@ -484,6 +485,57 @@ fun IslandVisualsSettingsUI(
                 onSettingsClick = { showPulseShadowSheet = true },
                 modifier = Modifier.highlight(highlightSetting == "island_pulse_shadow_on_notification"),
             )
+        }
+
+        IslandSettingsSection(R.string.island_section_icon_color) {
+            val iconSettings = remember { SettingsRepository(context) }
+            var colorMode by remember {
+                mutableStateOf(iconSettings.getString(SettingsRepository.KEY_ISLAND_ICON_COLOR_MODE, null) ?: SettingsRepository.ISLAND_ICON_COLOR_DYNAMIC)
+            }
+            var materialYou by remember { mutableStateOf(iconSettings.getBoolean(SettingsRepository.KEY_ISLAND_ICON_MATERIAL_YOU, true)) }
+            var customColor by remember {
+                mutableStateOf(iconSettings.getString(SettingsRepository.KEY_ISLAND_ICON_COLOR_CUSTOM, null) ?: "#FFFFFF")
+            }
+            val modeLabels = mapOf(
+                SettingsRepository.ISLAND_ICON_COLOR_DYNAMIC to stringResource(R.string.island_icon_color_dynamic),
+                SettingsRepository.ISLAND_ICON_COLOR_CUSTOM to stringResource(R.string.island_icon_color_custom),
+            )
+            SegmentedPicker(
+                items = modeLabels.keys.toList(),
+                selectedItem = colorMode,
+                onItemSelected = {
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    colorMode = it
+                    iconSettings.putString(SettingsRepository.KEY_ISLAND_ICON_COLOR_MODE, it)
+                },
+                labelProvider = { modeLabels[it].orEmpty() },
+                title = R.string.island_section_icon_color,
+                modifier = Modifier.fillMaxWidth().highlight(highlightSetting == "island_icon_color_mode"),
+            )
+            IconToggleItem(
+                iconRes = R.drawable.rounded_palette_24,
+                title = stringResource(R.string.island_icon_material_you_title),
+                isChecked = materialYou,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    materialYou = checked
+                    iconSettings.putBoolean(SettingsRepository.KEY_ISLAND_ICON_MATERIAL_YOU, checked)
+                },
+            )
+            AnimatedVisibility(
+                visible = colorMode == SettingsRepository.ISLAND_ICON_COLOR_CUSTOM && !materialYou,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically(),
+            ) {
+                ColorSwatchPicker(
+                    selectedColorHex = customColor,
+                    onColorSelected = {
+                        customColor = it
+                        iconSettings.putString(SettingsRepository.KEY_ISLAND_ICON_COLOR_CUSTOM, it)
+                    },
+                    colors = ISLAND_ICON_PASTEL_COLORS,
+                )
+            }
         }
     }
 

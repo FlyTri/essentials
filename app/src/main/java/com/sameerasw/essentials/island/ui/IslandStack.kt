@@ -1,6 +1,8 @@
 package com.sameerasw.essentials.island.ui
 
 import com.sameerasw.essentials.island.model.SideBubble
+import androidx.compose.ui.graphics.lerp
+import com.sameerasw.essentials.island.ui.components.LocalIslandIconColor
 import com.sameerasw.essentials.island.model.CompactCell
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -195,6 +197,9 @@ private fun queueVisible(icons: List<StackIcon>, max: Int): List<StackIcon> {
 
 private const val OVERFLOW_KEY = "queue_overflow"
 
+@Composable
+private fun overflowBackground(): Color = lerp(LocalIslandIconColor.current ?: Color.White, Color.Black, 0.65f)
+
 private fun queueOverflowIcon(count: Int) = StackIcon(OVERFLOW_KEY) { size -> QueueOverflowCounter(count, size) }
 
 @Composable
@@ -203,7 +208,7 @@ private fun QueueOverflowCounter(count: Int, size: Dp) {
         Modifier
             .size(size)
             .clip(CircleShape)
-            .background(Color.White.copy(alpha = 0.18f)),
+            .background(overflowBackground()),
         contentAlignment = Alignment.Center,
     ) {
         AnimatedContent(
@@ -385,7 +390,7 @@ fun IslandStackPill(
                         .padding(4.dp)
                         .size(iconSize)
                         .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.18f)),
+                        .background(overflowBackground()),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
