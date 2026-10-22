@@ -36,6 +36,9 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
     override val settingKeys = setOf(
         SettingsRepository.KEY_ISLAND_SHOW_TIME_BATTERY,
         SettingsRepository.KEY_ISLAND_TIME_SHOW_SECONDS,
+        SettingsRepository.KEY_ISLAND_TIME_FORMAT,
+        SettingsRepository.KEY_ISLAND_TIME_PERIOD,
+        SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO,
         SettingsRepository.KEY_ISLAND_TIME_HIDE_LOCKED,
         SettingsRepository.KEY_ISLAND_BATTERY_HIDE_LOCKED,
         SettingsRepository.KEY_ISLAND_SHOW_BATTERY,
@@ -172,8 +175,23 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
     private fun showSeconds() = settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_SHOW_SECONDS, false)
 
     private fun readTime() {
-        val base = if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm"
-        val pattern = if (showSeconds()) "$base:ss" else base
+        val format = settings.getString(SettingsRepository.KEY_ISLAND_TIME_FORMAT, null) ?: SettingsRepository.ISLAND_TIME_FORMAT_SYSTEM
+        val is24 = when (format) {
+            SettingsRepository.ISLAND_TIME_FORMAT_12H -> false
+            SettingsRepository.ISLAND_TIME_FORMAT_24H -> true
+            else -> DateFormat.is24HourFormat(context)
+        }
+        val base = if (is24) {
+            "HH:mm"
+        } else if (settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO, false)) {
+            "hh:mm"
+        } else {
+            "h:mm"
+        }
+        val withSeconds = if (showSeconds()) "$base:ss" else base
+        val showPeriod = !is24 &&
+            settings.getString(SettingsRepository.KEY_ISLAND_TIME_PERIOD, null) == SettingsRepository.ISLAND_TIME_PERIOD_AM_PM
+        val pattern = if (showPeriod) "$withSeconds a" else withSeconds
         time = SimpleDateFormat(pattern, Locale.getDefault()).format(Date())
     }
 

@@ -3175,6 +3175,14 @@
     <string name="island_action_tap_desc">Open app</string>
     <string name="island_tap_action_title">Tap action</string>
     <string name="island_show_time_title">Time</string>
+    <string name="island_time_format_title">Time format</string>
+    <string name="island_time_format_system">System</string>
+    <string name="island_time_format_12h">12 hr</string>
+    <string name="island_time_format_24h">24 hr</string>
+    <string name="island_time_period_title">AM / PM</string>
+    <string name="island_time_period_am_pm">AM / PM</string>
+    <string name="island_time_period_none">None</string>
+    <string name="island_time_leading_zero_title">Show leading 0</string>
     <string name="island_time_show_seconds_title">Show seconds</string>
     <string name="island_show_battery_title">Battery</string>
     <string name="island_battery_style_title">Battery style</string>
