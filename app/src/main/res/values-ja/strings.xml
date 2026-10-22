@@ -1768,8 +1768,6 @@
     <string name="island_expanded_timeout_desc">折りたたまれたピルに戻るまでの時間（0は無限大）</string>
     <string name="island_show_glow_title">アクセントの輝きを表示する</string>
     <string name="island_tap_action_title">タップ操作</string>
-    <string name="island_suppress_system_heads_up_title">システムのヘッドアップ通知を非表示にする</string>
-    <string name="island_dynamic_hide_status_bar_title">ステータスバーの項目を動的に非表示にする</string>
     <string name="island_catch_up_title">追いつく</string>
     <string name="island_catch_up_desc">最後の通知をアイランドに長時間表示する</string>
     <string name="diy_action_media_play_pause">メディアの一時停止または再生</string>
