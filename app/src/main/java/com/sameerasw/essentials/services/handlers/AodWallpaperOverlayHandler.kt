@@ -1158,6 +1158,7 @@ class AodWallpaperOverlayHandler(
     }
 
     private var lastWallpaperId = -1
+    private var lastCustomImageModified = 0L
 
     private fun loadAndApplyWallpaper() {
         val wallpaperManager = WallpaperManager.getInstance(service)
@@ -1170,6 +1171,15 @@ class AodWallpaperOverlayHandler(
                 lastWallpaperId = effectiveId
             }
         }
+        // Picking another custom image rewrites the file but leaves the pref at true, which
+        // fires no change listener, so detect the new image from the file itself.
+        if (prefs.getBoolean(SettingsRepository.KEY_AOD_WALLPAPER_CUSTOM_IMAGE, false)) {
+            val modified = File(service.filesDir, CUSTOM_IMAGE_FILE_NAME).lastModified()
+            if (modified != lastCustomImageModified) {
+                cachedWallpaperBitmap = null
+                lastCustomImageModified = modified
+            }
+        }
 
         evaluateAndApplyDisplayBitmap(animated = false)
     }
@@ -1177,7 +1187,7 @@ class AodWallpaperOverlayHandler(
     private fun extractCurrentWallpaper(): Bitmap? {
         return try {
             if (prefs.getBoolean(SettingsRepository.KEY_AOD_WALLPAPER_CUSTOM_IMAGE, false)) {
-                val file = File(service.filesDir, "custom_aod_wallpaper.png")
+                val file = File(service.filesDir, CUSTOM_IMAGE_FILE_NAME)
                 if (file.exists()) {
                     val customBmp = AppUtil.decodeSampledBitmapFromFile(file.absolutePath, reqWidth = 1440, reqHeight = 3200)
                     if (customBmp != null) return customBmp
@@ -1348,6 +1358,7 @@ class AodWallpaperOverlayHandler(
         const val LOCK_SCREEN_MEDIA_KEY = "media_controls_lock_screen"
         const val KEY_SAVED_LOCK_SCREEN_MEDIA = "saved_lock_screen_media"
         const val NO_SAVED_VALUE = -1
+        const val CUSTOM_IMAGE_FILE_NAME = "custom_aod_wallpaper.png"
         const val FADE_IN_DURATION_MS = 2000L
         const val FADE_OUT_DURATION_MS = 500L
         const val CROSSFADE_HALF_DURATION_MS = 350L
