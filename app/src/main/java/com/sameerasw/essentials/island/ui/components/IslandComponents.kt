@@ -118,7 +118,7 @@ fun EqualizerBars(
     modifier: Modifier = Modifier,
     size: Dp = 18.dp,
 ) {
-    val barColor = LocalIslandChipInk.current ?: color
+    val barColor = if (LocalIslandChipInk.current != null) Color.Black else color
     val levels = remember { mutableStateListOf(0.16f, 0.16f, 0.16f) }
     LaunchedEffect(playing) {
         if (!playing) {
