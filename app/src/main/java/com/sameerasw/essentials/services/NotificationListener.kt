@@ -584,6 +584,8 @@ class NotificationListener : NotificationListenerService() {
         progressDestroyed = true
         progressHandler.removeCallbacks(progressRefreshRunnable)
         progressExecutor.shutdownNow()
+        alertExecutor.shutdownNow()
+        alertHandler.removeCallbacksAndMessages(null)
         try {
             unregisterReceiver(likeActionReceiver)
         } catch (_: Exception) {
@@ -1089,18 +1091,20 @@ class NotificationListener : NotificationListenerService() {
         if (isHandledAsProgress(sbn)) {
             notifyAlertRemoved(sbn.key)
         } else if (!isRepost && isHeadsUpNotification(sbn, rankingMap, allowSilent = true)) {
-            val alert = extractNotificationAlert(sbn)?.copy(
-                isSilent = isSilentNotification(sbn, rankingMap),
-                blockedByDnd = isBlockedByDnd(sbn, rankingMap),
-                otpCode = otpCodeOf(sbn),
-                isConversation = isConversationNotification(sbn, rankingMap),
-            )
-            val callHidden = CallNotificationParser.isCall(sbn) && !SettingsRepository(applicationContext).isIslandShowCallsEnabled()
-            if (alert != null && !callHidden) {
-                notifyAlertPosted(alert)
+            runOffMain {
+                val alert = extractNotificationAlert(sbn)?.copy(
+                    isSilent = isSilentNotification(sbn, rankingMap),
+                    blockedByDnd = isBlockedByDnd(sbn, rankingMap),
+                    otpCode = otpCodeOf(sbn),
+                    isConversation = isConversationNotification(sbn, rankingMap),
+                )
+                val callHidden = CallNotificationParser.isCall(sbn) && !SettingsRepository(applicationContext).isIslandShowCallsEnabled()
+                if (alert != null && !callHidden && isStillActive(sbn.key)) {
+                    alertHandler.post { notifyAlertPosted(alert) }
+                }
             }
         } else if (!isRepost && isHubEnabled()) {
-            hubAlertOf(sbn, rankingMap)?.let(::notifyAlertPosted)
+            runOffMain { hubAlertOf(sbn, rankingMap)?.takeIf { isStillActive(sbn.key) }?.let { alert -> alertHandler.post { notifyAlertPosted(alert) } } }
         }
 
         val pm = getSystemService(POWER_SERVICE) as PowerManager
@@ -1941,6 +1945,8 @@ class NotificationListener : NotificationListenerService() {
 
     @Volatile
     private var progressDestroyed = false
+    private val alertHandler = Handler(Looper.getMainLooper())
+    private val alertExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private val progressHandler = Handler(Looper.getMainLooper())
     private val progressExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private val progressRefreshRunnable =
@@ -2136,8 +2142,28 @@ class NotificationListener : NotificationListenerService() {
             extras.getBoolean(Notification.EXTRA_PROGRESS_INDETERMINATE, false)
     }
 
-    fun hubAlerts(): List<ActiveNotificationAlert> =
-        safeActiveNotifications().orEmpty().mapNotNull { hubAlertOf(it, null) }.sortedByDescending { it.timestamp }
+    fun hubAlertsAsync(onResult: (List<ActiveNotificationAlert>) -> Unit) {
+        runOffMain {
+            val alerts = safeActiveNotifications().orEmpty().mapNotNull { hubAlertOf(it, null) }.sortedByDescending { it.timestamp }
+            alertHandler.post { onResult(alerts) }
+        }
+    }
+
+    private fun isStillActive(key: String): Boolean = safeActiveNotifications()?.any { it.key == key } != false
+
+    private fun runOffMain(task: () -> Unit) {
+        if (progressDestroyed || alertExecutor.isShutdown) return
+        try {
+            alertExecutor.execute {
+                try {
+                    task()
+                } catch (e: Exception) {
+                    Log.e("NotificationListener", "Alert extraction failed", e)
+                }
+            }
+        } catch (_: java.util.concurrent.RejectedExecutionException) {
+        }
+    }
 
     fun extractNotificationAlert(sbn: StatusBarNotification): ActiveNotificationAlert? {
         val notif = sbn.notification ?: return null

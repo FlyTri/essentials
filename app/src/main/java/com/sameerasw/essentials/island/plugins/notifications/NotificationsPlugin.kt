@@ -230,8 +230,21 @@ class NotificationsPlugin : BaseIslandPlugin() {
 
     private fun maxQueue() = if (hub()) HUB_MAX_QUEUE else MAX_QUEUE
 
+    private var hubSyncGeneration = 0
+
     private fun syncHub() {
-        val live = NotificationListener.instance?.hubAlerts().orEmpty()
+        val generation = ++hubSyncGeneration
+        val listener = NotificationListener.instance
+        if (listener == null) {
+            applyHub(emptyList())
+            return
+        }
+        listener.hubAlertsAsync { live ->
+            if (generation == hubSyncGeneration && ctx != null) applyHub(live)
+        }
+    }
+
+    private fun applyHub(live: List<ActiveNotificationAlert>) {
         val liveKeys = live.mapTo(HashSet()) { it.key }
         val stale = alerts.filter { it.key !in liveKeys && !it.key.startsWith("simulated_") }
         stale.forEach { removeQuietly(it.key) }
