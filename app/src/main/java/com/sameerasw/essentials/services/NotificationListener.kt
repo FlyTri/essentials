@@ -581,6 +581,7 @@ class NotificationListener : NotificationListenerService() {
     override fun onDestroy() {
         super.onDestroy()
         instance = null
+        progressDestroyed = true
         progressHandler.removeCallbacks(progressRefreshRunnable)
         progressExecutor.shutdownNow()
         try {
@@ -1938,11 +1939,13 @@ class NotificationListener : NotificationListenerService() {
         )
     }
 
+    @Volatile
+    private var progressDestroyed = false
     private val progressHandler = Handler(Looper.getMainLooper())
     private val progressExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private val progressRefreshRunnable =
         Runnable {
-            if (progressExecutor.isShutdown) return@Runnable
+            if (progressDestroyed || progressExecutor.isShutdown) return@Runnable
             try {
                 progressExecutor.execute {
                     val navigation =
@@ -1968,6 +1971,7 @@ class NotificationListener : NotificationListenerService() {
         }
 
     private fun scheduleProgressRefresh() {
+        if (progressDestroyed) return
         progressHandler.removeCallbacks(progressRefreshRunnable)
         progressHandler.postDelayed(progressRefreshRunnable, PROGRESS_REFRESH_DEBOUNCE_MS)
     }
