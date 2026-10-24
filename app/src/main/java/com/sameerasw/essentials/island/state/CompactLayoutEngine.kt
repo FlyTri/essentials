@@ -102,7 +102,7 @@ object CompactLayoutEngine {
                 val movedGap = kotlin.math.abs((left - size) - (right + size))
                 if (movedGap > gap || (movedGap == gap && left <= right)) break
                 before.removeAll(entry.cellKeys.toSet())
-                after += if (size == 2) entry.cellKeys.reversed() else entry.cellKeys
+                after.addAll(0, if (size == 2) entry.cellKeys.reversed() else entry.cellKeys)
             }
         }
 
@@ -115,7 +115,7 @@ object CompactLayoutEngine {
                 val movedGap = kotlin.math.abs((left - size) - (right + size))
                 if (movedGap >= gap) break
                 before.removeAll(entry.cellKeys.toSet())
-                after += if (size == 2) entry.cellKeys.reversed() else entry.cellKeys
+                after.addAll(0, if (size == 2) entry.cellKeys.reversed() else entry.cellKeys)
             }
         }
 
