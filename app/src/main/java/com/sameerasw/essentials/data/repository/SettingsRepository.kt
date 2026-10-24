@@ -561,6 +561,7 @@ class SettingsRepository(
         const val KEY_ISLAND_SHOW_TIME_BATTERY = "island_show_time_battery"
         const val KEY_ISLAND_TIME_SHOW_SECONDS = "island_time_show_seconds"
         const val KEY_ISLAND_THEMED_TEXT = "island_themed_text"
+        const val KEY_ISLAND_CHIPS = "island_chips"
         const val KEY_ISLAND_ICON_COLOR_MODE = "island_icon_color_mode"
         const val KEY_ISLAND_ICON_COLOR_CUSTOM = "island_icon_color_custom"
         const val KEY_ISLAND_ICON_MATERIAL_YOU = "island_icon_material_you"

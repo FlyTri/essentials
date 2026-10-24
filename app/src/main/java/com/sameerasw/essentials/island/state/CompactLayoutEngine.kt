@@ -9,6 +9,7 @@ data class CompactEntry(
     val soloCellKeys: List<String> = emptyList(),
     val needsCompany: Boolean = false,
     val companionOnly: Boolean = false,
+    val keepTogether: Boolean = false,
 )
 
 // `before` / `after` are camera-relative and ordered inner (next to camera) → outer.
@@ -120,10 +121,11 @@ object CompactLayoutEngine {
 
         val solo = selected.singleOrNull()
         if (solo != null && solo.soloCellKeys.isNotEmpty() && solo.cellKeys.size == 1) {
+            if (solo.keepTogether) return CompactArrangement(emptyList(), solo.soloCellKeys + solo.cellKeys, visible)
             return CompactArrangement(solo.soloCellKeys, solo.cellKeys, visible)
         }
 
-        if (before.isEmpty() && selected.size == 1 && after.size == 2) {
+        if (before.isEmpty() && selected.size == 1 && after.size == 2 && !selected.first().keepTogether) {
             val item = selected.first()
             return CompactArrangement(listOf(item.cellKeys[0]), listOf(item.cellKeys[1]), visible)
         }

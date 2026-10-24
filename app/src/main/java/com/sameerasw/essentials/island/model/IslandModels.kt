@@ -109,6 +109,12 @@ object SideBubblePriority {
     const val PROGRESS = 10
 }
 
+object IslandChips {
+    val items = setOf(
+        "media", "calendar", "timer", "alarm", "caffeinate", "flashlight", "sound_mode", "devices", "travel", "navigation", "progress",
+    )
+}
+
 class QueueInfo(
     val next: IslandItem,
     val onAdvance: () -> Unit,

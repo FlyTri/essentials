@@ -720,6 +720,7 @@ class IslandCoordinator(
             },
             iconDynamic = !iconCustomMode,
             themedText = settings.getBoolean(SettingsRepository.KEY_ISLAND_THEMED_TEXT, false),
+            chips = settings.getBoolean(SettingsRepository.KEY_ISLAND_CHIPS, false),
             iconMaterialYou = iconMaterialYou,
         )
         windowHost.maxWidthPx = (maxOf(lineWidth, expandedWidth * scale) * density).toInt()
@@ -727,6 +728,7 @@ class IslandCoordinator(
         controller.lineStageEnabled = settings.isIslandLineStageEnabled()
         controller.maxCells = settings.getIslandMaxItems() * 2
         controller.balanceCompact = settings.isIslandBalanceCompactEnabled()
+        controller.chipsEnabled = settings.getBoolean(SettingsRepository.KEY_ISLAND_CHIPS, false)
         controller.secondaryBubbleEnabled = settings.isIslandSecondaryBubbleEnabled()
         controller.secondaryBubbleOverlap = settings.getIslandNotifQueueStyle() == SettingsRepository.ISLAND_NOTIF_QUEUE_STYLE_OVERLAP
         controller.relayout()
@@ -835,6 +837,7 @@ class IslandCoordinator(
             SettingsRepository.KEY_ISLAND_ICON_COLOR_CUSTOM,
             SettingsRepository.KEY_ISLAND_ICON_MATERIAL_YOU,
             SettingsRepository.KEY_ISLAND_THEMED_TEXT,
+            SettingsRepository.KEY_ISLAND_CHIPS,
             SettingsRepository.KEY_ISLAND_BORDER_OUTLINE_ENABLED,
             SettingsRepository.KEY_ISLAND_BORDER_OUTLINE_COLOR,
             SettingsRepository.KEY_ISLAND_BORDER_OUTLINE_DYNAMIC,

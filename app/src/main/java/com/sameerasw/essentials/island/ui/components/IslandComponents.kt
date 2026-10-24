@@ -95,6 +95,8 @@ fun IslandBitmap(
 
 val LocalIslandBitmapFlat = compositionLocalOf { false }
 
+val LocalIslandChipInk = compositionLocalOf<Color?> { null }
+
 val LocalIslandIconColor = compositionLocalOf<Color?> { null }
 
 @Composable
@@ -116,6 +118,7 @@ fun EqualizerBars(
     modifier: Modifier = Modifier,
     size: Dp = 18.dp,
 ) {
+    val barColor = LocalIslandChipInk.current ?: color
     val levels = remember { mutableStateListOf(0.16f, 0.16f, 0.16f) }
     LaunchedEffect(playing) {
         if (!playing) {
@@ -136,7 +139,7 @@ fun EqualizerBars(
         animated.forEachIndexed { i, level ->
             val h = this.size.height * level
             drawRoundRect(
-                color = color,
+                color = barColor,
                 topLeft = Offset(barWidth * (i * 2f), (this.size.height - h) / 2f),
                 size = Size(barWidth, h),
                 cornerRadius = CornerRadius(barWidth / 2f),

@@ -18,6 +18,27 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.geometry.Size
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.unit.dp
+import com.sameerasw.essentials.island.ui.components.LocalIslandChipInk
+import com.sameerasw.essentials.island.ui.components.LocalIslandIconColor
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -28,7 +49,30 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import com.sameerasw.essentials.island.model.CompactCell
+import com.sameerasw.essentials.island.model.IslandChips
 import com.sameerasw.essentials.island.state.IslandUiState
+
+@Composable
+private fun ChipUnit(color: Color, spec: IslandLayoutSpec, content: @Composable () -> Unit) {
+    val container by animateColorAsState(color, label = "islandChip")
+    val ink = if (container.luminance() > 0.5f) Color.Black else Color.White
+    CompositionLocalProvider(
+        LocalIslandIconColor provides ink,
+        LocalIslandTextColor provides ink,
+        LocalIslandChipInk provides ink,
+    ) {
+        Row(
+            modifier = Modifier
+                .height(spec.cellSize)
+                .defaultMinSize(minWidth = spec.cellSize)
+                .clip(RoundedCornerShape(50))
+                .background(container)
+                .padding(horizontal = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(spec.cellSpacing / 2),
+            verticalAlignment = Alignment.CenterVertically,
+        ) { content() }
+    }
+}
 
 private class CellEntry(val itemKey: String, val cell: CompactCell, val before: Boolean)
 
@@ -44,6 +88,8 @@ fun CompactTemplate(
     onBaseWidth: (Int) -> Unit = {},
     onNeedLeft: (Int) -> Unit = {},
 ) {
+    val iconColor = LocalIslandIconColor.current
+    val primary = MaterialTheme.colorScheme.primary
     val cells = buildMap {
         state.items.values.forEach { item -> item.compact.forEach { put(it.key, item.key to it) } }
     }
@@ -73,13 +119,23 @@ fun CompactTemplate(
     previous.clear()
     previous.addAll(merged)
     SideEffect { settled[0] = true }
-    val beforeCount = merged.count { it.before }
-    val ordered = merged.filter { it.before } + merged.filterNot { it.before }
+    val ordered = (merged.filter { it.before } + merged.filterNot { it.before }).fold(mutableListOf<MutableList<CellEntry>>()) { units, entry ->
+        val last = units.lastOrNull()
+        val chipped = spec.chips && entry.itemKey in IslandChips.items && state.items.containsKey(entry.itemKey)
+        if (chipped && last != null && last[0].itemKey == entry.itemKey && last[0].before == entry.before) {
+            last.add(entry)
+        } else {
+            units.add(mutableListOf(entry))
+        }
+        units
+    }
+    val beforeCount = ordered.count { it[0].before }
 
     Layout(
         modifier = Modifier.height(spec.compactHeight),
         content = {
-            ordered.forEach { entry ->
+            ordered.forEach { unit ->
+                val entry = unit[0]
                 key(entry.cell.key) {
                     val visibleState = transitions[entry.cell.key] ?: remember { MutableTransitionState(true) }
                     val cameraOnEnd = if (spec.growDirection != 0) spec.growDirection < 0 else entry.before
@@ -105,10 +161,26 @@ fun CompactTemplate(
                                 )
                             },
                     ) {
-                        Box(
-                            modifier = Modifier.height(spec.cellSize).defaultMinSize(minWidth = spec.cellSize),
-                            contentAlignment = Alignment.Center,
-                        ) { entry.cell.content() }
+                        val chipColor = if (spec.chips && entry.itemKey in IslandChips.items) {
+                            state.items[entry.itemKey]?.let { it.accent ?: iconColor ?: primary }
+                        } else {
+                            null
+                        }
+                        if (chipColor != null) {
+                            ChipUnit(chipColor, spec) {
+                                unit.forEach { member ->
+                                    Box(
+                                        modifier = Modifier.height(spec.cellSize).defaultMinSize(minWidth = spec.cellSize),
+                                        contentAlignment = Alignment.Center,
+                                    ) { member.cell.content() }
+                                }
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier.height(spec.cellSize).defaultMinSize(minWidth = spec.cellSize),
+                                contentAlignment = Alignment.Center,
+                            ) { entry.cell.content() }
+                        }
                     }
                 }
             }
