@@ -67,7 +67,7 @@ private fun ChipUnit(color: Color, spec: IslandLayoutSpec, content: @Composable 
                 .defaultMinSize(minWidth = spec.cellSize)
                 .clip(RoundedCornerShape(50))
                 .background(container)
-                .padding(horizontal = 6.dp),
+                .padding(horizontal = 3.dp),
             horizontalArrangement = Arrangement.spacedBy(spec.cellSpacing / 2),
             verticalAlignment = Alignment.CenterVertically,
         ) { content() }
@@ -170,7 +170,15 @@ fun CompactTemplate(
                             ChipUnit(chipColor, spec) {
                                 unit.forEach { member ->
                                     Box(
-                                        modifier = Modifier.height(spec.cellSize).defaultMinSize(minWidth = spec.cellSize),
+                                        modifier = Modifier
+                                            .height(spec.cellSize)
+                                            .then(
+                                                if (member.cell.key.endsWith(".art")) {
+                                                    Modifier
+                                                } else {
+                                                    Modifier.defaultMinSize(minWidth = spec.cellSize).padding(horizontal = 4.dp)
+                                                },
+                                            ),
                                         contentAlignment = Alignment.Center,
                                     ) { member.cell.content() }
                                 }
@@ -188,6 +196,7 @@ fun CompactTemplate(
     ) { measurables, constraints ->
         val loose = Constraints(maxHeight = constraints.maxHeight)
         val placeables = measurables.map { it.measure(loose) }
+        val chipPlaceables = placeables.filterIndexed { i, _ -> ordered[i].let { spec.chips && it[0].itemKey in IslandChips.items && state.items.containsKey(it[0].itemKey) } }.toSet()
         val spacing = spec.cellSpacing.roundToPx()
         val cameraSlot = spec.cameraSlotWidth.roundToPx()
         val left = placeables.take(beforeCount).filter { it.width > 0 }
@@ -197,7 +206,7 @@ fun CompactTemplate(
         
         val squareCell = spec.cellSize.roundToPx()
         val opticalInset = (height * OPTICAL_INSET_RATIO).toInt()
-        fun edgeInset(outer: Placeable?) = if (outer != null && outer.width > squareCell) opticalInset else 0
+        fun edgeInset(outer: Placeable?) = if (outer != null && outer.width > squareCell && outer !in chipPlaceables) opticalInset else 0
         if (cameraSlot == 0) {
             val cells = left + right
             onSlack(if (spec.balanceCompact) bubbleExtent().coerceAtLeast(0) else 0)
