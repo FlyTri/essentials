@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.animation.togetherWith
@@ -61,9 +62,12 @@ import com.sameerasw.essentials.island.model.IslandChips
 import com.sameerasw.essentials.island.state.IslandUiState
 
 @Composable
-private fun ChipUnit(color: Color, spec: IslandLayoutSpec, content: @Composable () -> Unit) {
+private fun ChipUnit(color: Color, spec: IslandLayoutSpec, startNeighbor: Boolean, endNeighbor: Boolean, content: @Composable () -> Unit) {
     val container by animateColorAsState(color, label = "islandChip")
     val ink = if (container.luminance() > 0.5f) Color.Black else Color.White
+    val full = spec.cellSize / 2
+    val startRadius by animateDpAsState(if (startNeighbor) 6.dp else full, IslandMotion.float(), label = "chipStart")
+    val endRadius by animateDpAsState(if (endNeighbor) 6.dp else full, IslandMotion.float(), label = "chipEnd")
     CompositionLocalProvider(
         LocalIslandIconColor provides ink,
         LocalIslandTextColor provides ink,
@@ -73,7 +77,7 @@ private fun ChipUnit(color: Color, spec: IslandLayoutSpec, content: @Composable 
             modifier = Modifier
                 .height(spec.cellSize)
                 .defaultMinSize(minWidth = spec.cellSize)
-                .clip(RoundedCornerShape(50))
+                .clip(RoundedCornerShape(topStart = startRadius, bottomStart = startRadius, topEnd = endRadius, bottomEnd = endRadius))
                 .background(container)
                 .padding(horizontal = 3.dp),
             horizontalArrangement = Arrangement.spacedBy(spec.cellSpacing / 2),
@@ -207,7 +211,10 @@ fun CompactTemplate(
                 }
                 if (unit.chipColor != null) {
                     Box(tap) {
-                        ChipUnit(unit.chipColor, spec) {
+                        val at = units.indexOfFirst { it.key == unit.key }
+                        val innerNeighbor = at > 0 && units[at - 1].chipColor != null
+                        val outerNeighbor = at >= 0 && units.getOrNull(at + 1)?.chipColor != null
+                        ChipUnit(unit.chipColor, spec, startNeighbor = if (before) outerNeighbor else innerNeighbor, endNeighbor = if (before) innerNeighbor else outerNeighbor) {
                             unit.cells.forEach { member ->
                                 Box(
                                     modifier = Modifier
@@ -249,7 +256,10 @@ fun CompactTemplate(
         val cameraSlot = spec.cameraSlotWidth.roundToPx()
         val left = placeables.take(beforeCount).filter { it.width > 0 }
         val right = placeables.drop(beforeCount).filter { it.width > 0 }
-        fun content(list: List<Placeable>) = if (list.isEmpty()) 0 else list.sumOf { it.width } + spacing * (list.size - 1)
+        val chipGap = 2.dp.roundToPx()
+        fun gapAfter(list: List<Placeable>, i: Int) =
+            if (i < list.lastIndex && list[i] in chipPlaceables && list[i + 1] in chipPlaceables) chipGap else spacing
+        fun content(list: List<Placeable>) = if (list.isEmpty()) 0 else list.sumOf { it.width } + list.indices.sumOf { if (it < list.lastIndex) gapAfter(list, it) else 0 }
         val height = spec.compactHeight.roundToPx()
         
         val squareCell = spec.cellSize.roundToPx()
@@ -267,9 +277,9 @@ fun CompactTemplate(
             onNeedLeft(-1)
             return@Layout layout(width, height) {
                 var x = pad + startInset
-                cells.forEach {
+                cells.forEachIndexed { index, it ->
                     it.place(x, (height - it.height) / 2)
-                    x += it.width + spacing
+                    x += it.width + gapAfter(cells, index)
                 }
             }
         }
@@ -282,9 +292,9 @@ fun CompactTemplate(
             onNeedLeft(-1)
             return@Layout layout(width, height) {
                 var x = if (spec.growDirection > 0) cameraSlot else spacing + inset
-                cells.forEach {
+                cells.forEachIndexed { index, it ->
                     it.place(x, (height - it.height) / 2)
-                    x += it.width + spacing
+                    x += it.width + gapAfter(cells, index)
                 }
             }
         }
@@ -308,14 +318,14 @@ fun CompactTemplate(
         val width = leftSide + rightSide + cameraSlot
         layout(width, height) {
             var x = spacing + leftInset
-            left.forEach {
+            left.forEachIndexed { index, it ->
                 it.place(x, (height - it.height) / 2)
-                x += it.width + spacing
+                x += it.width + gapAfter(left, index)
             }
             x = width - spacing - rightInset - content(right)
-            right.forEach {
+            right.forEachIndexed { index, it ->
                 it.place(x, (height - it.height) / 2)
-                x += it.width + spacing
+                x += it.width + gapAfter(right, index)
             }
         }
     }
