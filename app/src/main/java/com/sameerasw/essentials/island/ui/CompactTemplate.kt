@@ -20,6 +20,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.slideInVertically
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -74,7 +82,22 @@ private fun ChipUnit(color: Color, spec: IslandLayoutSpec, content: @Composable 
     }
 }
 
-private class CellEntry(val itemKey: String, val cell: CompactCell, val before: Boolean)
+private fun slotChipped(i: Int, beforeSlots: Int, beforeUnits: List<SlotUnit>, afterUnits: List<SlotUnit>): Boolean {
+    val unit = if (i < beforeSlots) beforeUnits.getOrNull(beforeSlots - 1 - i) else afterUnits.getOrNull(i - beforeSlots)
+    return unit?.chipColor != null
+}
+
+private class CellEntry(val itemKey: String, val cell: CompactCell)
+
+private class SlotUnit(
+    val key: String,
+    val itemKey: String,
+    val priority: Int,
+    val before: Boolean,
+    val cells: List<CellEntry>,
+    val chipColor: Color?,
+    val sideKeys: List<String>,
+)
 
 @Composable
 fun CompactTemplate(
@@ -93,110 +116,135 @@ fun CompactTemplate(
     val cells = buildMap {
         state.items.values.forEach { item -> item.compact.forEach { put(it.key, item.key to it) } }
     }
-    val current = state.arrangement.before.reversed().mapNotNull { k -> cells[k]?.let { CellEntry(it.first, it.second, true) } } +
-        state.arrangement.after.mapNotNull { k -> cells[k]?.let { CellEntry(it.first, it.second, false) } }
+    fun chipColorOf(itemKey: String): Color? =
+        if (spec.chips && itemKey in IslandChips.items) state.items[itemKey]?.let { it.accent ?: iconColor ?: primary } else null
 
-    // Cells that just left stay composed until their exit animation finishes.
-    val transitions = remember { HashMap<String, MutableTransitionState<Boolean>>() }
-    val previous = remember { arrayListOf<CellEntry>() }
-    // Cells present when the template first appears show immediately; only later arrivals animate in.
+    fun group(keys: List<String>, before: Boolean): List<SlotUnit> {
+        val units = mutableListOf<MutableList<CellEntry>>()
+        keys.forEach { k ->
+            val (itemKey, cell) = cells[k] ?: return@forEach
+            val last = units.lastOrNull()
+            if (chipColorOf(itemKey) != null && last != null && last[0].itemKey == itemKey) {
+                last.add(CellEntry(itemKey, cell))
+            } else {
+                units.add(mutableListOf(CellEntry(itemKey, cell)))
+            }
+        }
+        val ids = units.map { it[0].cell.key }
+        return units.map {
+            SlotUnit(it[0].cell.key, it[0].itemKey, state.items[it[0].itemKey]?.effectivePriority ?: 0, before, it, chipColorOf(it[0].itemKey), ids)
+        }
+    }
+
+    val beforeUnits = group(state.arrangement.before.reversed(), true).reversed()
+    val afterUnits = group(state.arrangement.after, false)
+
+    val known = remember { HashMap<String, SlotUnit>() }
+    (beforeUnits + afterUnits).forEach { known[it.key] = it }
     val settled = remember { booleanArrayOf(false) }
-    val currentKeys = current.map { it.cell.key }.toSet()
-    val merged = current.toMutableList()
-    previous.forEachIndexed { index, entry ->
-        if (entry.cell.key in currentKeys) return@forEachIndexed
-        val exitState = transitions[entry.cell.key] ?: return@forEachIndexed
-        if (exitState.isIdle && !exitState.currentState) {
-            transitions.remove(entry.cell.key)
-            return@forEachIndexed
+    val lingerBefore = remember { intArrayOf(0) }
+    val lingerAfter = remember { intArrayOf(0) }
+    val trim = remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    trim.intValue
+    lingerBefore[0] = maxOf(lingerBefore[0], beforeUnits.size)
+    lingerAfter[0] = maxOf(lingerAfter[0], afterUnits.size)
+    val beforeSlots = lingerBefore[0]
+    val afterSlots = lingerAfter[0]
+    val beforeCount = beforeSlots
+
+    @Composable
+    fun Slot(before: Boolean, index: Int, units: List<SlotUnit>, linger: IntArray) {
+        val target = units.getOrNull(index)?.key
+        var shown by remember { mutableStateOf(if (settled[0]) null else target) }
+        androidx.compose.runtime.LaunchedEffect(target) { shown = target }
+        androidx.compose.runtime.LaunchedEffect(index >= units.size, units.size) {
+            if (index >= units.size) {
+                kotlinx.coroutines.delay(IslandMotion.COMPACT_MS + 80L)
+                if (linger[0] > units.size) {
+                    linger[0] = units.size
+                    trim.intValue++
+                }
+            }
         }
-        exitState.targetState = false
-        merged.add(index.coerceAtMost(merged.size), entry)
-    }
-    current.forEach { entry ->
-        transitions.getOrPut(entry.cell.key) { MutableTransitionState(!settled[0]) }.targetState = true
-    }
-    previous.clear()
-    previous.addAll(merged)
-    SideEffect { settled[0] = true }
-    val ordered = (merged.filter { it.before } + merged.filterNot { it.before }).fold(mutableListOf<MutableList<CellEntry>>()) { units, entry ->
-        val last = units.lastOrNull()
-        val chipped = spec.chips && entry.itemKey in IslandChips.items && state.items.containsKey(entry.itemKey)
-        if (chipped && last != null && last[0].itemKey == entry.itemKey && last[0].before == entry.before) {
-            last.add(entry)
-        } else {
-            units.add(mutableListOf(entry))
+        val cameraOnEnd = if (spec.growDirection != 0) spec.growDirection < 0 else before
+        val towardCamera: (Int) -> Int = { if (cameraOnEnd) it / 2 else -it / 2 }
+        val edgeAnchored = spec.growDirection != 0
+        AnimatedContent(
+            targetState = shown,
+            transitionSpec = {
+                val from = initialState?.let { known[it] }
+                val to = targetState?.let { known[it] }
+                val swap = from != null && to != null && from.key !in to.sideKeys && to.key !in from.sideKeys
+                val up = (to?.priority ?: 0) < (from?.priority ?: 0)
+                val spec2 = when {
+                    swap -> (fadeIn(IslandMotion.contentIn()) + slideInVertically(IslandMotion.compactOffset) { if (up) it else -it })
+                        .togetherWith(fadeOut(IslandMotion.contentOut()) + slideOutVertically(IslandMotion.compactOffset) { if (up) -it else it })
+                    else -> (
+                        fadeIn(IslandMotion.contentIn()) +
+                            (if (edgeAnchored) EnterTransition.None else slideInHorizontally(IslandMotion.compactOffset, towardCamera)) +
+                            scaleIn(IslandMotion.compactFloat(), initialScale = 0.6f)
+                        ).togetherWith(
+                            fadeOut(IslandMotion.contentOut()) +
+                                (if (edgeAnchored) ExitTransition.None else slideOutHorizontally(IslandMotion.compactOffset, towardCamera)) +
+                                scaleOut(IslandMotion.compactFloat(), targetScale = 0.6f),
+                        )
+                }
+                spec2.using(SizeTransform(clip = true) { _, _ -> IslandMotion.compactSize })
+            },
+            contentAlignment = Alignment.Center,
+            label = "compactSlot",
+            modifier = Modifier
+                .animatePlacement(fromEnd = spec.growDirection == 0 && !before)
+                .height(spec.cellSize),
+        ) { k ->
+            val unit = k?.let { known[it] }
+            if (unit != null) {
+                val tap = Modifier.pointerInput(unit.itemKey) {
+                    detectTapGestures(
+                        onTap = { onCellTap(unit.itemKey) },
+                        onLongPress = { onCellLongPress(unit.itemKey) },
+                    )
+                }
+                if (unit.chipColor != null) {
+                    Box(tap) {
+                        ChipUnit(unit.chipColor, spec) {
+                            unit.cells.forEach { member ->
+                                Box(
+                                    modifier = Modifier
+                                        .height(spec.cellSize)
+                                        .then(
+                                            if (member.cell.key.endsWith(".art")) {
+                                                Modifier
+                                            } else {
+                                                Modifier.defaultMinSize(minWidth = spec.cellSize).padding(horizontal = 4.dp)
+                                            },
+                                        ),
+                                    contentAlignment = Alignment.Center,
+                                ) { member.cell.content() }
+                            }
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = tap.height(spec.cellSize).defaultMinSize(minWidth = spec.cellSize),
+                        contentAlignment = Alignment.Center,
+                    ) { unit.cells[0].cell.content() }
+                }
+            }
         }
-        units
     }
-    val beforeCount = ordered.count { it[0].before }
 
     Layout(
         modifier = Modifier.height(spec.compactHeight),
         content = {
-            ordered.forEach { unit ->
-                val entry = unit[0]
-                key(entry.cell.key) {
-                    val visibleState = transitions[entry.cell.key] ?: remember { MutableTransitionState(true) }
-                    val cameraOnEnd = if (spec.growDirection != 0) spec.growDirection < 0 else entry.before
-                    val cameraEdge = if (cameraOnEnd) Alignment.End else Alignment.Start
-                    val towardCamera: (Int) -> Int = { if (cameraOnEnd) it / 2 else -it / 2 }
-                    val edgeAnchored = spec.growDirection != 0
-                    AnimatedVisibility(
-                        visibleState = visibleState,
-                        enter = fadeIn(IslandMotion.contentIn()) +
-                            expandHorizontally(IslandMotion.compactSize, expandFrom = cameraEdge) +
-                            (if (edgeAnchored) EnterTransition.None else slideInHorizontally(IslandMotion.compactOffset, towardCamera)) +
-                            scaleIn(IslandMotion.compactFloat(), initialScale = 0.6f),
-                        exit = fadeOut(IslandMotion.contentOut()) +
-                            shrinkHorizontally(IslandMotion.compactSize, shrinkTowards = cameraEdge) +
-                            (if (edgeAnchored) ExitTransition.None else slideOutHorizontally(IslandMotion.compactOffset, towardCamera)) +
-                            scaleOut(IslandMotion.compactFloat(), targetScale = 0.6f),
-                        modifier = Modifier
-                            .animatePlacement(fromEnd = spec.growDirection == 0 && !entry.before)
-                            .pointerInput(entry.itemKey) {
-                                detectTapGestures(
-                                    onTap = { onCellTap(entry.itemKey) },
-                                    onLongPress = { onCellLongPress(entry.itemKey) },
-                                )
-                            },
-                    ) {
-                        val chipColor = if (spec.chips && entry.itemKey in IslandChips.items) {
-                            state.items[entry.itemKey]?.let { it.accent ?: iconColor ?: primary }
-                        } else {
-                            null
-                        }
-                        if (chipColor != null) {
-                            ChipUnit(chipColor, spec) {
-                                unit.forEach { member ->
-                                    Box(
-                                        modifier = Modifier
-                                            .height(spec.cellSize)
-                                            .then(
-                                                if (member.cell.key.endsWith(".art")) {
-                                                    Modifier
-                                                } else {
-                                                    Modifier.defaultMinSize(minWidth = spec.cellSize).padding(horizontal = 4.dp)
-                                                },
-                                            ),
-                                        contentAlignment = Alignment.Center,
-                                    ) { member.cell.content() }
-                                }
-                            }
-                        } else {
-                            Box(
-                                modifier = Modifier.height(spec.cellSize).defaultMinSize(minWidth = spec.cellSize),
-                                contentAlignment = Alignment.Center,
-                            ) { entry.cell.content() }
-                        }
-                    }
-                }
-            }
+            for (i in beforeSlots - 1 downTo 0) key("b$i") { Slot(true, i, beforeUnits, lingerBefore) }
+            for (i in 0 until afterSlots) key("a$i") { Slot(false, i, afterUnits, lingerAfter) }
+            SideEffect { settled[0] = true }
         },
     ) { measurables, constraints ->
         val loose = Constraints(maxHeight = constraints.maxHeight)
         val placeables = measurables.map { it.measure(loose) }
-        val chipPlaceables = placeables.filterIndexed { i, _ -> ordered[i].let { spec.chips && it[0].itemKey in IslandChips.items && state.items.containsKey(it[0].itemKey) } }.toSet()
+        val chipPlaceables = placeables.filterIndexed { i, _ -> slotChipped(i, beforeSlots, beforeUnits, afterUnits) }.toSet()
         val spacing = spec.cellSpacing.roundToPx()
         val cameraSlot = spec.cameraSlotWidth.roundToPx()
         val left = placeables.take(beforeCount).filter { it.width > 0 }
