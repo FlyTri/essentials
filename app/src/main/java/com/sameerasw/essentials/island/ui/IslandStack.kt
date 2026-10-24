@@ -1,6 +1,8 @@
 package com.sameerasw.essentials.island.ui
 
 import com.sameerasw.essentials.island.model.SideBubble
+import androidx.compose.ui.graphics.lerp
+import com.sameerasw.essentials.island.ui.components.LocalIslandIconColor
 import com.sameerasw.essentials.island.model.CompactCell
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -42,6 +44,16 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.runtime.getValue
+import com.sameerasw.essentials.island.ui.components.LocalIslandBitmapFlat
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
+import kotlinx.coroutines.delay
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.input.pointer.pointerInput
@@ -195,6 +207,9 @@ private fun queueVisible(icons: List<StackIcon>, max: Int): List<StackIcon> {
 
 private const val OVERFLOW_KEY = "queue_overflow"
 
+@Composable
+private fun overflowBackground(): Color = lerp(LocalIslandIconColor.current ?: Color.White, Color.Black, 0.65f)
+
 private fun queueOverflowIcon(count: Int) = StackIcon(OVERFLOW_KEY) { size -> QueueOverflowCounter(count, size) }
 
 @Composable
@@ -203,7 +218,7 @@ private fun QueueOverflowCounter(count: Int, size: Dp) {
         Modifier
             .size(size)
             .clip(CircleShape)
-            .background(Color.White.copy(alpha = 0.18f)),
+            .background(overflowBackground()),
         contentAlignment = Alignment.Center,
     ) {
         AnimatedContent(
@@ -288,6 +303,13 @@ fun IslandStackOverlap(
                                 .clip(CircleShape)
                                 .background(Color.Black)
                                 .islandOutline(outlineColor, outlineThickness, CircleShape)
+                                .then(
+                                    if (entry.icon.onSelect != null && !entry.leaving) {
+                                        Modifier.pointerInput(entry.icon.key) { detectTapGestures { entry.icon.onSelect.invoke() } }
+                                    } else {
+                                        Modifier
+                                    },
+                                )
                                 .drawWithContent {
                                     drawContent()
                                     if (ringAlpha > 0f) {
@@ -317,85 +339,78 @@ fun IslandStackPill(
     outlineColor: Color? = null,
     outlineThickness: Dp = 1.dp,
     bond: LiquidBond? = null,
+    onInteraction: () -> Unit = {},
 ) {
     val ring = MaterialTheme.colorScheme.primary
     val liquid = rememberLiquidBody(bond = bond)
-    Row(
+    val itemWidth = iconSize + 8.dp
+    val spacing = 2.dp
+    val carouselState = rememberCarouselState { icons.size }
+    val hapticContext = LocalContext.current
+    val selectedIndex = icons.indexOfFirst { it.key == selectedKey }
+    LaunchedEffect(selectedKey) {
+        if (selectedIndex >= 0) carouselState.animateScrollToItem(selectedIndex)
+    }
+    LaunchedEffect(carouselState) {
+        var last = carouselState.currentItem
+        snapshotFlow { carouselState.currentItem }.collect {
+            if (it != last) {
+                last = it
+                IslandHaptics.scrollTick(hapticContext)
+                onInteraction()
+            }
+        }
+    }
+    LaunchedEffect(carouselState) {
+        snapshotFlow { carouselState.isScrollInProgress }.collect { scrolling ->
+            while (scrolling && carouselState.isScrollInProgress) {
+                onInteraction()
+                delay(300)
+            }
+        }
+    }
+    val visibleSlots = icons.size.coerceAtMost(PILL_MAX_ICONS)
+    val carouselWidth by animateDpAsState((itemWidth + spacing) * visibleSlots + 12.dp, IslandMotion.expressiveDefaultSpatial(), label = "pillWidth")
+    Box(
         modifier = modifier
             .liquid(liquid)
             .clip(CircleShape)
             .background(Color.Black)
             .islandOutline(outlineColor, outlineThickness, CircleShape)
             .animateContentSize(IslandMotion.compactSize)
-            .padding(horizontal = 6.dp, vertical = 5.dp),
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(vertical = 5.dp),
     ) {
-        val selectedIndex = icons.indexOfFirst { it.key == selectedKey }
-        val limit = if (icons.size == PILL_MAX_ICONS + 1) icons.size else PILL_MAX_ICONS
-        val start = if (selectedIndex >= limit) selectedIndex - limit + 1 else 0
-        val visible = icons.drop(start).take(limit)
-        val overflow = icons.size - visible.size
-        visible.forEach { icon ->
-            key(icon.key) {
-                val selected by animateFloatAsState(if (icon.key == selectedKey) 1f else 0f, IslandMotion.float(), label = "stackSelected")
-                val enter = remember { Animatable(0f) }
-                val iconLiquid = rememberLiquidBody(LiquidSpec.Droplet)
-                LaunchedEffect(Unit) { enter.animateTo(1f, IslandMotion.compactFloat()) }
-                Box(
-                    Modifier
-                        .animatePlacement()
-                        .liquid(iconLiquid)
-                        .graphicsLayer {
-                            scaleX = enter.value
-                            scaleY = enter.value
-                            alpha = enter.value.coerceIn(0f, 1f)
-                        }
-                        .clip(CircleShape)
-                        .drawBehind {
-                            val stroke = 2.dp.toPx()
-                            drawCircle(ring.copy(alpha = selected), radius = size.minDimension / 2f - stroke / 2f, style = Stroke(stroke))
-                        }
-                        .then(
-                            if (interactive && icon.onSelect != null) {
-                                Modifier.pointerInput(icon.key) { detectTapGestures { icon.onSelect.invoke() } }
-                            } else {
-                                Modifier
-                            },
-                        )
-                        .padding(4.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Box(Modifier.size(iconSize), contentAlignment = Alignment.Center) { icon.content(iconSize) }
-                }
-            }
-        }
-        if (overflow > 0) {
-            key("stack_overflow") {
-                val enter = remember { Animatable(0f) }
-                LaunchedEffect(Unit) { enter.animateTo(1f, IslandMotion.compactFloat()) }
-                Box(
-                    Modifier
-                        .animatePlacement()
-                        .graphicsLayer {
-                            scaleX = enter.value
-                            scaleY = enter.value
-                            alpha = enter.value.coerceIn(0f, 1f)
-                        }
-                        .padding(4.dp)
-                        .size(iconSize)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.18f)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = "+$overflow",
-                        color = Color.White,
-                        maxLines = 1,
-                        softWrap = false,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = with(LocalDensity.current) { (iconSize * if (overflow > 9) 0.4f else 0.5f).toSp() },
-                    )
+        HorizontalMultiBrowseCarousel(
+            state = carouselState,
+            preferredItemWidth = itemWidth,
+            minSmallItemWidth = 10.dp,
+            maxSmallItemWidth = itemWidth,
+            itemSpacing = spacing,
+            contentPadding = PaddingValues(horizontal = 6.dp),
+            modifier = Modifier
+                .width(carouselWidth)
+                .height(itemWidth),
+        ) { index ->
+            val icon = icons[index]
+            val selected by animateFloatAsState(if (icon.key == selectedKey) 1f else 0f, IslandMotion.float(), label = "stackSelected")
+            val shape = RoundedCornerShape(14.dp)
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .maskClip(shape)
+                    .maskBorder(BorderStroke(2.dp, ring.copy(alpha = selected)), shape)
+                    .background(Color.White.copy(alpha = 0.08f))
+                    .then(
+                        if (interactive && icon.onSelect != null) {
+                            Modifier.pointerInput(icon.key) { detectTapGestures { IslandHaptics.button(hapticContext); onInteraction(); icon.onSelect.invoke() } }
+                        } else {
+                            Modifier
+                        },
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                CompositionLocalProvider(LocalIslandBitmapFlat provides true) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { icon.content(itemWidth) }
                 }
             }
         }

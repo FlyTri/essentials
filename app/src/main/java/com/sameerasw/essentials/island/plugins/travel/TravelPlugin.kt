@@ -29,6 +29,7 @@ import com.sameerasw.essentials.island.model.IslandPriority
 import com.sameerasw.essentials.island.model.LineContent
 import com.sameerasw.essentials.island.plugins.BaseIslandPlugin
 import com.sameerasw.essentials.island.ui.IslandTextStyles
+import com.sameerasw.essentials.island.ui.islandTextColor
 import com.sameerasw.essentials.island.ui.components.CameraRow
 import com.sameerasw.essentials.island.ui.components.ConnectedButtonRow
 import com.sameerasw.essentials.island.ui.components.ConnectedItem
@@ -148,7 +149,7 @@ class TravelPlugin : BaseIslandPlugin() {
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = trip.time,
-                        style = IslandTextStyles.body.copy(color = Color.White, fontSize = 15.sp, lineHeight = 20.sp),
+                        style = IslandTextStyles.body.copy(color = islandTextColor(), fontSize = 15.sp, lineHeight = 20.sp),
                         modifier = Modifier.fillMaxWidth().padding(horizontal = sidePadding),
                     )
                 }

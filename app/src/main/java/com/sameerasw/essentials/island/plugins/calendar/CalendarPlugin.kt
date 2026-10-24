@@ -5,6 +5,10 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.provider.CalendarContract
+import android.text.format.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.data.repository.SettingsRepository
@@ -31,6 +35,7 @@ class CalendarPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_CALENDAR_EMOJIS,
         SettingsRepository.KEY_ISLAND_CALENDAR_PRIORITY_MINUTES,
         SettingsRepository.KEY_ISLAND_CALENDAR_HIDE_LOCKED,
+        SettingsRepository.KEY_ISLAND_CALENDAR_COMPACT_TIME,
     )
 
     private var event: UpcomingCalendarEvent? = null
@@ -80,7 +85,12 @@ class CalendarPlugin : BaseIslandPlugin() {
         }
         val now = System.currentTimeMillis()
         val full = CalendarEventUtil.formatRelativeTime(context, e.startTimeMillis, now)
-        val short = CalendarEventUtil.formatRelativeTimeCompact(e.startTimeMillis, now)
+        val short = if (settings.getBoolean(SettingsRepository.KEY_ISLAND_CALENDAR_COMPACT_TIME, false) && e.startTimeMillis - now >= 60 * 60_000L) {
+            val pattern = if (DateFormat.is24HourFormat(context)) "H:mm" else "h:mm"
+            SimpleDateFormat(pattern, Locale.getDefault()).format(Date(e.startTimeMillis))
+        } else {
+            CalendarEventUtil.formatRelativeTimeCompact(e.startTimeMillis, now)
+        }
         val showGlow = settings.isIslandShowGlowEnabled()
         val emoji = settings.getIslandCalendarEmojis()[e.calendarId]
         val priorityMs = settings.getIslandCalendarPriorityMinutes() * 60_000L

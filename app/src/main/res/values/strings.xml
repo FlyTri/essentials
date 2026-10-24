@@ -3174,6 +3174,11 @@
     <string name="island_action_tap_desc">Open app</string>
     <string name="island_tap_action_title">Tap action</string>
     <string name="island_show_time_title">Time</string>
+    <string name="island_section_icon_color">Icon color</string>
+    <string name="island_themed_text_title">Themed text color</string>
+    <string name="island_icon_color_dynamic">Dynamic</string>
+    <string name="island_icon_color_custom">Custom</string>
+    <string name="island_icon_material_you_title">Use Material You colors</string>
     <string name="island_time_format_title">Time format</string>
     <string name="island_time_format_system">System</string>
     <string name="island_time_format_12h">12 hr</string>
@@ -3583,4 +3588,6 @@
     <string name="feature_reset_done">Settings reset</string>
     <string name="feature_reset_info_title">Reset this feature</string>
     <string name="feature_reset_info_desc">Resets every Essentials setting for this feature to its default. System settings and permissions are not changed.</string>
+    <string name="island_chips_title">Island chips</string>
+    <string name="island_calendar_compact_time_title">Compact time</string>
 </resources>

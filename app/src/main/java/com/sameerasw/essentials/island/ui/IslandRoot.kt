@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.ui
 
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.scaleOut
@@ -68,6 +69,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import com.sameerasw.essentials.island.ui.components.LocalIslandIconColor
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -133,8 +135,46 @@ private enum class SwipeIntent { Hide, Dismiss }
 
 // The window never moves; the surface is always horizontally centred in it (= on the camera).
 // Only the surface's width/height/corner animate, read in layout/draw so frames don't recompose.
+private fun readableOnDark(color: Color): Color {
+    var result = color
+    var steps = 0
+    while (result.luminance() < 0.4f && steps < 10) {
+        result = androidx.compose.ui.graphics.lerp(result, Color.White, 0.12f)
+        steps++
+    }
+    return result
+}
+
 @Composable
 fun IslandRoot(
+    state: IslandUiState,
+    targetSpec: IslandLayoutSpec,
+    actions: IslandActions,
+    onTargetBoundsChanged: (IntRect) -> Unit,
+    registerCollapseAnimator: (((() -> Unit) -> Unit)?) -> Unit = {},
+    showCameraRing: Boolean = false,
+) {
+    val primary = MaterialTheme.colorScheme.primary
+    val focused = state.items[state.focusedKey]
+    val dynamicAccent = (focused?.outlineAccent ?: focused?.accent)
+        ?: state.arrangement.visibleItems.firstNotNullOfOrNull { key -> state.items[key]?.let { it.outlineAccent ?: it.accent } }
+    val iconBase = if (targetSpec.iconMaterialYou) primary else Color.White
+    val iconTarget = if (targetSpec.iconDynamic) {
+        dynamicAccent ?: iconBase
+    } else {
+        targetSpec.iconColorCustom ?: iconBase
+    }
+    val iconColor by animateColorAsState(readableOnDark(iconTarget), label = "islandIconColor")
+    CompositionLocalProvider(
+        LocalIslandIconColor provides iconColor,
+        LocalIslandTextColor provides if (targetSpec.themedText) pastelOf(iconColor) else null,
+    ) {
+        IslandRootContent(state, targetSpec, actions, onTargetBoundsChanged, registerCollapseAnimator, showCameraRing)
+    }
+}
+
+@Composable
+private fun IslandRootContent(
     state: IslandUiState,
     targetSpec: IslandLayoutSpec,
     actions: IslandActions,
@@ -439,6 +479,11 @@ fun IslandRoot(
 
     val bubbleSizePx = with(density) { spec.compactHeight.roundToPx() }
     val compactSlack = remember { mutableIntStateOf(0) }
+    val slideFeedback by IslandSlideFeedback.state.collectAsState()
+    val feedbackTakeover = slideFeedback.let {
+        it is SlideFeedback.Level || it is SlideFeedback.Sound || (it != null && state.arrangement.visibleItems.isEmpty())
+    }
+    val slackTarget = if (feedbackTakeover && stage == IslandStage.Compact) 0 else compactSlack.intValue
     val compactBaseWidth = remember { mutableIntStateOf(0) }
     val compactNeedLeft = remember { mutableIntStateOf(-1) }
     val bubbleMaxIcons = lastCatchUp?.maxIcons?.let { chosen ->
@@ -471,7 +516,11 @@ fun IslandRoot(
     val bubbleGapPx = with(density) { spec.cameraGap.roundToPx() }
     fun sideBubbleProgress(): Float =
         if (spec.growDirection == 0 && (hasCompactCells || stage == IslandStage.Hidden)) catchUpAnim.value.coerceIn(0f, 1f) else 0f
-    fun catchShiftPx(): Float = sideBubbleProgress() * compactSlack.intValue / 2f
+    val slackAnim = remember { Animatable(slackTarget.toFloat()) }
+    LaunchedEffect(slackTarget) {
+        if (inspection) slackAnim.snapTo(slackTarget.toFloat()) else slackAnim.animateTo(slackTarget.toFloat(), IslandMotion.smoothSpatial())
+    }
+    fun catchShiftPx(): Float = sideBubbleProgress() * slackAnim.value / 2f
     val lineShift = remember { Animatable(0f) }
     val liveSurfaceHeight = remember { mutableIntStateOf(0) }
     fun surfaceShiftFor(width: Int): Int = spec.growDirection * (width - cameraSlotPx) / 2
@@ -565,14 +614,14 @@ fun IslandRoot(
 
     LaunchedEffect(
         target, windowWidth, stage, queueShown, pillSize, lineInsetActive, catchUpShown, hasCompactCells,
-        bubbleOnlyLayout, condensedLineActive, queueWidthPx, sideWidthPx, compactSlack.intValue,
+        bubbleOnlyLayout, condensedLineActive, queueWidthPx, sideWidthPx, slackTarget,
     ) {
         if (target == IntSize.Zero || windowWidth == 0) return@LaunchedEffect
         val g = if (stage == IslandStage.Expanded) outsetPx.roundToInt() else 0
         val shift = when {
             spec.growDirection != 0 || condensedLineActive -> 0
             lineInsetActive -> (queueWidthPx + bubbleGapPx) / 2
-            catchUpShown && hasCompactCells -> compactSlack.intValue / 2
+            catchUpShown && hasCompactCells -> slackTarget / 2
             else -> 0
         }
         val left = windowWidth / 2 - target.width / 2 + surfaceShiftFor(target.width) + shift
@@ -683,6 +732,7 @@ fun IslandRoot(
                     outlineColor = outlineFor(1f),
                     outlineThickness = spec.outlineThickness,
                     bond = pillBond,
+                    onInteraction = actions::onInteraction,
                     modifier = Modifier
                         .queueSlot(0.5f, 1f, slides = true) { k -> ((k - 0.3f) / 0.7f).coerceIn(0f, 1f) }
                         .onSizeChanged { pillSize = it },

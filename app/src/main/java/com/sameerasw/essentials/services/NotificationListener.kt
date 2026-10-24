@@ -581,8 +581,11 @@ class NotificationListener : NotificationListenerService() {
     override fun onDestroy() {
         super.onDestroy()
         instance = null
+        progressDestroyed = true
         progressHandler.removeCallbacks(progressRefreshRunnable)
         progressExecutor.shutdownNow()
+        alertExecutor.shutdownNow()
+        alertHandler.removeCallbacksAndMessages(null)
         try {
             unregisterReceiver(likeActionReceiver)
         } catch (_: Exception) {
@@ -1085,19 +1088,23 @@ class NotificationListener : NotificationListenerService() {
             scheduleProgressRefresh()
         }
 
-        if (!isRepost && isHeadsUpNotification(sbn, rankingMap, allowSilent = true)) {
-            val alert = extractNotificationAlert(sbn)?.copy(
-                isSilent = isSilentNotification(sbn, rankingMap),
-                blockedByDnd = isBlockedByDnd(sbn, rankingMap),
-                otpCode = otpCodeOf(sbn),
-                isConversation = isConversationNotification(sbn, rankingMap),
-            )
-            val callHidden = CallNotificationParser.isCall(sbn) && !SettingsRepository(applicationContext).isIslandShowCallsEnabled()
-            if (alert != null && !callHidden) {
-                notifyAlertPosted(alert)
+        if (isHandledAsProgress(sbn)) {
+            notifyAlertRemoved(sbn.key)
+        } else if (!isRepost && isHeadsUpNotification(sbn, rankingMap, allowSilent = true)) {
+            runOffMain {
+                val alert = extractNotificationAlert(sbn)?.copy(
+                    isSilent = isSilentNotification(sbn, rankingMap),
+                    blockedByDnd = isBlockedByDnd(sbn, rankingMap),
+                    otpCode = otpCodeOf(sbn),
+                    isConversation = isConversationNotification(sbn, rankingMap),
+                )
+                val callHidden = CallNotificationParser.isCall(sbn) && !SettingsRepository(applicationContext).isIslandShowCallsEnabled()
+                if (alert != null && !callHidden && isStillActive(sbn.key)) {
+                    alertHandler.post { notifyAlertPosted(alert) }
+                }
             }
         } else if (!isRepost && isHubEnabled()) {
-            hubAlertOf(sbn, rankingMap)?.let(::notifyAlertPosted)
+            runOffMain { hubAlertOf(sbn, rankingMap)?.takeIf { isStillActive(sbn.key) }?.let { alert -> alertHandler.post { notifyAlertPosted(alert) } } }
         }
 
         val pm = getSystemService(POWER_SERVICE) as PowerManager
@@ -1924,14 +1931,27 @@ class NotificationListener : NotificationListenerService() {
                 null
             },
             contentIntent = notif.contentIntent,
+            actions = notif.actions.orEmpty().mapNotNull { action ->
+                val title = action.title?.toString()
+                val intent = action.actionIntent
+                if (title.isNullOrBlank() || intent == null || !action.remoteInputs.isNullOrEmpty()) {
+                    null
+                } else {
+                    NotificationActionItem(title = title, pendingIntent = intent, actionKey = "${sbn.key}_$title")
+                }
+            },
         )
     }
 
+    @Volatile
+    private var progressDestroyed = false
+    private val alertHandler = Handler(Looper.getMainLooper())
+    private val alertExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private val progressHandler = Handler(Looper.getMainLooper())
     private val progressExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private val progressRefreshRunnable =
         Runnable {
-            if (progressExecutor.isShutdown) return@Runnable
+            if (progressDestroyed || progressExecutor.isShutdown) return@Runnable
             try {
                 progressExecutor.execute {
                     val navigation =
@@ -1957,6 +1977,7 @@ class NotificationListener : NotificationListenerService() {
         }
 
     private fun scheduleProgressRefresh() {
+        if (progressDestroyed) return
         progressHandler.removeCallbacks(progressRefreshRunnable)
         progressHandler.postDelayed(progressRefreshRunnable, PROGRESS_REFRESH_DEBOUNCE_MS)
     }
@@ -2080,8 +2101,12 @@ class NotificationListener : NotificationListenerService() {
         if (notif.category == Notification.CATEGORY_MESSAGE) return true
         if (notif.extras?.getString(Notification.EXTRA_TEMPLATE)?.endsWith("MessagingStyle") == true) return true
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return false
-        val ranking = Ranking()
-        return (rankingMap ?: currentRanking)?.getRanking(sbn.key, ranking) == true && ranking.isConversation
+        return try {
+            val ranking = Ranking()
+            (rankingMap ?: currentRanking)?.getRanking(sbn.key, ranking) == true && ranking.isConversation
+        } catch (_: Throwable) {
+            false
+        }
     }
 
     private fun isStandaloneSummary(sbn: StatusBarNotification): Boolean {
@@ -2098,6 +2123,7 @@ class NotificationListener : NotificationListenerService() {
 
     private fun hubAlertOf(sbn: StatusBarNotification, rankingMap: RankingMap?): ActiveNotificationAlert? {
         if (sbn.packageName == packageName || !hasReadableExtras(sbn) || isMediaNotification(sbn)) return null
+        if (isHandledAsProgress(sbn)) return null
         if ((sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0 && !isStandaloneSummary(sbn)) return null
         return extractNotificationAlert(sbn)?.copy(
             isSilent = isSilentNotification(sbn, rankingMap),
@@ -2109,8 +2135,35 @@ class NotificationListener : NotificationListenerService() {
         )
     }
 
-    fun hubAlerts(): List<ActiveNotificationAlert> =
-        safeActiveNotifications().orEmpty().mapNotNull { hubAlertOf(it, null) }.sortedByDescending { it.timestamp }
+    private fun isHandledAsProgress(sbn: StatusBarNotification): Boolean {
+        if (!SettingsRepository(applicationContext).isIslandNotifKeepProgressEnabled()) return false
+        val extras = sbn.notification?.extras ?: return false
+        return extras.getInt(Notification.EXTRA_PROGRESS_MAX, 0) > 0 ||
+            extras.getBoolean(Notification.EXTRA_PROGRESS_INDETERMINATE, false)
+    }
+
+    fun hubAlertsAsync(onResult: (List<ActiveNotificationAlert>) -> Unit) {
+        runOffMain {
+            val alerts = safeActiveNotifications().orEmpty().mapNotNull { hubAlertOf(it, null) }.sortedByDescending { it.timestamp }
+            alertHandler.post { onResult(alerts) }
+        }
+    }
+
+    private fun isStillActive(key: String): Boolean = safeActiveNotifications()?.any { it.key == key } != false
+
+    private fun runOffMain(task: () -> Unit) {
+        if (progressDestroyed || alertExecutor.isShutdown) return
+        try {
+            alertExecutor.execute {
+                try {
+                    task()
+                } catch (e: Exception) {
+                    Log.e("NotificationListener", "Alert extraction failed", e)
+                }
+            }
+        } catch (_: java.util.concurrent.RejectedExecutionException) {
+        }
+    }
 
     fun extractNotificationAlert(sbn: StatusBarNotification): ActiveNotificationAlert? {
         val notif = sbn.notification ?: return null

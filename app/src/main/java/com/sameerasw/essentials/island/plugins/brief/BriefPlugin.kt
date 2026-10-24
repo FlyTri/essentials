@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.plugins.brief
 
+import com.sameerasw.essentials.island.ui.components.LocalIslandIconColor
 import com.sameerasw.essentials.island.plugins.alarm.NextAlarm
 import androidx.compose.foundation.layout.fillMaxSize
 import com.sameerasw.essentials.island.remote.RemoteBriefCardRow
@@ -109,6 +110,7 @@ import com.sameerasw.essentials.island.model.IslandItem
 import com.sameerasw.essentials.island.model.IslandPriority
 import com.sameerasw.essentials.island.plugins.BaseIslandPlugin
 import com.sameerasw.essentials.island.ui.IslandTextStyles
+import com.sameerasw.essentials.island.ui.islandTextColor
 import com.sameerasw.essentials.island.ui.components.BatteryGlyph
 import com.sameerasw.essentials.island.ui.components.BatteryRing
 import com.sameerasw.essentials.island.ui.components.CameraRow
@@ -584,7 +586,7 @@ private fun BriefEventRow(event: UpcomingCalendarEvent, now: Long, accent: Color
         Column(Modifier.weight(1f)) {
             Text(
                 text = event.title,
-                style = IslandTextStyles.body.copy(color = Color.White, fontSize = 15.sp),
+                style = IslandTextStyles.body.copy(color = islandTextColor(), fontSize = 15.sp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -628,7 +630,7 @@ private fun BriefPlayer(media: MediaSnapshot, artwork: ImageBitmap?, onClick: ()
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            MarqueeText(text = media.title, style = IslandTextStyles.body.copy(color = Color.White, fontSize = 15.sp))
+            MarqueeText(text = media.title, style = IslandTextStyles.body.copy(color = islandTextColor(), fontSize = 15.sp))
             MarqueeText(text = media.artist, style = IslandTextStyles.body)
         }
         media.actions.like?.let {
@@ -640,10 +642,11 @@ private fun BriefPlayer(media: MediaSnapshot, artwork: ImageBitmap?, onClick: ()
                 it()
             }
         }
+        val playContainer = LocalIslandIconColor.current ?: media.accent
         BriefPlayerButton(
             icon = if (media.playing) R.drawable.rounded_pause_24 else R.drawable.rounded_play_arrow_24,
-            tint = if (media.accent.luminance() > 0.5f) Color.Black else Color.White,
-            container = media.accent,
+            tint = if (playContainer.luminance() > 0.5f) Color.Black else Color.White,
+            container = playContainer,
             width = 64.dp,
             iconSize = 26.dp,
         ) {
@@ -676,7 +679,9 @@ private fun BriefPlayerButton(
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        IslandIcon(icon, tint = tint, size = iconSize)
+        CompositionLocalProvider(LocalIslandIconColor provides if (container != null) null else LocalIslandIconColor.current) {
+            IslandIcon(icon, tint = tint, size = iconSize)
+        }
     }
 }
 

@@ -1763,4 +1763,6 @@
     <string name="about_desc_call_sync">Sync call status between your phone and your watch.\n\nThis is only used for the launcher and is not a full call handler.</string>
     <string name="about_desc_mono_audio_tile">Quick Settings tile to toggle mono audio.\n\nMono audio plays the same sound in both ears, which helps when using a single earbud or if you have hearing difficulty in one ear.</string>
     <string name="about_desc_back_gesture">Fine tune the system back gesture.\n\nAdjust the edge widths for the left and right gesture areas and set up per-app back gesture behavior. Requires secure settings permission.</string>
+    <string name="island_chips_title">Island chips</string>
+    <string name="island_calendar_compact_time_title">Compact time</string>
 </resources>
