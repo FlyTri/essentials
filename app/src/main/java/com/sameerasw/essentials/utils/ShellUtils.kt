@@ -168,6 +168,8 @@ object ShellUtils {
             }
         } catch (e: Exception) {
             null
+        } catch (e: OutOfMemoryError) {
+            null
         }
 
     fun newProcess(
