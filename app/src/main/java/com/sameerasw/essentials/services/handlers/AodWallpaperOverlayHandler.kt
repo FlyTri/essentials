@@ -210,7 +210,6 @@ class AodWallpaperOverlayHandler(
         }
     }
 
-    // Fallbacks that put the overlay in its final state when animators are paused by the system.
     private val removalFallbackRunnable = Runnable {
         if (pendingRemoval != null) {
             Log.w("AodWallpaperOverlay", "Fade-out did not finish, removing overlay directly")
@@ -767,7 +766,6 @@ class AodWallpaperOverlayHandler(
             hideOverlay()
             return
         }
-        // A window still fading out cannot be reused, finish removing it before showing a fresh one.
         runPendingRemoval()
         registerDisplayListener()
         val opacity = prefs.getFloat(SettingsRepository.KEY_AOD_WALLPAPER_OPACITY, 0.3f)
@@ -849,9 +847,7 @@ class AodWallpaperOverlayHandler(
 
             try {
                 val container = overlayContainer ?: return
-                // One UI skips drawing app windows while the AOD is showing, so only the first
-                // frame ever reaches the screen. Fading in from 0 there leaves the overlay invisible.
-                val fadeIn = !Build.MANUFACTURER.equals("samsung", ignoreCase = true)
+                val fadeIn = !compatMode()
                 container.visibility = View.VISIBLE
                 container.alpha = if (fadeIn) 0f else 1f
                 applyBurnInShift(animated = false)
@@ -1120,7 +1116,7 @@ class AodWallpaperOverlayHandler(
 
         handler.removeCallbacks(bitmapSwapFallbackRunnable)
         pendingSwapBitmap = null
-        if (!animated || imageView.drawable == null) {
+        if (!animated || compatMode() || imageView.drawable == null) {
             crossfadeAnimator?.cancel()
             crossfadeAnimator = null
             imageView.setImageBitmap(bitmap)
@@ -1142,13 +1138,18 @@ class AodWallpaperOverlayHandler(
                                 val fraction = inAnim.animatedValue as Float
                                 imageView.alpha = targetOpacity * fraction
                             }
+                            addListener(object : android.animation.AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: android.animation.Animator) {
+                                    pendingSwapBitmap = null
+                                    handler.removeCallbacks(bitmapSwapFallbackRunnable)
+                                }
+                            })
                             start()
                         }
                     }
                 })
                 start()
             }
-            // Without this the new image is never applied if the system pauses the crossfade.
             pendingSwapBitmap = bitmap
             handler.postDelayed(
                 bitmapSwapFallbackRunnable,
@@ -1158,7 +1159,6 @@ class AodWallpaperOverlayHandler(
     }
 
     private var lastWallpaperId = -1
-    private var lastCustomImageModified = 0L
 
     private fun loadAndApplyWallpaper() {
         val wallpaperManager = WallpaperManager.getInstance(service)
@@ -1169,15 +1169,6 @@ class AodWallpaperOverlayHandler(
             if (effectiveId > 0 && effectiveId != lastWallpaperId) {
                 cachedWallpaperBitmap = null
                 lastWallpaperId = effectiveId
-            }
-        }
-        // Picking another custom image rewrites the file but leaves the pref at true, which
-        // fires no change listener, so detect the new image from the file itself.
-        if (prefs.getBoolean(SettingsRepository.KEY_AOD_WALLPAPER_CUSTOM_IMAGE, false)) {
-            val modified = File(service.filesDir, CUSTOM_IMAGE_FILE_NAME).lastModified()
-            if (modified != lastCustomImageModified) {
-                cachedWallpaperBitmap = null
-                lastCustomImageModified = modified
             }
         }
 
@@ -1312,6 +1303,10 @@ class AodWallpaperOverlayHandler(
                 mediaSubtitleText = null
             }
 
+            if (compatMode()) {
+                runPendingRemoval()
+                return
+            }
             fadeOutAnimator = ObjectAnimator.ofFloat(currentView, "alpha", currentView.alpha, 0f).apply {
                 duration = FADE_OUT_DURATION_MS
                 addListener(object : android.animation.AnimatorListenerAdapter() {
@@ -1321,11 +1316,11 @@ class AodWallpaperOverlayHandler(
                 })
                 start()
             }
-            // Some OEMs (e.g. One UI) stop animators of processes they consider in background,
-            // so the fade-out may never end. Remove the window anyway once it should have finished.
             handler.postDelayed(removalFallbackRunnable, FADE_OUT_DURATION_MS + ANIMATION_FALLBACK_SLACK_MS)
         }
     }
+
+    private fun compatMode(): Boolean = prefs.getBoolean(SettingsRepository.KEY_AOD_WALLPAPER_COMPAT, false)
 
     private fun runPendingRemoval() {
         val removal = pendingRemoval ?: return
