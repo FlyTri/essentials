@@ -9729,6 +9729,7 @@ class MainViewModel : ViewModel() {
                     FileOutputStream(file).use { output ->
                         sampledBitmap.compress(Bitmap.CompressFormat.PNG, 95, output)
                     }
+                    settingsRepository.putLong(SettingsRepository.KEY_AOD_WALLPAPER_CUSTOM_IMAGE_VERSION, System.currentTimeMillis())
                     settingsRepository.setAodWallpaperCustomImage(true)
                     withContext(Dispatchers.Main) {
                         hasAodWallpaperCustomImage.value = true

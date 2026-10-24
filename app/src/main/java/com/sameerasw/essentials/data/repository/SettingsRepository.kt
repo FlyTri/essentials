@@ -423,6 +423,8 @@ class SettingsRepository(
         const val KEY_AOD_WALLPAPER_VIGNETTE = "aod_wallpaper_vignette"
         const val KEY_AOD_WALLPAPER_BLACK_THRESHOLD = "aod_wallpaper_black_threshold"
         const val KEY_AOD_WALLPAPER_CUSTOM_IMAGE = "aod_wallpaper_custom_image"
+        const val KEY_AOD_WALLPAPER_CUSTOM_IMAGE_VERSION = "aod_wallpaper_custom_image_version"
+        const val KEY_AOD_WALLPAPER_COMPAT = "aod_wallpaper_compat_mode"
         const val KEY_AOD_WALLPAPER_USE_ALBUM_ART = "aod_wallpaper_use_album_art"
         const val KEY_AOD_WALLPAPER_DISABLE_ON_DND = "aod_wallpaper_disable_on_dnd"
         const val KEY_AOD_WALLPAPER_KEEP_ON_MEDIA = "aod_wallpaper_keep_on_media"

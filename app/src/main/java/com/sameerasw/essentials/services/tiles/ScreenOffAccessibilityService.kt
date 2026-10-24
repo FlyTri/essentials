@@ -264,6 +264,8 @@ class ScreenOffAccessibilityService :
                 key == SettingsRepository.KEY_AOD_WALLPAPER_VIGNETTE ||
                 key == SettingsRepository.KEY_AOD_WALLPAPER_BLACK_THRESHOLD ||
                 key == SettingsRepository.KEY_AOD_WALLPAPER_CUSTOM_IMAGE ||
+                key == SettingsRepository.KEY_AOD_WALLPAPER_CUSTOM_IMAGE_VERSION ||
+                key == SettingsRepository.KEY_AOD_WALLPAPER_COMPAT ||
                 key == SettingsRepository.KEY_AOD_WALLPAPER_USE_ALBUM_ART ||
                 key == SettingsRepository.KEY_AOD_WALLPAPER_KEEP_ON_MEDIA ||
                 key == SettingsRepository.KEY_AOD_WALLPAPER_EXTENDED_MEDIA ||
@@ -271,7 +273,7 @@ class ScreenOffAccessibilityService :
                 key == SettingsRepository.KEY_AOD_WALLPAPER_EXTENDED_TEXT_SCALE ||
                 key == SettingsRepository.KEY_AOD_WALLPAPER_MEDIA_EXCLUDED_APPS
             ) {
-                if (key == SettingsRepository.KEY_AOD_WALLPAPER_CUSTOM_IMAGE) {
+                if (key == SettingsRepository.KEY_AOD_WALLPAPER_CUSTOM_IMAGE || key == SettingsRepository.KEY_AOD_WALLPAPER_CUSTOM_IMAGE_VERSION) {
                     aodWallpaperOverlayHandler.invalidateWallpaperCache()
                 }
                 aodWallpaperOverlayHandler.updateState()

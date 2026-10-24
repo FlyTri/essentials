@@ -315,7 +315,7 @@ class AppVolumeOverlayHandler(
             circle.background =
                 GradientDrawable().apply {
                     shape = GradientDrawable.OVAL
-                    setColor(colorScheme().surfaceContainerHigh.toArgb())
+                    setColor(colorScheme().primaryContainer.toArgb())
                 }
             circle.outlineProvider = ovalOutline
             circle.clipToOutline = true
