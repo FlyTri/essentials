@@ -2091,8 +2091,12 @@ class NotificationListener : NotificationListenerService() {
         if (notif.category == Notification.CATEGORY_MESSAGE) return true
         if (notif.extras?.getString(Notification.EXTRA_TEMPLATE)?.endsWith("MessagingStyle") == true) return true
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return false
-        val ranking = Ranking()
-        return (rankingMap ?: currentRanking)?.getRanking(sbn.key, ranking) == true && ranking.isConversation
+        return try {
+            val ranking = Ranking()
+            (rankingMap ?: currentRanking)?.getRanking(sbn.key, ranking) == true && ranking.isConversation
+        } catch (_: Throwable) {
+            false
+        }
     }
 
     private fun isStandaloneSummary(sbn: StatusBarNotification): Boolean {
