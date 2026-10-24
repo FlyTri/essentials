@@ -85,7 +85,7 @@ class CalendarPlugin : BaseIslandPlugin() {
         }
         val now = System.currentTimeMillis()
         val full = CalendarEventUtil.formatRelativeTime(context, e.startTimeMillis, now)
-        val short = if (settings.getBoolean(SettingsRepository.KEY_ISLAND_CALENDAR_COMPACT_TIME, false)) {
+        val short = if (settings.getBoolean(SettingsRepository.KEY_ISLAND_CALENDAR_COMPACT_TIME, false) && e.startTimeMillis - now >= 60 * 60_000L) {
             val pattern = if (DateFormat.is24HourFormat(context)) "H:mm" else "h:mm"
             SimpleDateFormat(pattern, Locale.getDefault()).format(Date(e.startTimeMillis))
         } else {
