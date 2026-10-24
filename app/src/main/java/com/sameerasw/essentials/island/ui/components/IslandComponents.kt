@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.layout.onSizeChanged
@@ -63,7 +64,11 @@ fun IslandBitmap(
     circle: Boolean = false,
     fallbackRes: Int? = null,
 ) {
-    val shape = if (circle) CircleShape else RoundedCornerShape(percent = 28)
+    val shape = when {
+        LocalIslandBitmapFlat.current -> RectangleShape
+        circle -> CircleShape
+        else -> RoundedCornerShape(percent = 28)
+    }
     AnimatedContent(
         targetState = bitmap,
         transitionSpec = { fadeIn(IslandMotion.contentIn()) togetherWith fadeOut(IslandMotion.contentOut()) },
@@ -88,6 +93,10 @@ fun IslandBitmap(
     }
 }
 
+val LocalIslandBitmapFlat = compositionLocalOf { false }
+
+val LocalIslandChipInk = compositionLocalOf<Color?> { null }
+
 val LocalIslandIconColor = compositionLocalOf<Color?> { null }
 
 @Composable
@@ -109,6 +118,7 @@ fun EqualizerBars(
     modifier: Modifier = Modifier,
     size: Dp = 18.dp,
 ) {
+    val barColor = if (LocalIslandChipInk.current != null) Color.Black else color
     val levels = remember { mutableStateListOf(0.16f, 0.16f, 0.16f) }
     LaunchedEffect(playing) {
         if (!playing) {
@@ -129,7 +139,7 @@ fun EqualizerBars(
         animated.forEachIndexed { i, level ->
             val h = this.size.height * level
             drawRoundRect(
-                color = color,
+                color = barColor,
                 topLeft = Offset(barWidth * (i * 2f), (this.size.height - h) / 2f),
                 size = Size(barWidth, h),
                 cornerRadius = CornerRadius(barWidth / 2f),

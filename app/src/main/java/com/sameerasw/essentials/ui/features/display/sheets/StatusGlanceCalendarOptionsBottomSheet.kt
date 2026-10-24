@@ -115,6 +115,13 @@ fun StatusGlanceCalendarOptionsBottomSheet(
             )
 
             if (allowIconEdit) {
+                RoundedCardContainer(spacing = 2.dp, cornerRadius = 24.dp) {
+                    IslandPrefToggle(
+                        settingKey = SettingsRepository.KEY_ISLAND_CALENDAR_COMPACT_TIME,
+                        iconRes = R.drawable.rounded_schedule_24,
+                        title = stringResource(R.string.island_calendar_compact_time_title),
+                    )
+                }
                 IslandLauncherOnlyToggle(SettingsRepository.KEY_ISLAND_CALENDAR_LAUNCHER_ONLY)
                 if (rememberIslandShowsWhileLocked()) {
                     RoundedCardContainer(spacing = 2.dp, cornerRadius = 24.dp) {

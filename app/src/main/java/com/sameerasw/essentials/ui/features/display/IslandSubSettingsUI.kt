@@ -548,6 +548,18 @@ fun IslandVisualsSettingsUI(
                     iconSettings.putBoolean(SettingsRepository.KEY_ISLAND_THEMED_TEXT, checked)
                 },
             )
+
+            var chips by remember { mutableStateOf(iconSettings.getBoolean(SettingsRepository.KEY_ISLAND_CHIPS, false)) }
+            IconToggleItem(
+                iconRes = R.drawable.rounded_palette_24,
+                title = stringResource(R.string.island_chips_title),
+                isChecked = chips,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    chips = checked
+                    iconSettings.putBoolean(SettingsRepository.KEY_ISLAND_CHIPS, checked)
+                },
+            )
         }
     }
 

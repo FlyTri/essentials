@@ -3588,4 +3588,6 @@
     <string name="feature_reset_done">Settings reset</string>
     <string name="feature_reset_info_title">Reset this feature</string>
     <string name="feature_reset_info_desc">Resets every Essentials setting for this feature to its default. System settings and permissions are not changed.</string>
+    <string name="island_chips_title">Island chips</string>
+    <string name="island_calendar_compact_time_title">Compact time</string>
 </resources>
