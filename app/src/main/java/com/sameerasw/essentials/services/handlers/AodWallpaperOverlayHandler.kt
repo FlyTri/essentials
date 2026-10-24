@@ -93,6 +93,9 @@ class AodWallpaperOverlayHandler(
     private var isMediaListenerRegistered = false
     private var crossfadeAnimator: ValueAnimator? = null
     private var fadeInAnimator: ObjectAnimator? = null
+    private var fadeOutAnimator: ObjectAnimator? = null
+    private var pendingRemoval: Runnable? = null
+    private var pendingSwapBitmap: Bitmap? = null
 
     private val powerManager by lazy { service.getSystemService(Context.POWER_SERVICE) as? PowerManager }
     private val displayManager by lazy { service.getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager }
@@ -205,6 +208,36 @@ class AodWallpaperOverlayHandler(
                 handler.postDelayed(this, BURN_IN_INTERVAL_MS)
             }
         }
+    }
+
+    private val removalFallbackRunnable = Runnable {
+        if (pendingRemoval != null) {
+            Log.w("AodWallpaperOverlay", "Fade-out did not finish, removing overlay directly")
+            runPendingRemoval()
+        }
+    }
+
+    private val fadeInFallbackRunnable = Runnable {
+        val container = overlayContainer ?: return@Runnable
+        if (isOverlayAdded && pendingRemoval == null && container.alpha < 1f) {
+            fadeInAnimator?.cancel()
+            fadeInAnimator = null
+            container.alpha = 1f
+        }
+    }
+
+    private val bitmapSwapFallbackRunnable = Runnable {
+        val bitmap = pendingSwapBitmap ?: return@Runnable
+        pendingSwapBitmap = null
+        val imageView = wallpaperImageView ?: return@Runnable
+        if (currentDisplayedBitmap !== bitmap) return@Runnable
+        crossfadeAnimator?.let {
+            crossfadeAnimator = null
+            it.removeAllListeners()
+            it.cancel()
+        }
+        imageView.setImageBitmap(bitmap)
+        imageView.alpha = prefs.getFloat(SettingsRepository.KEY_AOD_WALLPAPER_OPACITY, 0.3f)
     }
 
     private val timeoutRunnable: Runnable = Runnable {
@@ -733,6 +766,7 @@ class AodWallpaperOverlayHandler(
             hideOverlay()
             return
         }
+        runPendingRemoval()
         registerDisplayListener()
         val opacity = prefs.getFloat(SettingsRepository.KEY_AOD_WALLPAPER_OPACITY, 0.3f)
         val blurRadius = prefs.getFloat(SettingsRepository.KEY_AOD_WALLPAPER_BLUR, 0f)
@@ -813,18 +847,24 @@ class AodWallpaperOverlayHandler(
 
             try {
                 val container = overlayContainer ?: return
+                val fadeIn = !compatMode()
                 container.visibility = View.VISIBLE
-                container.alpha = 0f
+                container.alpha = if (fadeIn) 0f else 1f
                 applyBurnInShift(animated = false)
                 windowManager?.addView(container, params)
                 isOverlayAdded = true
 
                 fadeInAnimator?.cancel()
-                fadeInAnimator =
-                    ObjectAnimator.ofFloat(container, "alpha", 0f, 1f).apply {
-                        duration = 2000
-                        start()
-                    }
+                fadeInAnimator = null
+                handler.removeCallbacks(fadeInFallbackRunnable)
+                if (fadeIn) {
+                    fadeInAnimator =
+                        ObjectAnimator.ofFloat(container, "alpha", 0f, 1f).apply {
+                            duration = FADE_IN_DURATION_MS
+                            start()
+                        }
+                    handler.postDelayed(fadeInFallbackRunnable, FADE_IN_DURATION_MS + ANIMATION_FALLBACK_SLACK_MS)
+                }
 
                 handler.removeCallbacks(burnInShiftRunnable)
                 handler.postDelayed(burnInShiftRunnable, BURN_IN_INTERVAL_MS)
@@ -1074,7 +1114,9 @@ class AodWallpaperOverlayHandler(
 
         currentDisplayedBitmap = bitmap
 
-        if (!animated || imageView.drawable == null) {
+        handler.removeCallbacks(bitmapSwapFallbackRunnable)
+        pendingSwapBitmap = null
+        if (!animated || compatMode() || imageView.drawable == null) {
             crossfadeAnimator?.cancel()
             crossfadeAnimator = null
             imageView.setImageBitmap(bitmap)
@@ -1082,7 +1124,7 @@ class AodWallpaperOverlayHandler(
             val targetOpacity = prefs.getFloat(SettingsRepository.KEY_AOD_WALLPAPER_OPACITY, 0.3f)
             crossfadeAnimator?.cancel()
             crossfadeAnimator = ValueAnimator.ofFloat(1f, 0f).apply {
-                duration = 350
+                duration = CROSSFADE_HALF_DURATION_MS
                 addUpdateListener { animator ->
                     val fraction = animator.animatedValue as Float
                     imageView.alpha = targetOpacity * fraction
@@ -1090,18 +1132,29 @@ class AodWallpaperOverlayHandler(
                 addListener(object : android.animation.AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: android.animation.Animator) {
                         imageView.setImageBitmap(bitmap)
-                        ValueAnimator.ofFloat(0f, 1f).apply {
-                            duration = 350
+                        crossfadeAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+                            duration = CROSSFADE_HALF_DURATION_MS
                             addUpdateListener { inAnim ->
                                 val fraction = inAnim.animatedValue as Float
                                 imageView.alpha = targetOpacity * fraction
                             }
+                            addListener(object : android.animation.AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: android.animation.Animator) {
+                                    pendingSwapBitmap = null
+                                    handler.removeCallbacks(bitmapSwapFallbackRunnable)
+                                }
+                            })
                             start()
                         }
                     }
                 })
                 start()
             }
+            pendingSwapBitmap = bitmap
+            handler.postDelayed(
+                bitmapSwapFallbackRunnable,
+                CROSSFADE_HALF_DURATION_MS * 2 + ANIMATION_FALLBACK_SLACK_MS,
+            )
         }
     }
 
@@ -1125,7 +1178,7 @@ class AodWallpaperOverlayHandler(
     private fun extractCurrentWallpaper(): Bitmap? {
         return try {
             if (prefs.getBoolean(SettingsRepository.KEY_AOD_WALLPAPER_CUSTOM_IMAGE, false)) {
-                val file = File(service.filesDir, "custom_aod_wallpaper.png")
+                val file = File(service.filesDir, CUSTOM_IMAGE_FILE_NAME)
                 if (file.exists()) {
                     val customBmp = AppUtil.decodeSampledBitmapFromFile(file.absolutePath, reqWidth = 1440, reqHeight = 3200)
                     if (customBmp != null) return customBmp
@@ -1197,7 +1250,9 @@ class AodWallpaperOverlayHandler(
         currentDisplayedBitmap = null
         handler.removeCallbacks(burnInShiftRunnable)
         handler.removeCallbacks(timeoutRunnable)
-        if (isOverlayAdded && overlayContainer != null) {
+        handler.removeCallbacks(fadeInFallbackRunnable)
+        handler.removeCallbacks(bitmapSwapFallbackRunnable)
+        if (isOverlayAdded && overlayContainer != null && pendingRemoval == null) {
             val currentView = overlayContainer ?: return
             val imageView = wallpaperImageView
 
@@ -1224,36 +1279,59 @@ class AodWallpaperOverlayHandler(
                 }
             }
 
-            ObjectAnimator.ofFloat(currentView, "alpha", currentView.alpha, 0f).apply {
-                duration = 500
+            pendingRemoval = Runnable {
+                currentView.visibility = View.GONE
+                imageView?.translationX = 0f
+                imageView?.translationY = 0f
+                imageView?.scaleX = 1.0f
+                imageView?.scaleY = 1.0f
+                extendedInfoColumn?.translationX = 0f
+                extendedInfoColumn?.translationY = 0f
+                try {
+                    windowManager?.removeView(currentView)
+                } catch (_: Exception) {
+                }
+                isOverlayAdded = false
+                overlayContainer = null
+                maskedContainer = null
+                wallpaperImageView = null
+                extendedLayer = null
+                extendedInfoColumn = null
+                mediaTitleText = null
+                mediaNoteIcon = null
+                appIconCachePackage = null
+                mediaSubtitleText = null
+            }
+
+            if (compatMode()) {
+                runPendingRemoval()
+                return
+            }
+            fadeOutAnimator = ObjectAnimator.ofFloat(currentView, "alpha", currentView.alpha, 0f).apply {
+                duration = FADE_OUT_DURATION_MS
                 addListener(object : android.animation.AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: android.animation.Animator) {
-                        currentView.visibility = View.GONE
-                        imageView?.translationX = 0f
-                        imageView?.translationY = 0f
-                        imageView?.scaleX = 1.0f
-                        imageView?.scaleY = 1.0f
-                        extendedInfoColumn?.translationX = 0f
-                        extendedInfoColumn?.translationY = 0f
-                        try {
-                            windowManager?.removeView(currentView)
-                        } catch (_: Exception) {
-                        }
-                        isOverlayAdded = false
-                        overlayContainer = null
-                        maskedContainer = null
-                        wallpaperImageView = null
-                        extendedLayer = null
-                        extendedInfoColumn = null
-                                                        mediaTitleText = null
-                        mediaNoteIcon = null
-                        appIconCachePackage = null
-                        mediaSubtitleText = null
+                        runPendingRemoval()
                     }
                 })
                 start()
             }
+            handler.postDelayed(removalFallbackRunnable, FADE_OUT_DURATION_MS + ANIMATION_FALLBACK_SLACK_MS)
         }
+    }
+
+    private fun compatMode(): Boolean = prefs.getBoolean(SettingsRepository.KEY_AOD_WALLPAPER_COMPAT, false)
+
+    private fun runPendingRemoval() {
+        val removal = pendingRemoval ?: return
+        pendingRemoval = null
+        handler.removeCallbacks(removalFallbackRunnable)
+        fadeOutAnimator?.let {
+            fadeOutAnimator = null
+            it.removeAllListeners()
+            it.cancel()
+        }
+        removal.run()
     }
 
     fun removeOverlay() {
@@ -1261,6 +1339,7 @@ class AodWallpaperOverlayHandler(
         handler.removeCallbacks(burnInShiftRunnable)
         handler.removeCallbacks(timeoutRunnable)
         hideOverlay()
+        runPendingRemoval()
         setLockScreenMediaSuppressed(false)
         overlayContainer = null
         maskedContainer = null
@@ -1274,5 +1353,10 @@ class AodWallpaperOverlayHandler(
         const val LOCK_SCREEN_MEDIA_KEY = "media_controls_lock_screen"
         const val KEY_SAVED_LOCK_SCREEN_MEDIA = "saved_lock_screen_media"
         const val NO_SAVED_VALUE = -1
+        const val CUSTOM_IMAGE_FILE_NAME = "custom_aod_wallpaper.png"
+        const val FADE_IN_DURATION_MS = 2000L
+        const val FADE_OUT_DURATION_MS = 500L
+        const val CROSSFADE_HALF_DURATION_MS = 350L
+        const val ANIMATION_FALLBACK_SLACK_MS = 250L
     }
 }
