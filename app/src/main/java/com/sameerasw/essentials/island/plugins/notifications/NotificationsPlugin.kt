@@ -85,11 +85,19 @@ class NotificationsPlugin : BaseIslandPlugin() {
     }
 
     private var wasHere = false
+    private var lastExpandedHere = false
+
+    private fun expandedHere(): Boolean = lastExpandedHere
 
     override fun onFocusChanged(stage: IslandStage, focusedKey: String?) {
         val here = focusedKey == ITEM_KEY && (stage == IslandStage.Line || stage == IslandStage.Expanded)
         val left = wasHere && !here
         wasHere = here
+        val expanded = focusedKey == ITEM_KEY && stage == IslandStage.Expanded
+        if (expanded != lastExpandedHere) {
+            lastExpandedHere = expanded
+            if (hub() && alerts.isNotEmpty()) render()
+        }
         if (left && !pendingPopUp && alerts.isNotEmpty() && currentAlert()?.hubOnly == false && settings.isIslandCatchUpEnabled()) {
             val c = ctx
             if (c != null) {
@@ -638,7 +646,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         }
         val stack = alerts.map { stackIconFor(it, current = it === alert) }
         val waitingAlerts = waitingInOrder(alert).filter { !it.hubOnly && it.key !in seen }
-        val queued = if (hub() && alert.hubOnly) {
+        val queued = if (hub() && (alert.hubOnly || expandedHere())) {
             hubEntries().filter { entry -> entry.alerts.none { it === alert } }.map { hubIconFor(it) }
         } else {
             waitingAlerts.map { stackIconFor(it, current = false) }

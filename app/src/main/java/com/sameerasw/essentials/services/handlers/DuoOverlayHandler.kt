@@ -58,6 +58,7 @@ import com.sameerasw.essentials.domain.model.ActiveNotificationAlert
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.ProgressNotificationData
 import com.sameerasw.essentials.services.NotificationListener
+import com.sameerasw.essentials.utils.NetworkUtil
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.DuoOverlayView
 import com.sameerasw.essentials.utils.FlashlightUtil
@@ -500,22 +501,7 @@ class DuoOverlayHandler(
         }
     }
 
-    private fun underlyingWifiCapabilities(): NetworkCapabilities? {
-        val manager = connectivityManager ?: return null
-        val active = manager.activeNetwork ?: return null
-        val activeCaps = manager.getNetworkCapabilities(active) ?: return null
-        if (!activeCaps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-            return activeCaps.takeIf { it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) }
-        }
-        if (!activeCaps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return null
-        return manager.allNetworks
-            .mapNotNull { manager.getNetworkCapabilities(it) }
-            .firstOrNull {
-                it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) &&
-                    !it.hasTransport(NetworkCapabilities.TRANSPORT_VPN) &&
-                    it.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            }
-    }
+    private fun underlyingWifiCapabilities(): NetworkCapabilities? = NetworkUtil.underlyingWifi(connectivityManager)
 
     private fun wifiLevelOf(capabilities: NetworkCapabilities): Int {
         var rssi = Int.MIN_VALUE

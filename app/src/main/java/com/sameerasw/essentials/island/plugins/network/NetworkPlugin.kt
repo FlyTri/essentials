@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.plugins.network
 
+import com.sameerasw.essentials.utils.NetworkUtil
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -66,9 +67,11 @@ class NetworkPlugin : BaseIslandPlugin() {
     override fun onStart() {
         val c = ctx ?: return
         airplane = readAirplane()
-        wifiNetwork = connectivity.activeNetwork?.takeIf {
-            connectivity.getNetworkCapabilities(it)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-        }
+        wifiNetwork = connectivity.allNetworks.firstOrNull { network ->
+            connectivity.getNetworkCapabilities(network)?.let {
+                it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) && !it.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+            } == true
+        }.takeIf { NetworkUtil.isWifiConnected(connectivity) }
         ssid = wifiNetwork?.let { WifiUtil.getCurrentSsid(context) }
         try {
             val request = NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build()
@@ -102,7 +105,7 @@ class NetworkPlugin : BaseIslandPlugin() {
     override fun refresh() = render()
 
     private fun onWifi(network: Network, caps: NetworkCapabilities) {
-        if (ctx == null || !caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return
+        if (ctx == null || !caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) return
         if (network == wifiNetwork) {
             if (ssid == null) ssidFrom(caps)?.let { ssid = it }
             return
