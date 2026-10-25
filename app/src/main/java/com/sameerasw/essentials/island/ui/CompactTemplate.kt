@@ -63,7 +63,7 @@ import com.sameerasw.essentials.island.state.IslandUiState
 @Composable
 private fun ChipUnit(color: Color, spec: IslandLayoutSpec, startNeighbor: Boolean, endNeighbor: Boolean, content: @Composable () -> Unit) {
     val container by animateColorAsState(color, label = "islandChip")
-    val ink = if (container.luminance() > 0.5f) Color.Black else Color.White
+    val ink = Color.Black
     val full = spec.cellSize / 2
     val startRadius by animateDpAsState(if (startNeighbor) 6.dp else full, IslandMotion.float(), label = "chipStart")
     val endRadius by animateDpAsState(if (endNeighbor) 6.dp else full, IslandMotion.float(), label = "chipEnd")

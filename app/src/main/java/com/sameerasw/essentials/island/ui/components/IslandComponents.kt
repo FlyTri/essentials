@@ -101,7 +101,7 @@ fun IslandBitmap(
                 )
             }
             fallbackRes != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Icon(painterResource(fallbackRes), null, tint = Color.White, modifier = Modifier.fillMaxSize(0.8f))
+                Icon(painterResource(fallbackRes), null, tint = LocalIslandChipInk.current ?: Color.White, modifier = Modifier.fillMaxSize(0.8f))
             }
             else -> Box(Modifier.fillMaxSize())
         }
