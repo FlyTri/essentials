@@ -119,8 +119,10 @@ fun CompactTemplate(
     val cells = buildMap {
         state.items.values.forEach { item -> item.compact.forEach { put(it.key, item.key to it) } }
     }
+    val splitAcrossCamera = spec.growDirection == 0 && state.arrangement.visibleItems.size == 1 &&
+        state.arrangement.before.isNotEmpty() && state.arrangement.after.isNotEmpty()
     fun chipColorOf(itemKey: String): Color? =
-        state.items[itemKey]?.takeIf { spec.chips && it.chip }?.let { it.accent ?: iconColor ?: primary }
+        state.items[itemKey]?.takeIf { spec.chips && it.chip && !splitAcrossCamera }?.let { it.accent ?: iconColor ?: primary }
 
     fun group(keys: List<String>, before: Boolean): List<SlotUnit> {
         val units = mutableListOf<MutableList<CellEntry>>()
