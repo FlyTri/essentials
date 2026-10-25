@@ -143,6 +143,11 @@ fun IslandTimeOptionsBottomSheet(
                         settings.putBoolean(SettingsRepository.KEY_ISLAND_TIME_SHOW_SECONDS, it)
                     },
                 )
+                IslandPrefToggle(
+                    settingKey = SettingsRepository.KEY_ISLAND_TIME_DAY_SUFFIX,
+                    iconRes = R.drawable.rounded_schedule_24,
+                    title = stringResource(R.string.island_time_day_suffix_title),
+                )
                 if (settings.getBoolean(SettingsRepository.KEY_ISLAND_CHIPS, false)) {
                     IslandPrefToggle(
                         settingKey = SettingsRepository.KEY_ISLAND_TIME_CHIP,
