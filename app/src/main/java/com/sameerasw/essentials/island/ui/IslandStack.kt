@@ -348,22 +348,31 @@ fun IslandStackPill(
     val carouselState = rememberCarouselState { icons.size }
     val hapticContext = LocalContext.current
     val selectedIndex = icons.indexOfFirst { it.key == selectedKey }
+    val programmatic = remember { booleanArrayOf(false) }
     LaunchedEffect(selectedKey) {
-        if (selectedIndex >= 0) carouselState.animateScrollToItem(selectedIndex)
+        if (selectedIndex < 0) return@LaunchedEffect
+        programmatic[0] = true
+        try {
+            carouselState.animateScrollToItem(selectedIndex)
+        } finally {
+            programmatic[0] = false
+        }
     }
     LaunchedEffect(carouselState) {
         var last = carouselState.currentItem
         snapshotFlow { carouselState.currentItem }.collect {
             if (it != last) {
                 last = it
-                IslandHaptics.scrollTick(hapticContext)
-                onInteraction()
+                if (!programmatic[0]) {
+                    IslandHaptics.scrollTick(hapticContext)
+                    onInteraction()
+                }
             }
         }
     }
     LaunchedEffect(carouselState) {
         snapshotFlow { carouselState.isScrollInProgress }.collect { scrolling ->
-            while (scrolling && carouselState.isScrollInProgress) {
+            while (scrolling && carouselState.isScrollInProgress && !programmatic[0]) {
                 onInteraction()
                 delay(300)
             }
