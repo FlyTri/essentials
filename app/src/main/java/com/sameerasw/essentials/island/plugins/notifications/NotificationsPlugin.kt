@@ -58,6 +58,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_NOTIF_HUB,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_ICONS,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_ORDER,
+        SettingsRepository.KEY_ISLAND_NOTIF_HUB_CHAT_PICTURES,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_OVERFLOW,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_SILENT,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_GROUP,
@@ -540,8 +541,9 @@ class NotificationsPlugin : BaseIslandPlugin() {
             .filter { settings.isIslandNotifHubIncludeSilent() || !it.isSilent || it.ongoing }
             .sortedByDescending { it.timestamp }
         val entries = if (settings.isIslandNotifHubGroupByApps()) {
-            val standalone = shown.filter { it.ongoing || it.isConversation }.map { HubEntry(it.key, listOf(it), grouped = false) }
-            val groups = shown.filterNot { it.ongoing || it.isConversation }
+            val chats = settings.isIslandNotifHubPreferChatPictures()
+            val standalone = shown.filter { it.ongoing || (chats && it.isConversation) }.map { HubEntry(it.key, listOf(it), grouped = false) }
+            val groups = shown.filterNot { it.ongoing || (chats && it.isConversation) }
                 .groupBy { it.packageName }
                 .map { (pkg, members) -> if (members.size == 1) HubEntry(members.first().key, members, grouped = false) else HubEntry("group:$pkg", members, grouped = true) }
             standalone + groups
@@ -939,7 +941,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
     }
 
     private fun stackIconFor(alert: ActiveNotificationAlert, current: Boolean, highlight: Boolean = false): StackIcon {
-        val icon = if (concealed() && hidesChatPictures()) alert.appIcon ?: alert.icon else alert.chatIcon ?: alert.appIcon ?: alert.icon
+        val icon = if ((concealed() && hidesChatPictures()) || (hub() && !settings.isIslandNotifHubPreferChatPictures())) alert.appIcon ?: alert.icon else alert.chatIcon ?: alert.appIcon ?: alert.icon
         return StackIcon(alert.key, current = current, onSelect = { select(alert.key) }, highlight = highlight) { size ->
             IslandBitmap(icon, size, circle = true, fallbackRes = R.drawable.rounded_notifications_unread_24)
         }

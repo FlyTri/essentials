@@ -703,6 +703,7 @@ class SettingsRepository(
         const val KEY_ISLAND_SHOW_NOTIFICATIONS = "island_show_notifications"
         const val KEY_ISLAND_NOTIF_HUB = "island_notif_hub"
         const val KEY_ISLAND_NOTIF_HUB_ICONS = "island_notif_hub_icons"
+        const val KEY_ISLAND_NOTIF_HUB_CHAT_PICTURES = "island_notif_hub_chat_pictures"
         const val KEY_ISLAND_NOTIF_HUB_ORDER = "island_notif_hub_order"
         const val KEY_ISLAND_NOTIF_HUB_OVERFLOW = "island_notif_hub_overflow"
         const val KEY_ISLAND_NOTIF_HUB_SILENT = "island_notif_hub_silent"
@@ -4396,6 +4397,9 @@ class SettingsRepository(
 
     fun isIslandNotifHubIncludeSilent(): Boolean = getBoolean(KEY_ISLAND_NOTIF_HUB_SILENT, false)
     fun setIslandNotifHubIncludeSilent(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_HUB_SILENT, enabled)
+
+    fun isIslandNotifHubPreferChatPictures(): Boolean = getBoolean(KEY_ISLAND_NOTIF_HUB_CHAT_PICTURES, true)
+    fun setIslandNotifHubPreferChatPictures(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_HUB_CHAT_PICTURES, enabled)
 
     fun isIslandNotifHubGroupByApps(): Boolean = getBoolean(KEY_ISLAND_NOTIF_HUB_GROUP, false)
     fun setIslandNotifHubGroupByApps(enabled: Boolean) = putBoolean(KEY_ISLAND_NOTIF_HUB_GROUP, enabled)

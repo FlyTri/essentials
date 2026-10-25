@@ -86,6 +86,15 @@ fun IslandNotificationHubOptionsBottomSheet(
                         viewModel.setIslandNotifHubGroupByApps(it)
                     },
                 )
+                IconToggleItem(
+                    iconRes = R.drawable.rounded_person_24,
+                    title = stringResource(R.string.island_notif_hub_chat_pictures),
+                    isChecked = viewModel.isIslandNotifHubPreferChatPictures.value,
+                    onCheckedChange = {
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        viewModel.setIslandNotifHubPreferChatPictures(it)
+                    },
+                )
                 ConfigSliderItem(
                     title = stringResource(R.string.island_hide_icon_notifications),
                     value = viewModel.islandNotifHubIcons.intValue.toFloat(),

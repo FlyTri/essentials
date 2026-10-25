@@ -294,6 +294,7 @@ class MainViewModel : ViewModel() {
     val islandNotifHubIcons = mutableIntStateOf(0)
     val isIslandNotifHubIncludeSilent = mutableStateOf(false)
     val isIslandNotifHubGroupByApps = mutableStateOf(false)
+    val isIslandNotifHubPreferChatPictures = mutableStateOf(true)
     val islandNotifHubOrder = mutableStateOf(SettingsRepository.ISLAND_NOTIF_HUB_ORDER_DYNAMIC)
     val islandNotifHubOverflow = mutableStateOf(com.sameerasw.essentials.island.model.QueueOverflow.Number)
     val isIslandNotifTapToOpen = mutableStateOf(false)
@@ -997,6 +998,9 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_ISLAND_NOTIF_HUB_GROUP ->
                         isIslandNotifHubGroupByApps.value = settingsRepository.isIslandNotifHubGroupByApps()
+
+                    SettingsRepository.KEY_ISLAND_NOTIF_HUB_CHAT_PICTURES ->
+                        isIslandNotifHubPreferChatPictures.value = settingsRepository.isIslandNotifHubPreferChatPictures()
 
                     SettingsRepository.KEY_ISLAND_NOTIF_HUB_OVERFLOW ->
                         islandNotifHubOverflow.value = settingsRepository.getIslandNotifHubOverflow()
@@ -2584,6 +2588,7 @@ class MainViewModel : ViewModel() {
         islandNotifHubOrder.value = settingsRepository.getIslandNotifHubOrder()
         isIslandNotifHubIncludeSilent.value = settingsRepository.isIslandNotifHubIncludeSilent()
         isIslandNotifHubGroupByApps.value = settingsRepository.isIslandNotifHubGroupByApps()
+        isIslandNotifHubPreferChatPictures.value = settingsRepository.isIslandNotifHubPreferChatPictures()
         islandNotifHubOverflow.value = settingsRepository.getIslandNotifHubOverflow()
         isIslandNotifTapToOpen.value = settingsRepository.isIslandNotifTapToOpenEnabled()
         isIslandCatchUpEnabled.value = settingsRepository.isIslandCatchUpEnabled()
@@ -6081,6 +6086,11 @@ class MainViewModel : ViewModel() {
     fun setIslandNotifHubOverflow(value: com.sameerasw.essentials.island.model.QueueOverflow) {
         islandNotifHubOverflow.value = value
         settingsRepository.setIslandNotifHubOverflow(value)
+    }
+
+    fun setIslandNotifHubPreferChatPictures(enabled: Boolean) {
+        isIslandNotifHubPreferChatPictures.value = enabled
+        settingsRepository.setIslandNotifHubPreferChatPictures(enabled)
     }
 
     fun setIslandNotifHubGroupByApps(enabled: Boolean) {
