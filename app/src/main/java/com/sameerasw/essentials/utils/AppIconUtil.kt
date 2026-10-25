@@ -57,45 +57,44 @@ object AppIconUtil {
         return themed(context, icon) ?: icon
     }
 
+    enum class ThemedMode { MONO, DUO }
+
+    private val themedModes = java.util.Collections.synchronizedMap(java.util.WeakHashMap<Bitmap, ThemedMode>())
+
+    fun themedMode(bitmap: Bitmap): ThemedMode? = themedModes[bitmap]
+
     private fun themed(context: Context, icon: Drawable): Drawable? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return null
         val monochrome = (icon as? AdaptiveIconDrawable)?.monochrome?.mutate() ?: return duotone(context, icon)
-        monochrome.setTint(context.getColor(android.R.color.system_accent1_200))
+        monochrome.setTint(android.graphics.Color.WHITE)
         val canvasSize = 432
         val full = Bitmap.createBitmap(canvasSize, canvasSize, Bitmap.Config.ARGB_8888)
         monochrome.setBounds(0, 0, canvasSize, canvasSize)
         monochrome.draw(Canvas(full))
         val start = canvasSize * SAFE_ZONE_START / ADAPTIVE_SIZE
         val side = canvasSize * (SAFE_ZONE_END - SAFE_ZONE_START) / ADAPTIVE_SIZE
-        return BitmapDrawable(context.resources, Bitmap.createBitmap(full, start, start, side, side))
+        val bitmap = Bitmap.createBitmap(full, start, start, side, side)
+        themedModes[bitmap] = ThemedMode.MONO
+        return BitmapDrawable(context.resources, bitmap)
     }
 
     private fun duotone(context: Context, icon: Drawable): Drawable {
-        val dark = context.getColor(android.R.color.system_accent1_700)
-        val light = context.getColor(android.R.color.system_accent1_100)
-        fun channel(shift: Int) = (dark shr shift and 0xFF).toFloat() to (light shr shift and 0xFF).toFloat()
-        val (rd, rl) = channel(16)
-        val (gd, gl) = channel(8)
-        val (bd, bl) = channel(0)
-        fun row(low: Float, high: Float) =
-            floatArrayOf(
-                (high - low) / 255f * 0.213f, (high - low) / 255f * 0.715f, (high - low) / 255f * 0.072f, 0f, low,
-            )
-        val matrix =
+        val gray =
             ColorMatrix(
                 floatArrayOf(
-                    *row(rd, rl),
-                    *row(gd, gl),
-                    *row(bd, bl),
+                    0.213f, 0.715f, 0.072f, 0f, 0f,
+                    0.213f, 0.715f, 0.072f, 0f, 0f,
+                    0.213f, 0.715f, 0.072f, 0f, 0f,
                     0f, 0f, 0f, 1f, 0f,
                 ),
             )
         val size = 216
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val drawable = icon.constantState?.newDrawable()?.mutate() ?: icon.mutate()
-        drawable.colorFilter = ColorMatrixColorFilter(matrix)
+        drawable.colorFilter = ColorMatrixColorFilter(gray)
         drawable.setBounds(0, 0, size, size)
         drawable.draw(Canvas(bitmap))
+        themedModes[bitmap] = ThemedMode.DUO
         return BitmapDrawable(context.resources, bitmap)
     }
 

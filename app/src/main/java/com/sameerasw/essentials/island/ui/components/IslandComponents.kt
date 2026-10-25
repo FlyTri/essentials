@@ -1,5 +1,11 @@
 package com.sameerasw.essentials.island.ui.components
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ColorFilter
+import com.sameerasw.essentials.utils.AppIconUtil
 import com.sameerasw.essentials.island.ui.squareFit
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.aspectRatio
@@ -79,18 +85,43 @@ fun IslandBitmap(
             .clip(shape),
     ) { bmp ->
         when {
-            bmp != null -> Image(
-                bitmap = remember(bmp) { bmp.asImageBitmap() },
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
+            bmp != null -> {
+                val iconColor = LocalIslandIconColor.current ?: MaterialTheme.colorScheme.primary
+                val themedMode = remember(bmp) { AppIconUtil.themedMode(bmp) }
+                Image(
+                    bitmap = remember(bmp) { bmp.asImageBitmap() },
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    colorFilter = when (themedMode) {
+                        AppIconUtil.ThemedMode.MONO -> ColorFilter.tint(iconColor, BlendMode.SrcIn)
+                        AppIconUtil.ThemedMode.DUO -> duotoneFilter(iconColor)
+                        null -> null
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
             fallbackRes != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Icon(painterResource(fallbackRes), null, tint = Color.White, modifier = Modifier.fillMaxSize(0.8f))
+                Icon(painterResource(fallbackRes), null, tint = LocalIslandChipInk.current ?: Color.White, modifier = Modifier.fillMaxSize(0.8f))
             }
             else -> Box(Modifier.fillMaxSize())
         }
     }
+}
+
+private fun duotoneFilter(accent: Color): ColorFilter {
+    val dark = lerp(accent, Color.Black, 0.55f)
+    val light = lerp(accent, Color.White, 0.85f)
+    fun row(low: Float, high: Float) = floatArrayOf((high - low), (high - low), (high - low), 0f, low * 255f)
+    return ColorFilter.colorMatrix(
+        ColorMatrix(
+            floatArrayOf(
+                *row(dark.red, light.red).also { it[1] = 0f; it[2] = 0f },
+                *row(dark.green, light.green).also { it[0] = 0f; it[2] = 0f },
+                *row(dark.blue, light.blue).also { it[0] = 0f; it[1] = 0f },
+                0f, 0f, 0f, 1f, 0f,
+            ),
+        ),
+    )
 }
 
 val LocalIslandBitmapFlat = compositionLocalOf { false }
