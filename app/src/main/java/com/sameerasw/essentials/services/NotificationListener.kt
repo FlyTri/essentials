@@ -1897,18 +1897,6 @@ class NotificationListener : NotificationListenerService() {
 
         if (bitmap == null) {
             try {
-                val smallIcon = notif.smallIcon
-                if (smallIcon != null) {
-                    val drawable = smallIcon.loadDrawable(this)
-                    if (drawable != null) {
-                        bitmap = AppUtil.drawableToBitmap(drawable)
-                    }
-                }
-            } catch (_: Exception) {}
-        }
-
-        if (bitmap == null) {
-            try {
                 val appIconDrawable = packageManager.getApplicationIcon(sbn.packageName)
                 bitmap = AppUtil.drawableToBitmap(appIconDrawable)
             } catch (_: Exception) {}
