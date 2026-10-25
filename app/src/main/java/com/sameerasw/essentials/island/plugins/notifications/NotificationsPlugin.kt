@@ -244,7 +244,8 @@ class NotificationsPlugin : BaseIslandPlugin() {
         }
     }
 
-    private fun applyHub(live: List<ActiveNotificationAlert>) {
+    private fun applyHub(allLive: List<ActiveNotificationAlert>) {
+        val live = allLive.filter { passesFilters(it) }
         val liveKeys = live.mapTo(HashSet()) { it.key }
         val stale = alerts.filter { it.key !in liveKeys && !it.key.startsWith("simulated_") }
         stale.forEach { removeQuietly(it.key) }
@@ -277,6 +278,11 @@ class NotificationsPlugin : BaseIslandPlugin() {
     }
 
     private fun addSilently(alert: ActiveNotificationAlert) {
+        if (!passesFilters(alert)) {
+            removeQuietly(alert.key)
+            render()
+            return
+        }
         val index = alerts.indexOfFirst { it.key == alert.key }
         if (index >= 0) alerts[index] = alert.copy(hubOnly = alerts[index].hubOnly) else insertSilently(alert)
         render()
