@@ -295,6 +295,7 @@ class MainViewModel : ViewModel() {
     val isIslandNotifHubIncludeSilent = mutableStateOf(false)
     val isIslandNotifHubGroupByApps = mutableStateOf(false)
     val islandNotifHubOrder = mutableStateOf(SettingsRepository.ISLAND_NOTIF_HUB_ORDER_DYNAMIC)
+    val islandNotifHubOverflow = mutableStateOf(com.sameerasw.essentials.island.model.QueueOverflow.Number)
     val isIslandNotifTapToOpen = mutableStateOf(false)
     val isIslandCatchUpEnabled = mutableStateOf(true)
     val islandCatchUpTimeoutMs = mutableLongStateOf(10000L)
@@ -996,6 +997,9 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_ISLAND_NOTIF_HUB_GROUP ->
                         isIslandNotifHubGroupByApps.value = settingsRepository.isIslandNotifHubGroupByApps()
+
+                    SettingsRepository.KEY_ISLAND_NOTIF_HUB_OVERFLOW ->
+                        islandNotifHubOverflow.value = settingsRepository.getIslandNotifHubOverflow()
 
                     SettingsRepository.KEY_ISLAND_NOTIF_HUB_ORDER ->
                         islandNotifHubOrder.value = settingsRepository.getIslandNotifHubOrder()
@@ -2580,6 +2584,7 @@ class MainViewModel : ViewModel() {
         islandNotifHubOrder.value = settingsRepository.getIslandNotifHubOrder()
         isIslandNotifHubIncludeSilent.value = settingsRepository.isIslandNotifHubIncludeSilent()
         isIslandNotifHubGroupByApps.value = settingsRepository.isIslandNotifHubGroupByApps()
+        islandNotifHubOverflow.value = settingsRepository.getIslandNotifHubOverflow()
         isIslandNotifTapToOpen.value = settingsRepository.isIslandNotifTapToOpenEnabled()
         isIslandCatchUpEnabled.value = settingsRepository.isIslandCatchUpEnabled()
         islandCatchUpTimeoutMs.longValue = settingsRepository.getIslandCatchUpStoredMs()
@@ -6071,6 +6076,11 @@ class MainViewModel : ViewModel() {
     fun setIslandNotifHubIncludeSilent(enabled: Boolean) {
         isIslandNotifHubIncludeSilent.value = enabled
         settingsRepository.setIslandNotifHubIncludeSilent(enabled)
+    }
+
+    fun setIslandNotifHubOverflow(value: com.sameerasw.essentials.island.model.QueueOverflow) {
+        islandNotifHubOverflow.value = value
+        settingsRepository.setIslandNotifHubOverflow(value)
     }
 
     fun setIslandNotifHubGroupByApps(enabled: Boolean) {

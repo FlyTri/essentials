@@ -1,5 +1,7 @@
 package com.sameerasw.essentials.island.plugins.notifications
 
+import com.sameerasw.essentials.island.model.QueueOverflow
+
 import com.sameerasw.essentials.island.model.QueueInfo
 import com.sameerasw.essentials.island.model.StackIcon
 import android.widget.Toast
@@ -56,6 +58,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_NOTIF_HUB,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_ICONS,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_ORDER,
+        SettingsRepository.KEY_ISLAND_NOTIF_HUB_OVERFLOW,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_SILENT,
         SettingsRepository.KEY_ISLAND_NOTIF_HUB_GROUP,
         SettingsRepository.KEY_ISLAND_NOTIF_DISABLE_LOCKED,
@@ -509,7 +512,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         val cap = settings.getIslandNotifHubIcons().let { if (it == 0) AUTO_CELL_ICONS else it }
         val count = hubEntries().size
         val shown = count.coerceIn(1, cap)
-        val overflow = if (count > cap) 0.3f else 0f
+        val overflow = if (count > cap && settings.getIslandNotifHubOverflow() != QueueOverflow.None) 0.3f else 0f
         return ceil(1f + 0.55f * (shown - 1) + overflow).toInt()
     }
 
@@ -672,6 +675,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
                 onOpen = { select(alert.key) },
                 onDismiss = if (hub()) null else ({ clearAll() }),
                 maxIcons = if (hub()) settings.getIslandNotifHubIcons() else null,
+                overflow = if (hub()) settings.getIslandNotifHubOverflow() else QueueOverflow.Number,
                 cells = bubbleCells(),
             )
             else -> null

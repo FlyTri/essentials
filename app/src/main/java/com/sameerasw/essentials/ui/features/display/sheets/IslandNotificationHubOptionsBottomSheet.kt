@@ -99,6 +99,32 @@ fun IslandNotificationHubOptionsBottomSheet(
                     valueFormatter = { if (it.toInt() == 0) autoLabel else it.toInt().toString() },
                 )
             }
+
+            Text(
+                text = stringResource(R.string.island_notif_hub_overflow_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(start = 8.dp),
+            )
+            RoundedCardContainer(spacing = 2.dp, cornerRadius = 24.dp) {
+                val numberLabel = stringResource(R.string.island_notif_hub_overflow_number)
+                val dotLabel = stringResource(R.string.island_notif_hub_overflow_dot)
+                val noneLabel = stringResource(R.string.island_notif_hub_overflow_none)
+                SegmentedPicker(
+                    items = com.sameerasw.essentials.island.model.QueueOverflow.entries.toList(),
+                    selectedItem = viewModel.islandNotifHubOverflow.value,
+                    onItemSelected = { viewModel.setIslandNotifHubOverflow(it) },
+                    labelProvider = {
+                        when (it) {
+                            com.sameerasw.essentials.island.model.QueueOverflow.Dot -> dotLabel
+                            com.sameerasw.essentials.island.model.QueueOverflow.None -> noneLabel
+                            else -> numberLabel
+                        }
+                    },
+                    title = R.string.island_notif_hub_overflow_title,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
     }
 }

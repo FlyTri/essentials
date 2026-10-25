@@ -3452,6 +3452,10 @@
     <string name="island_notif_peek_style_search_desc">Full or compact peeks</string>
     <string name="island_notif_show_title">Show notifications</string>
     <string name="island_notif_hub_desc">Replace statusbar notification icons with island</string>
+    <string name="island_notif_hub_overflow_title">More notifications indicator</string>
+    <string name="island_notif_hub_overflow_number">Number</string>
+    <string name="island_notif_hub_overflow_dot">Dot</string>
+    <string name="island_notif_hub_overflow_none">None</string>
     <string name="island_notif_hub_title">Notification Hub</string>
     <string name="island_notif_hub_icons_auto">Auto</string>
     <string name="island_notif_hub_order_title">Ordering</string>

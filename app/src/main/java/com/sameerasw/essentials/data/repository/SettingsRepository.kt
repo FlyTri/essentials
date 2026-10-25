@@ -704,6 +704,7 @@ class SettingsRepository(
         const val KEY_ISLAND_NOTIF_HUB = "island_notif_hub"
         const val KEY_ISLAND_NOTIF_HUB_ICONS = "island_notif_hub_icons"
         const val KEY_ISLAND_NOTIF_HUB_ORDER = "island_notif_hub_order"
+        const val KEY_ISLAND_NOTIF_HUB_OVERFLOW = "island_notif_hub_overflow"
         const val KEY_ISLAND_NOTIF_HUB_SILENT = "island_notif_hub_silent"
         const val KEY_ISLAND_NOTIF_HUB_GROUP = "island_notif_hub_group"
         const val ISLAND_NOTIF_HUB_ORDER_DYNAMIC = "dynamic"
@@ -4405,6 +4406,11 @@ class SettingsRepository(
             ?: ISLAND_NOTIF_HUB_ORDER_DYNAMIC
 
     fun setIslandNotifHubOrder(value: String) = putString(KEY_ISLAND_NOTIF_HUB_ORDER, value)
+
+    fun getIslandNotifHubOverflow(): com.sameerasw.essentials.island.model.QueueOverflow =
+        com.sameerasw.essentials.island.model.QueueOverflow.entries.firstOrNull { it.name == getString(KEY_ISLAND_NOTIF_HUB_OVERFLOW, null) }
+            ?: com.sameerasw.essentials.island.model.QueueOverflow.Number
+    fun setIslandNotifHubOverflow(value: com.sameerasw.essentials.island.model.QueueOverflow) = putString(KEY_ISLAND_NOTIF_HUB_OVERFLOW, value.name)
 
     // 0 = fit to the available width
     fun getIslandNotifHubIcons(): Int = getInt(KEY_ISLAND_NOTIF_HUB_ICONS, 0).coerceIn(0, 8)
