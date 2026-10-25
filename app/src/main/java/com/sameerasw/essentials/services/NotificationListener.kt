@@ -2123,7 +2123,7 @@ class NotificationListener : NotificationListenerService() {
 
     private fun hubAlertOf(sbn: StatusBarNotification, rankingMap: RankingMap?): ActiveNotificationAlert? {
         if (sbn.packageName == packageName || !hasReadableExtras(sbn) || isMediaNotification(sbn)) return null
-        if (isHandledAsProgress(sbn)) return null
+        if (isHandledAsProgress(sbn) || isShownByDedicatedFeature(sbn)) return null
         if ((sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0 && !isStandaloneSummary(sbn)) return null
         return extractNotificationAlert(sbn)?.copy(
             isSilent = isSilentNotification(sbn, rankingMap),
@@ -2133,6 +2133,12 @@ class NotificationListener : NotificationListenerService() {
             hubOnly = true,
             timestamp = if (sbn.postTime > 0) sbn.postTime else System.currentTimeMillis(),
         )
+    }
+
+    private fun isShownByDedicatedFeature(sbn: StatusBarNotification): Boolean {
+        val settings = SettingsRepository(applicationContext)
+        if (CallNotificationParser.isCall(sbn) && settings.isIslandShowCallsEnabled()) return true
+        return sbn.isOngoing && settings.isIslandShowNavigationEnabled() && isNavigationNotification(sbn)
     }
 
     private fun isHandledAsProgress(sbn: StatusBarNotification): Boolean {
