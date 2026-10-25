@@ -109,8 +109,8 @@ fun IslandBitmap(
 }
 
 private fun duotoneFilter(accent: Color): ColorFilter {
-    val dark = lerp(accent, Color.Black, 0.55f)
-    val light = lerp(accent, Color.White, 0.85f)
+    val dark = lerp(accent, Color.Black, 0.6f)
+    val light = lerp(accent, Color.White, 0.45f)
     fun row(low: Float, high: Float) = floatArrayOf((high - low), (high - low), (high - low), 0f, low * 255f)
     return ColorFilter.colorMatrix(
         ColorMatrix(
