@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.plugins.alarm
 
+import com.sameerasw.essentials.island.IslandTimeFormat
 import android.app.AlarmManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -31,6 +32,9 @@ class AlarmPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_SHOW_ALARM,
         SettingsRepository.KEY_ISLAND_ALARM_WINDOW_HOURS,
         SettingsRepository.KEY_ISLAND_ALARM_HIDE_TIME,
+        SettingsRepository.KEY_ISLAND_TIME_FORMAT,
+        SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO,
+        SettingsRepository.KEY_ISLAND_TIME_PERIOD,
     )
 
     private var registered = false
@@ -135,11 +139,6 @@ object NextAlarm {
     }
 
     fun format(context: Context, millis: Long, withPeriod: Boolean): String {
-        val pattern = when {
-            DateFormat.is24HourFormat(context) -> "HH:mm"
-            withPeriod -> "h:mm a"
-            else -> "h:mm"
-        }
-        return SimpleDateFormat(pattern, Locale.getDefault()).format(Date(millis))
+        return IslandTimeFormat.format(context, SettingsRepository(context), millis, period = withPeriod)
     }
 }

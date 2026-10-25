@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.plugins.calendar
 
+import com.sameerasw.essentials.island.IslandTimeFormat
 import android.app.KeyguardManager
 import android.content.ContentUris
 import android.content.Context
@@ -36,6 +37,9 @@ class CalendarPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_CALENDAR_PRIORITY_MINUTES,
         SettingsRepository.KEY_ISLAND_CALENDAR_HIDE_LOCKED,
         SettingsRepository.KEY_ISLAND_CALENDAR_COMPACT_TIME,
+        SettingsRepository.KEY_ISLAND_TIME_FORMAT,
+        SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO,
+        SettingsRepository.KEY_ISLAND_TIME_PERIOD,
     )
 
     private var event: UpcomingCalendarEvent? = null
@@ -86,8 +90,7 @@ class CalendarPlugin : BaseIslandPlugin() {
         val now = System.currentTimeMillis()
         val full = CalendarEventUtil.formatRelativeTime(context, e.startTimeMillis, now)
         val short = if (settings.getBoolean(SettingsRepository.KEY_ISLAND_CALENDAR_COMPACT_TIME, false) && e.startTimeMillis - now >= 60 * 60_000L) {
-            val pattern = if (DateFormat.is24HourFormat(context)) "H:mm" else "h:mm"
-            SimpleDateFormat(pattern, Locale.getDefault()).format(Date(e.startTimeMillis))
+            IslandTimeFormat.format(context, settings, e.startTimeMillis, period = false)
         } else {
             CalendarEventUtil.formatRelativeTimeCompact(e.startTimeMillis, now)
         }

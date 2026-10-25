@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.plugins.timebattery
 
+import com.sameerasw.essentials.island.IslandTimeFormat
 import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -176,24 +177,7 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
     private fun showSeconds() = settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_SHOW_SECONDS, false)
 
     private fun readTime() {
-        val format = settings.getString(SettingsRepository.KEY_ISLAND_TIME_FORMAT, null) ?: SettingsRepository.ISLAND_TIME_FORMAT_SYSTEM
-        val is24 = when (format) {
-            SettingsRepository.ISLAND_TIME_FORMAT_12H -> false
-            SettingsRepository.ISLAND_TIME_FORMAT_24H -> true
-            else -> DateFormat.is24HourFormat(context)
-        }
-        val base = if (is24) {
-            "HH:mm"
-        } else if (settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO, false)) {
-            "hh:mm"
-        } else {
-            "h:mm"
-        }
-        val withSeconds = if (showSeconds()) "$base:ss" else base
-        val showPeriod = !is24 &&
-            settings.getString(SettingsRepository.KEY_ISLAND_TIME_PERIOD, null) == SettingsRepository.ISLAND_TIME_PERIOD_AM_PM
-        val pattern = if (showPeriod) "$withSeconds a" else withSeconds
-        time = SimpleDateFormat(pattern, Locale.getDefault()).format(Date())
+        time = IslandTimeFormat.format(context, settings, System.currentTimeMillis(), seconds = showSeconds())
     }
 
     private fun readBattery(intent: Intent?) {

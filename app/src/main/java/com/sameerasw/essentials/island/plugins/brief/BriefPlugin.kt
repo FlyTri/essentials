@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.plugins.brief
 
+import com.sameerasw.essentials.island.IslandTimeFormat
 import com.sameerasw.essentials.island.ui.components.LocalIslandIconColor
 import com.sameerasw.essentials.island.plugins.alarm.NextAlarm
 import androidx.compose.foundation.layout.fillMaxSize
@@ -440,8 +441,8 @@ private fun BriefOverview(
         }
     }
 
-    val timePattern = if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm"
-    val time = SimpleDateFormat(timePattern, Locale.getDefault()).format(Date(now))
+    val timeSettings = remember { SettingsRepository(context) }
+    val time = IslandTimeFormat.format(context, timeSettings, now)
     val date = SimpleDateFormat(DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEMMMd"), Locale.getDefault()).format(Date(now))
 
     val artwork = remember(media?.artwork) { media?.artwork?.asImageBitmap() }
@@ -686,7 +687,8 @@ private fun BriefPlayerButton(
 }
 
 private fun briefWhen(context: Context, event: UpcomingCalendarEvent, now: Long): String {
-    val timeFormat = DateFormat.getTimeFormat(context)
+    val timeSettings = SettingsRepository(context)
+    val timeText = { millis: Long -> IslandTimeFormat.format(context, timeSettings, millis) }
     val start = event.startTimeMillis
     val tomorrow = !isSameDay(start, now) && start > now
     if (event.allDay) {
@@ -694,7 +696,7 @@ private fun briefWhen(context: Context, event: UpcomingCalendarEvent, now: Long)
         return if (tomorrow) context.getString(R.string.island_brief_tomorrow, all) else all
     }
     if (start <= now) {
-        return context.getString(R.string.island_brief_now_until, timeFormat.format(Date(event.endTimeMillis)))
+        return context.getString(R.string.island_brief_now_until, timeText(event.endTimeMillis))
     }
     val minutes = ((start - now + 59_999L) / 60_000L).toInt()
     val hours = minutes / 60
@@ -707,8 +709,8 @@ private fun briefWhen(context: Context, event: UpcomingCalendarEvent, now: Long)
             context.getString(R.string.island_brief_in_hours_minutes, hours, rest)
         }
         minutes < 12 * 60 -> context.getString(R.string.island_brief_in_hours, if (rest >= 30) hours + 1 else hours)
-        tomorrow -> context.getString(R.string.island_brief_tomorrow, timeFormat.format(Date(start)))
-        else -> context.getString(R.string.island_brief_today, timeFormat.format(Date(start)))
+        tomorrow -> context.getString(R.string.island_brief_tomorrow, timeText(start))
+        else -> context.getString(R.string.island_brief_today, timeText(start))
     }
 }
 

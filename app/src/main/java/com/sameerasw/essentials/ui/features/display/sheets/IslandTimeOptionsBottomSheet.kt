@@ -9,6 +9,7 @@
 
 package com.sameerasw.essentials.ui.features.display.sheets
 
+import com.sameerasw.essentials.island.IslandTimeFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -59,7 +60,7 @@ fun IslandTimeOptionsBottomSheet(
     var period by remember {
         mutableStateOf(settings.getString(SettingsRepository.KEY_ISLAND_TIME_PERIOD, null) ?: SettingsRepository.ISLAND_TIME_PERIOD_NONE)
     }
-    var leadingZero by remember { mutableStateOf(settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO, false)) }
+    var leadingZero by remember { mutableStateOf(IslandTimeFormat.leadingZero(context, settings)) }
     val is12h = when (timeFormat) {
         SettingsRepository.ISLAND_TIME_FORMAT_12H -> true
         SettingsRepository.ISLAND_TIME_FORMAT_24H -> false
@@ -115,7 +116,7 @@ fun IslandTimeOptionsBottomSheet(
                     )
                 }
                 AnimatedVisibility(
-                    visible = is12h,
+                    visible = true,
                     enter = expandVertically() + fadeIn(),
                     exit = shrinkVertically() + fadeOut(),
                 ) {
