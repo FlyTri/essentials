@@ -184,16 +184,16 @@ fun CompactTemplate(
                 val up = (to?.priority ?: 0) < (from?.priority ?: 0)
                 val morph = from != null && to != null && from.itemKey == to.itemKey
                 val spec2 = when {
-                    morph -> fadeIn(tween(240, delayMillis = 40)) + scaleIn(IslandMotion.compactFloat(), initialScale = 0.9f) togetherWith
-                        fadeOut(tween(180)) + scaleOut(IslandMotion.compactFloat(), targetScale = 0.9f)
+                    morph -> fadeIn(motionTween(240, delayMillis = 40)) + scaleIn(IslandMotion.compactFloat(), initialScale = 0.9f) togetherWith
+                        fadeOut(motionTween(180)) + scaleOut(IslandMotion.compactFloat(), targetScale = 0.9f)
                     swap -> (fadeIn(IslandMotion.contentIn()) + slideInVertically(IslandMotion.compactOffset) { if (up) it else -it })
                         .togetherWith(fadeOut(IslandMotion.contentOut()) + slideOutVertically(IslandMotion.compactOffset) { if (up) -it else it })
                     else -> (
-                        fadeIn(tween(260, delayMillis = 60)) +
+                        fadeIn(motionTween(260, delayMillis = 60)) +
                             (if (edgeAnchored) EnterTransition.None else slideInHorizontally(IslandMotion.compactOffset, towardCamera)) +
                             scaleIn(IslandMotion.compactFloat(), initialScale = 0.5f)
                         ).togetherWith(
-                            fadeOut(tween(220)) +
+                            fadeOut(motionTween(220)) +
                                 (if (edgeAnchored) ExitTransition.None else slideOutHorizontally(IslandMotion.compactOffset, towardCamera)) +
                                 scaleOut(IslandMotion.compactFloat(), targetScale = 0.5f),
                         )

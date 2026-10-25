@@ -1,5 +1,9 @@
 package com.sameerasw.essentials.island.plugins.brief
 
+import com.sameerasw.essentials.island.ui.motionSpring
+
+import com.sameerasw.essentials.island.ui.motionTween
+
 import com.sameerasw.essentials.island.IslandTimeFormat
 import com.sameerasw.essentials.island.ui.components.LocalIslandIconColor
 import com.sameerasw.essentials.island.plugins.alarm.NextAlarm
@@ -219,7 +223,7 @@ private fun BriefExpanded(
                 val forward = targetState != BriefPage.Overview
                 (slideInHorizontally { if (forward) it / 3 else -it / 3 } + fadeIn()) togetherWith
                     (slideOutHorizontally { if (forward) -it / 3 else it / 3 } + fadeOut()) using
-                    SizeTransform(clip = false) { _, _ -> spring(stiffness = IslandMotion.STIFFNESS, dampingRatio = IslandMotion.DAMPING) }
+                    SizeTransform(clip = false) { _, _ -> motionSpring(stiffness = IslandMotion.STIFFNESS, dampingRatio = IslandMotion.DAMPING) }
             },
             label = "brief",
         ) { target ->
@@ -288,12 +292,12 @@ private fun BriefBackground(
             is BriefPage.Event -> 0f
             is BriefPage.Remote -> 0f
         },
-        tween(400),
+        motionTween(400),
         label = "briefArt",
     )
     val event = (page as? BriefPage.Event)?.event
     val glowColor = event?.calendarColor?.let { Color(soften(it)) } ?: MaterialTheme.colorScheme.primary
-    val glowAlpha by animateFloatAsState(if (event != null) 1f else 0f, tween(400), label = "briefGlow")
+    val glowAlpha by animateFloatAsState(if (event != null) 1f else 0f, motionTween(400), label = "briefGlow")
     Box(modifier) {
         if (artAlpha > 0f) {
             scope.ArtworkBackdrop(artwork, Modifier.matchParentSize().graphicsLayer { alpha = artAlpha })

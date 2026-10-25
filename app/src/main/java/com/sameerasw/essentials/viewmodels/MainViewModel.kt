@@ -229,6 +229,7 @@ class MainViewModel : ViewModel() {
     val islandExpandedWidth = mutableFloatStateOf(360f)
     val islandExpandedRoundness = mutableFloatStateOf(24f)
     val islandFontScale = mutableFloatStateOf(1f)
+    val islandAnimationSpeed = mutableFloatStateOf(1f)
     val isIslandHideInOwnerApp = mutableStateOf(false)
     val isIslandHideOnShade = mutableStateOf(false)
     val isIslandKeepOnLandscape = mutableStateOf(false)
@@ -2500,6 +2501,7 @@ class MainViewModel : ViewModel() {
         islandExpandedWidth.floatValue = settingsRepository.getIslandExpandedWidth()
         islandExpandedRoundness.floatValue = settingsRepository.getIslandExpandedRoundness()
         islandFontScale.floatValue = settingsRepository.getIslandFontScale()
+        islandAnimationSpeed.floatValue = settingsRepository.getIslandAnimationSpeed()
         isIslandHideInOwnerApp.value = settingsRepository.isIslandHideInOwnerAppEnabled()
         isIslandHideOnShade.value = settingsRepository.isIslandHideOnShadeEnabled()
         isIslandKeepOnLandscape.value = settingsRepository.isIslandKeepOnLandscapeEnabled()
@@ -5958,6 +5960,11 @@ class MainViewModel : ViewModel() {
     fun setIslandHideOnShade(enabled: Boolean) {
         isIslandHideOnShade.value = enabled
         settingsRepository.setIslandHideOnShadeEnabled(enabled)
+    }
+
+    fun setIslandAnimationSpeed(value: Float) {
+        islandAnimationSpeed.floatValue = value
+        settingsRepository.setIslandAnimationSpeed(value)
     }
 
     fun setIslandFontScale(value: Float) {

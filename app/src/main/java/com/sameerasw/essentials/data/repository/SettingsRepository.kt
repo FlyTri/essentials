@@ -602,6 +602,7 @@ class SettingsRepository(
         const val KEY_ISLAND_DEVICES_BATTERY_ONLY_LOW = "island_devices_battery_only_low"
         const val KEY_ISLAND_EXPANDED_SCALE = "island_expanded_scale"
         const val KEY_ISLAND_FONT_SCALE = "island_font_scale"
+        const val KEY_ISLAND_ANIMATION_SPEED = "island_animation_speed"
         const val KEY_ISLAND_HIDE_IN_OWNER_APP = "island_hide_in_owner_app"
         const val KEY_ISLAND_HIDE_ON_SHADE = "island_hide_on_shade"
         const val KEY_ISLAND_KEEP_ON_LANDSCAPE = "island_keep_on_landscape"
@@ -4364,6 +4365,9 @@ class SettingsRepository(
     fun isIslandHideOnShadeEnabled(): Boolean = getBoolean(KEY_ISLAND_HIDE_ON_SHADE, false)
 
     fun setIslandHideOnShadeEnabled(enabled: Boolean) = putBoolean(KEY_ISLAND_HIDE_ON_SHADE, enabled)
+
+    fun getIslandAnimationSpeed(): Float = getFloat(KEY_ISLAND_ANIMATION_SPEED, 1f)
+    fun setIslandAnimationSpeed(value: Float) = putFloat(KEY_ISLAND_ANIMATION_SPEED, value)
 
     fun getIslandFontScale(): Float = getFloat(KEY_ISLAND_FONT_SCALE, 1f)
     fun setIslandFontScale(value: Float) = putFloat(KEY_ISLAND_FONT_SCALE, value)

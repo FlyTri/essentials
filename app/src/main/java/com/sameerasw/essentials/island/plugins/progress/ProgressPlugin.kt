@@ -1,5 +1,7 @@
 package com.sameerasw.essentials.island.plugins.progress
 
+import com.sameerasw.essentials.island.ui.motionTween
+
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -148,7 +150,7 @@ internal fun ProgressRing(progress: Float, indeterminate: Boolean, icon: ImageBi
     val rotation by rememberInfiniteTransition(label = "progressSpin").animateFloat(
         initialValue = 0f,
         targetValue = 360f,
-        animationSpec = infiniteRepeatable(tween(1200, easing = LinearEasing), RepeatMode.Restart),
+        animationSpec = infiniteRepeatable(motionTween(1200, easing = LinearEasing), RepeatMode.Restart),
         label = "progressRotation",
     )
     Box(
