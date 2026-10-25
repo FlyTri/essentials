@@ -1,5 +1,7 @@
 package com.sameerasw.essentials.island.plugins.calendar
 
+import com.sameerasw.essentials.data.repository.SettingsRepository
+import com.sameerasw.essentials.island.IslandTimeFormat
 import com.sameerasw.essentials.island.ui.squareFit
 import androidx.compose.foundation.layout.fillMaxSize
 import com.sameerasw.essentials.island.ui.SurfaceBackdrop
@@ -62,12 +64,13 @@ fun CalendarExpanded(
     val context = LocalContext.current
     val sidePadding = spec.expandedPadding + spec.expandedCorner * 0.35f
     val calendarColor = event.calendarColor?.let { Color(soften(it)) } ?: MaterialTheme.colorScheme.primary
-    val timeFormat = DateFormat.getTimeFormat(context)
+    val timeSettings = remember { SettingsRepository(context) }
+    val timeText = { millis: Long -> IslandTimeFormat.format(context, timeSettings, millis) }
     val timeRange = when {
         event.allDay -> stringResource(R.string.island_calendar_all_day)
         event.endTimeMillis > event.startTimeMillis ->
-            "${timeFormat.format(Date(event.startTimeMillis))} – ${timeFormat.format(Date(event.endTimeMillis))}"
-        else -> timeFormat.format(Date(event.startTimeMillis))
+            "${timeText(event.startTimeMillis)} – ${timeText(event.endTimeMillis)}"
+        else -> timeText(event.startTimeMillis)
     }
     val detailStyle = IslandTextStyles.body.copy(color = islandTextColor(), fontSize = 15.sp, lineHeight = 20.sp)
 

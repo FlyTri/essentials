@@ -9,6 +9,7 @@
 
 package com.sameerasw.essentials.services
 
+import com.sameerasw.essentials.utils.AppIconUtil
 import android.graphics.drawable.Icon
 import android.content.pm.LauncherApps
 import com.sameerasw.essentials.domain.controller.HilightController
@@ -1897,19 +1898,7 @@ class NotificationListener : NotificationListenerService() {
 
         if (bitmap == null) {
             try {
-                val smallIcon = notif.smallIcon
-                if (smallIcon != null) {
-                    val drawable = smallIcon.loadDrawable(this)
-                    if (drawable != null) {
-                        bitmap = AppUtil.drawableToBitmap(drawable)
-                    }
-                }
-            } catch (_: Exception) {}
-        }
-
-        if (bitmap == null) {
-            try {
-                val appIconDrawable = packageManager.getApplicationIcon(sbn.packageName)
+                val appIconDrawable = AppIconUtil.islandAppIcon(this, sbn.packageName)
                 bitmap = AppUtil.drawableToBitmap(appIconDrawable)
             } catch (_: Exception) {}
         }
@@ -2123,7 +2112,7 @@ class NotificationListener : NotificationListenerService() {
 
     private fun hubAlertOf(sbn: StatusBarNotification, rankingMap: RankingMap?): ActiveNotificationAlert? {
         if (sbn.packageName == packageName || !hasReadableExtras(sbn) || isMediaNotification(sbn)) return null
-        if (isHandledAsProgress(sbn)) return null
+        if (isHandledAsProgress(sbn) || isShownByDedicatedFeature(sbn)) return null
         if ((sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0 && !isStandaloneSummary(sbn)) return null
         return extractNotificationAlert(sbn)?.copy(
             isSilent = isSilentNotification(sbn, rankingMap),
@@ -2133,6 +2122,12 @@ class NotificationListener : NotificationListenerService() {
             hubOnly = true,
             timestamp = if (sbn.postTime > 0) sbn.postTime else System.currentTimeMillis(),
         )
+    }
+
+    private fun isShownByDedicatedFeature(sbn: StatusBarNotification): Boolean {
+        val settings = SettingsRepository(applicationContext)
+        if (CallNotificationParser.isCall(sbn) && settings.isIslandShowCallsEnabled()) return true
+        return sbn.isOngoing && settings.isIslandShowNavigationEnabled() && isNavigationNotification(sbn)
     }
 
     private fun isHandledAsProgress(sbn: StatusBarNotification): Boolean {
@@ -2304,7 +2299,7 @@ class NotificationListener : NotificationListenerService() {
 
         var appIcon: Bitmap? = null
         try {
-            val appIconDrawable = packageManager.getApplicationIcon(sbn.packageName)
+            val appIconDrawable = AppIconUtil.islandAppIcon(this, sbn.packageName)
             appIcon = AppUtil.drawableToBitmap(appIconDrawable)
         } catch (_: Exception) {}
 

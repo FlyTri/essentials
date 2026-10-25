@@ -1,6 +1,5 @@
 package com.sameerasw.essentials.island.state
 
-import com.sameerasw.essentials.island.model.IslandChips
 import com.sameerasw.essentials.island.model.SideBubble
 import com.sameerasw.essentials.island.ui.inlineBubbleCell
 import com.sameerasw.essentials.island.model.CompactPlacement
@@ -308,7 +307,7 @@ class IslandController(
                     item.compact.filter { it.soloOnly }.map { it.key },
                     item.needsCompanyAtCenter,
                     item.companionOnly,
-                    chipsEnabled && item.key in IslandChips.items,
+                    chipsEnabled && item.chip,
                 )
             },
             anchorProvider(),

@@ -95,7 +95,7 @@ class SettingsRepository(
                     "Cycle sound modes" -> Action.CycleSoundModes
                     "Toggle media volume" -> Action.ToggleMediaVolume
                     "Like current song" -> Action.LikeCurrentSong
-                    "Circle to Search" -> Action.CircleToSearch
+                    "Circle to Search" -> Action.CircleToSearch()
                     else -> null
                 }
             setRemapAction(key, action)
@@ -299,6 +299,7 @@ class SettingsRepository(
         const val KEY_CIRCLE_TO_SEARCH_GESTURE_HEIGHT = "circle_to_search_gesture_height"
         const val KEY_CIRCLE_TO_SEARCH_GESTURE_WIDTH = "circle_to_search_gesture_width"
         const val KEY_CIRCLE_TO_SEARCH_PREVIEW_ENABLED = "circle_to_search_preview_enabled"
+        const val KEY_CIRCLE_TO_SEARCH_HIDE_ON_SHADE = "circle_to_search_hide_on_shade"
         const val KEY_AUTO_UPDATE_ENABLED = "auto_update_enabled"
         const val KEY_UPDATE_NOTIFICATION_ENABLED = "update_notification_enabled"
         const val KEY_LAST_UPDATE_CHECK_TIME = "last_update_check_time"
@@ -564,7 +565,9 @@ class SettingsRepository(
         const val KEY_ISLAND_SHOW_TIME_BATTERY = "island_show_time_battery"
         const val KEY_ISLAND_TIME_SHOW_SECONDS = "island_time_show_seconds"
         const val KEY_ISLAND_THEMED_TEXT = "island_themed_text"
+        const val KEY_ISLAND_THEMED_APP_ICONS = "island_themed_app_icons"
         const val KEY_ISLAND_CHIPS = "island_chips"
+        const val KEY_ISLAND_TIME_CHIP = "island_time_chip"
         const val KEY_ISLAND_ICON_COLOR_MODE = "island_icon_color_mode"
         const val KEY_ISLAND_ICON_COLOR_CUSTOM = "island_icon_color_custom"
         const val KEY_ISLAND_ICON_MATERIAL_YOU = "island_icon_material_you"
@@ -573,6 +576,7 @@ class SettingsRepository(
         const val KEY_ISLAND_TIME_FORMAT = "island_time_format"
         const val KEY_ISLAND_TIME_PERIOD = "island_time_period"
         const val KEY_ISLAND_TIME_LEADING_ZERO = "island_time_leading_zero"
+        const val KEY_ISLAND_TIME_DAY_SUFFIX = "island_time_day_suffix"
         const val ISLAND_TIME_FORMAT_SYSTEM = "system"
         const val ISLAND_TIME_FORMAT_12H = "12h"
         const val ISLAND_TIME_FORMAT_24H = "24h"

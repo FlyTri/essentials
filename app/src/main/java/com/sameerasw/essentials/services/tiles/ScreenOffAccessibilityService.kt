@@ -236,7 +236,8 @@ class ScreenOffAccessibilityService :
             } else if (key == "circle_to_search_gesture_enabled" ||
                 key == "circle_to_search_gesture_height" ||
                 key == "circle_to_search_gesture_width" ||
-                key == "circle_to_search_preview_enabled"
+                key == "circle_to_search_preview_enabled" ||
+                key == SettingsRepository.KEY_CIRCLE_TO_SEARCH_HIDE_ON_SHADE
             ) {
                 updateOmniOverlay()
             } else if (key == "smart_wifi_enabled" ||
@@ -396,6 +397,7 @@ class ScreenOffAccessibilityService :
                             statusGlanceHandler.setShadeExpanded(false)
                             islandOverlayHandler.setShadeExpanded(false)
                             duoOverlayHandler.setShadeExpanded(false)
+                            shadeExpandedNow = false
                             appFlowHandler.clearAuthenticated()
                             appFlowHandler.clearConsciousGate()
                             scheduleFreeze()
@@ -545,7 +547,8 @@ class ScreenOffAccessibilityService :
                 240f
             }
         val isPreview = prefs.getBoolean("circle_to_search_preview_enabled", false)
-        val shouldShow = isGestureEnabled && isScreenOn && !keyguardManager.isKeyguardLocked
+        val hiddenByShade = shadeExpandedNow && prefs.getBoolean(SettingsRepository.KEY_CIRCLE_TO_SEARCH_HIDE_ON_SHADE, false)
+        val shouldShow = isGestureEnabled && isScreenOn && !keyguardManager.isKeyguardLocked && !hiddenByShade
         omniGestureOverlayHandler.updateOverlay(shouldShow, height, width, isPreview)
     }
 
@@ -664,6 +667,7 @@ class ScreenOffAccessibilityService :
 
     @Volatile
     private var lastUnlockAt = 0L
+    private var shadeExpandedNow = false
 
     // Window queries are binder calls, so they run on their own thread, once per burst of events, and only the results hop to main
     private fun requestWindowScan() {
@@ -701,6 +705,10 @@ class ScreenOffAccessibilityService :
             statusGlanceHandler.setShadeExpanded(shadeExpanded)
             islandOverlayHandler.setShadeExpanded(shadeExpanded)
             duoOverlayHandler.setShadeExpanded(shadeExpanded)
+            if (shadeExpandedNow != shadeExpanded) {
+                shadeExpandedNow = shadeExpanded
+                updateOmniOverlay()
+            }
             buttonRemapHandler.isVolumeDialogVisible = volumeDialogVisible
             appVolumeOverlayHandler.onWindowsChanged()
         }

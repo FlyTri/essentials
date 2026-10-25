@@ -638,7 +638,7 @@ class NotificationsPlugin : BaseIslandPlugin() {
         }
         val stack = alerts.map { stackIconFor(it, current = it === alert) }
         val waitingAlerts = waitingInOrder(alert).filter { !it.hubOnly && it.key !in seen }
-        val queued = if (hub() && alert.hubOnly) {
+        val queued = if (hub()) {
             hubEntries().filter { entry -> entry.alerts.none { it === alert } }.map { hubIconFor(it) }
         } else {
             waitingAlerts.map { stackIconFor(it, current = false) }

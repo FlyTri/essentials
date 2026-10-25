@@ -1,5 +1,14 @@
 package com.sameerasw.essentials.island.plugins.timebattery
 
+import com.sameerasw.essentials.island.ui.islandTextColor
+import com.sameerasw.essentials.island.ui.IslandTextStyles
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import com.sameerasw.essentials.island.IslandTimeFormat
 import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -39,7 +48,9 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_TIME_FORMAT,
         SettingsRepository.KEY_ISLAND_TIME_PERIOD,
         SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO,
+        SettingsRepository.KEY_ISLAND_TIME_DAY_SUFFIX,
         SettingsRepository.KEY_ISLAND_TIME_HIDE_LOCKED,
+        SettingsRepository.KEY_ISLAND_TIME_CHIP,
         SettingsRepository.KEY_ISLAND_BATTERY_HIDE_LOCKED,
         SettingsRepository.KEY_ISLAND_SHOW_BATTERY,
         SettingsRepository.KEY_ISLAND_BATTERY_STYLE,
@@ -63,6 +74,7 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
     )
 
     private var time = ""
+    private var day = ""
     private var level = -1
     private var charging = false
     private var shielded = false
@@ -175,24 +187,12 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
     private fun showSeconds() = settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_SHOW_SECONDS, false)
 
     private fun readTime() {
-        val format = settings.getString(SettingsRepository.KEY_ISLAND_TIME_FORMAT, null) ?: SettingsRepository.ISLAND_TIME_FORMAT_SYSTEM
-        val is24 = when (format) {
-            SettingsRepository.ISLAND_TIME_FORMAT_12H -> false
-            SettingsRepository.ISLAND_TIME_FORMAT_24H -> true
-            else -> DateFormat.is24HourFormat(context)
-        }
-        val base = if (is24) {
-            "HH:mm"
-        } else if (settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO, false)) {
-            "hh:mm"
+        time = IslandTimeFormat.format(context, settings, System.currentTimeMillis(), seconds = showSeconds())
+        day = if (settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_DAY_SUFFIX, false)) {
+            SimpleDateFormat("EEE", Locale.getDefault()).format(Date())
         } else {
-            "h:mm"
+            ""
         }
-        val withSeconds = if (showSeconds()) "$base:ss" else base
-        val showPeriod = !is24 &&
-            settings.getString(SettingsRepository.KEY_ISLAND_TIME_PERIOD, null) == SettingsRepository.ISLAND_TIME_PERIOD_AM_PM
-        val pattern = if (showPeriod) "$withSeconds a" else withSeconds
-        time = SimpleDateFormat(pattern, Locale.getDefault()).format(Date())
     }
 
     private fun readBattery(intent: Intent?) {
@@ -246,6 +246,7 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
             return
         }
         val timeText = time
+        val dayText = day
         val batteryLevel = level
         val stateColor = stateColor()
         val displayColor = stateColor ?: idleColor()
@@ -264,8 +265,20 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
             priority = IslandPriority.TIME,
             placement = CompactPlacement.Pinned,
             needsCompanyAtCenter = settings.isIslandBatteryIconConditional(),
+            chip = settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_CHIP, false),
             compact = listOf(
-                CompactCell("time") { RollingText(timeText) },
+                CompactCell("time") {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RollingText(timeText)
+                        if (dayText.isNotEmpty()) {
+                            Text(
+                                dayText,
+                                style = IslandTextStyles.compact.copy(fontSize = 8.sp, color = islandTextColor(0.7f)),
+                                modifier = Modifier.padding(start = 2.dp),
+                            )
+                        }
+                    }
+                },
             ),
         )
         val batteryItem = IslandItem(

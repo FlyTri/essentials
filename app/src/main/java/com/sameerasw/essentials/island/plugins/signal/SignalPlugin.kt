@@ -1,5 +1,6 @@
 package com.sameerasw.essentials.island.plugins.signal
 
+import com.sameerasw.essentials.utils.NetworkUtil
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -211,8 +212,8 @@ class SignalPlugin : BaseIslandPlugin() {
             )
             return
         }
-        val caps = connectivity.getNetworkCapabilities(connectivity.activeNetwork)
-        val wifiLevel = if (settings.isIslandSignalWifiEnabled() && caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
+        val caps = NetworkUtil.underlyingWifi(connectivity)
+        val wifiLevel = if (settings.isIslandSignalWifiEnabled() && caps != null) {
             readWifiLevel(caps)
         } else {
             null
@@ -246,9 +247,13 @@ class SignalPlugin : BaseIslandPlugin() {
         val wifi = context.getSystemService(Context.WIFI_SERVICE) as? WifiManager
         var rssi: Int? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) rssi = (caps.transportInfo as? WifiInfo)?.rssi
-        if (rssi == null && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        if (rssi == null || rssi <= -127) {
             @Suppress("DEPRECATION")
-            rssi = wifi?.connectionInfo?.rssi
+            rssi = try {
+                wifi?.connectionInfo?.rssi
+            } catch (_: Exception) {
+                null
+            }
         }
         if (rssi == null || rssi <= -127) return 0
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && wifi != null) {

@@ -351,11 +351,16 @@ sealed interface Action {
         override val isConfigurable: Boolean = true
     }
 
+    enum class CircleToSearchMethod { ACCESSIBILITY, SHIZUKU }
+
     @Keep
-    data object CircleToSearch : Action {
-        override val title: Int = R.string.diy_action_circle_to_search
-        override val icon: Int = R.drawable.rounded_search_24
-        override val permissions: List<String> = listOf("shizuku", "root")
+    data class CircleToSearch(
+        @SerializedName("method") val method: CircleToSearchMethod = CircleToSearchMethod.ACCESSIBILITY,
+    ) : Action {
+        override val title: Int get() = R.string.diy_action_circle_to_search
+        override val icon: Int get() = R.drawable.rounded_search_24
+        override val permissions: List<String> get() =
+            if (method == CircleToSearchMethod.SHIZUKU) listOf("shizuku", "root") else listOf("ACCESSIBILITY")
     }
 
     @Keep
