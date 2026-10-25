@@ -2,7 +2,6 @@ package com.sameerasw.essentials.utils
 
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 
 object NetworkUtil {
     private val nonVpnTransports =
@@ -19,14 +18,6 @@ object NetworkUtil {
         val activeCaps = manager.getNetworkCapabilities(active) ?: return null
         if (!activeCaps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
             return activeCaps.takeIf { it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val underlying = activeCaps.underlyingNetworks
-            if (!underlying.isNullOrEmpty()) {
-                return underlying
-                    .mapNotNull { manager.getNetworkCapabilities(it) }
-                    .firstOrNull { it.isPlainWifi() }
-            }
         }
         val declaresOtherTransport = nonVpnTransports.any { it != NetworkCapabilities.TRANSPORT_WIFI && activeCaps.hasTransport(it) }
         if (declaresOtherTransport && !activeCaps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return null
