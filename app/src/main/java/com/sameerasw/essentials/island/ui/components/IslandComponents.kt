@@ -183,7 +183,7 @@ fun BatteryRing(level: Int, color: Color, modifier: Modifier = Modifier, showLev
 @Composable
 fun BatteryGlyph(level: Int, color: Color, modifier: Modifier = Modifier, showLevel: Boolean = true) {
     val fraction by animateFloatAsState(level.coerceIn(0, 100) / 100f, IslandMotion.float(), label = "batteryFill")
-    val fillColor by animateColorAsState(color, label = "batteryGlyphColor")
+    val fillColor by animateColorAsState(resolveIconTint(color), label = "batteryGlyphColor")
     val onFill = if (fillColor.luminance() > 0.5f) Color.Black else Color.White
     val textStyle = IslandTextStyles.compact.copy(fontSize = 11.sp, lineHeight = 11.sp, fontWeight = FontWeight.Bold)
     val label = level.coerceIn(0, 100).toString()
