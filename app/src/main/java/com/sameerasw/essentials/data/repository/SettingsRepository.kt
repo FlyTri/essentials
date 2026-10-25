@@ -299,6 +299,7 @@ class SettingsRepository(
         const val KEY_CIRCLE_TO_SEARCH_GESTURE_HEIGHT = "circle_to_search_gesture_height"
         const val KEY_CIRCLE_TO_SEARCH_GESTURE_WIDTH = "circle_to_search_gesture_width"
         const val KEY_CIRCLE_TO_SEARCH_PREVIEW_ENABLED = "circle_to_search_preview_enabled"
+        const val KEY_CIRCLE_TO_SEARCH_HIDE_ON_SHADE = "circle_to_search_hide_on_shade"
         const val KEY_AUTO_UPDATE_ENABLED = "auto_update_enabled"
         const val KEY_UPDATE_NOTIFICATION_ENABLED = "update_notification_enabled"
         const val KEY_LAST_UPDATE_CHECK_TIME = "last_update_check_time"
