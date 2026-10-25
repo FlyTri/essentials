@@ -1165,6 +1165,7 @@ fun IslandNotificationSettingsUI(
                 val peekStyle = viewModel.islandNotifPeekStyle.value
                 val fullLabel = stringResource(R.string.island_notif_peek_style_full)
                 val compactLabel = stringResource(R.string.island_notif_peek_style_compact)
+                val expandedLabel = stringResource(R.string.island_notif_peek_style_expanded)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1182,6 +1183,7 @@ fun IslandNotificationSettingsUI(
                         text = stringResource(
                             when (peekStyle) {
                                 SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_COMPACT -> R.string.island_notif_condensed_info_desc
+                                SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_EXPANDED -> R.string.island_notif_peek_style_expanded_desc
                                 else -> R.string.island_notif_peek_style_full_desc
                             },
                         ),
@@ -1193,12 +1195,14 @@ fun IslandNotificationSettingsUI(
                         items = listOf(
                             SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_FULL,
                             SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_COMPACT,
+                            SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_EXPANDED,
                         ),
                         selectedItem = peekStyle,
                         onItemSelected = { viewModel.setIslandNotifPeekStyle(it) },
                         labelProvider = {
                             when (it) {
                                 SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_COMPACT -> compactLabel
+                                SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_EXPANDED -> expandedLabel
                                 else -> fullLabel
                             }
                         },

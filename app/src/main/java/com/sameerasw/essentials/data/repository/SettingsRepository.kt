@@ -688,6 +688,7 @@ class SettingsRepository(
         const val ISLAND_NOTIF_PEEK_STYLE_FULL = "full"
         const val ISLAND_NOTIF_PEEK_STYLE_COMPACT = "compact"
         const val ISLAND_NOTIF_PEEK_STYLE_MINIMAL = "minimal"
+        const val ISLAND_NOTIF_PEEK_STYLE_EXPANDED = "expanded"
         const val KEY_ISLAND_NOTIF_KEEP_PROGRESS = "island_notif_keep_progress"
         const val KEY_ISLAND_NOTIF_QUEUE = "island_notif_queue"
         const val KEY_ISLAND_NOTIF_QUEUE_STYLE = "island_notif_queue_style"
@@ -4489,6 +4490,7 @@ class SettingsRepository(
     fun getIslandNotifPeekStyle(): String =
         when (getString(KEY_ISLAND_NOTIF_PEEK_STYLE, null)) {
             ISLAND_NOTIF_PEEK_STYLE_COMPACT -> ISLAND_NOTIF_PEEK_STYLE_COMPACT
+            ISLAND_NOTIF_PEEK_STYLE_EXPANDED -> ISLAND_NOTIF_PEEK_STYLE_EXPANDED
             null -> if (getBoolean(KEY_ISLAND_NOTIF_CONDENSED_INFO, false)) ISLAND_NOTIF_PEEK_STYLE_COMPACT else ISLAND_NOTIF_PEEK_STYLE_FULL
             else -> ISLAND_NOTIF_PEEK_STYLE_FULL
         }

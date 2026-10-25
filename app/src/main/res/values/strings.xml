@@ -3444,8 +3444,10 @@
     <string name="island_notif_condensed_info_title">Peek style</string>
     <string name="island_notif_condensed_info_desc">App icon and title only. Tap to expand for the content and actions</string>
     <string name="island_notif_peek_style_compact">Compact</string>
-    <string name="island_notif_peek_style_full">Full</string>
+    <string name="island_notif_peek_style_full">Wide</string>
     <string name="island_notif_peek_style_full_desc">Title and message</string>
+    <string name="island_notif_peek_style_expanded">Expanded</string>
+    <string name="island_notif_peek_style_expanded_desc">Opens expanded with the content and actions</string>
     <string name="island_notif_peek_style_search_desc">Full or compact peeks</string>
     <string name="island_notif_show_title">Show notifications</string>
     <string name="island_notif_hub_desc">Replace statusbar notification icons with island</string>

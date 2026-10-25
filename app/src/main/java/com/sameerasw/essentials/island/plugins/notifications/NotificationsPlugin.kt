@@ -415,7 +415,8 @@ class NotificationsPlugin : BaseIslandPlugin() {
         val c = ctx ?: return
         if (minimal()) return
         val otpNeedsExpand = currentAlert()?.let(::isOtp) == true && !settings.isIslandOtpTapToCopyEnabled()
-        val lineAvailable = settings.isIslandLineStageEnabled() && !otpNeedsExpand
+        val lineAvailable = settings.isIslandLineStageEnabled() && !otpNeedsExpand &&
+            peekStyle() != SettingsRepository.ISLAND_NOTIF_PEEK_STYLE_EXPANDED
         markSeen()
         c.request(
             if (lineAvailable) PluginRequest.Peek(ITEM_KEY, timeoutMs(), sticky = true)
