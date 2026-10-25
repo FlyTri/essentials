@@ -111,7 +111,7 @@ object SideBubblePriority {
 
 object IslandChips {
     val items = setOf(
-        "media", "calendar", "timer", "alarm", "caffeinate", "flashlight", "sound_mode", "devices", "travel", "navigation",
+        "media", "calendar", "timer", "alarm", "caffeinate", "flashlight", "sound_mode", "devices", "travel", "navigation", "call",
     )
 }
 

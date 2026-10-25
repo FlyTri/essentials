@@ -219,7 +219,7 @@ fun CompactTemplate(
                                     modifier = Modifier
                                         .height(spec.cellSize)
                                         .then(
-                                            if (member.cell.key.endsWith(".art")) {
+                                            if (member.cell.key.endsWith(".art") || member.cell.key.endsWith(".avatar")) {
                                                 Modifier
                                             } else {
                                                 Modifier.defaultMinSize(minWidth = spec.cellSize).padding(horizontal = 4.dp)
