@@ -40,6 +40,7 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
         SettingsRepository.KEY_ISLAND_TIME_PERIOD,
         SettingsRepository.KEY_ISLAND_TIME_LEADING_ZERO,
         SettingsRepository.KEY_ISLAND_TIME_HIDE_LOCKED,
+        SettingsRepository.KEY_ISLAND_TIME_CHIP,
         SettingsRepository.KEY_ISLAND_BATTERY_HIDE_LOCKED,
         SettingsRepository.KEY_ISLAND_SHOW_BATTERY,
         SettingsRepository.KEY_ISLAND_BATTERY_STYLE,
@@ -264,6 +265,7 @@ class TimeBatteryPlugin : BaseIslandPlugin() {
             priority = IslandPriority.TIME,
             placement = CompactPlacement.Pinned,
             needsCompanyAtCenter = settings.isIslandBatteryIconConditional(),
+            chip = settings.getBoolean(SettingsRepository.KEY_ISLAND_TIME_CHIP, false),
             compact = listOf(
                 CompactCell("time") { RollingText(timeText) },
             ),

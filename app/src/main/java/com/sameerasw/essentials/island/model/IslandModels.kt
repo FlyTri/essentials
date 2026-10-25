@@ -150,6 +150,8 @@ class IslandItem(
     val stack: List<StackIcon> = emptyList(),
     val queued: List<StackIcon>? = null,
     val priorityGroup: String? = null,
+    // Rendered inside a colored chip when Island chips is enabled.
+    val chip: Boolean = key in IslandChips.items,
 ) {
     var userPriority: Int? = null
 
@@ -178,6 +180,7 @@ class IslandItem(
         stack = stack,
         queued = queued,
         priorityGroup = priorityGroup,
+        chip = chip,
     ).also { it.userPriority = userPriority }
 
     val effectivePriority: Int get() = priorityOverride ?: userPriority ?: priority

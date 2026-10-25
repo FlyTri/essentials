@@ -142,6 +142,13 @@ fun IslandTimeOptionsBottomSheet(
                         settings.putBoolean(SettingsRepository.KEY_ISLAND_TIME_SHOW_SECONDS, it)
                     },
                 )
+                if (settings.getBoolean(SettingsRepository.KEY_ISLAND_CHIPS, false)) {
+                    IslandPrefToggle(
+                        settingKey = SettingsRepository.KEY_ISLAND_TIME_CHIP,
+                        iconRes = R.drawable.rounded_palette_24,
+                        title = stringResource(R.string.island_time_chip_title),
+                    )
+                }
             }
             IslandLauncherOnlyToggle(SettingsRepository.KEY_ISLAND_TIME_BATTERY_LAUNCHER_ONLY)
             if (rememberIslandShowsWhileLocked()) {

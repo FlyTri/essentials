@@ -58,7 +58,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import com.sameerasw.essentials.island.model.CompactCell
-import com.sameerasw.essentials.island.model.IslandChips
 import com.sameerasw.essentials.island.state.IslandUiState
 
 @Composable
@@ -121,7 +120,7 @@ fun CompactTemplate(
         state.items.values.forEach { item -> item.compact.forEach { put(it.key, item.key to it) } }
     }
     fun chipColorOf(itemKey: String): Color? =
-        if (spec.chips && itemKey in IslandChips.items) state.items[itemKey]?.let { it.accent ?: iconColor ?: primary } else null
+        state.items[itemKey]?.takeIf { spec.chips && it.chip }?.let { it.accent ?: iconColor ?: primary }
 
     fun group(keys: List<String>, before: Boolean): List<SlotUnit> {
         val units = mutableListOf<MutableList<CellEntry>>()
