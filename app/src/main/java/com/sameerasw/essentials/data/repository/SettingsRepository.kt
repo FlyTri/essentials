@@ -95,7 +95,7 @@ class SettingsRepository(
                     "Cycle sound modes" -> Action.CycleSoundModes
                     "Toggle media volume" -> Action.ToggleMediaVolume
                     "Like current song" -> Action.LikeCurrentSong
-                    "Circle to Search" -> Action.CircleToSearch
+                    "Circle to Search" -> Action.CircleToSearch()
                     else -> null
                 }
             setRemapAction(key, action)
