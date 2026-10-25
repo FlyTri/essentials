@@ -131,6 +131,9 @@ val LocalIslandChipInk = compositionLocalOf<Color?> { null }
 val LocalIslandIconColor = compositionLocalOf<Color?> { null }
 
 @Composable
+fun islandAccent(): Color = LocalIslandIconColor.current ?: MaterialTheme.colorScheme.primary
+
+@Composable
 fun resolveIconTint(tint: Color): Color {
     val override = LocalIslandIconColor.current ?: return tint
     if (tint.red == 0f && tint.green == 0f && tint.blue == 0f) return tint

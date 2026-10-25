@@ -70,7 +70,7 @@ fun SlideFeedbackCompact(feedback: SlideFeedback, spec: IslandLayoutSpec) {
                 modifier = Modifier.defaultMinSize(minWidth = spec.cellSize),
                 contentAlignment = Alignment.Center,
             ) {
-                IslandIcon(feedback.iconRes(), tint = MaterialTheme.colorScheme.primary)
+                IslandIcon(feedback.iconRes(), tint = islandAccent())
             }
         },
     ) { measurables, constraints ->

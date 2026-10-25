@@ -1,5 +1,7 @@
 package com.sameerasw.essentials.island.plugins.brief
 
+import com.sameerasw.essentials.island.ui.components.islandAccent
+
 import com.sameerasw.essentials.island.ui.motionSpring
 
 import com.sameerasw.essentials.island.ui.motionTween
@@ -296,7 +298,7 @@ private fun BriefBackground(
         label = "briefArt",
     )
     val event = (page as? BriefPage.Event)?.event
-    val glowColor = event?.calendarColor?.let { Color(soften(it)) } ?: MaterialTheme.colorScheme.primary
+    val glowColor = event?.calendarColor?.let { Color(soften(it)) } ?: islandAccent()
     val glowAlpha by animateFloatAsState(if (event != null) 1f else 0f, motionTween(400), label = "briefGlow")
     Box(modifier) {
         if (artAlpha > 0f) {
@@ -419,7 +421,7 @@ private fun BriefOverview(
     val context = LocalContext.current
     val spec = scope.spec
     val sidePadding = spec.expandedPadding * 0.6f + spec.expandedCorner * 0.25f
-    val accent = MaterialTheme.colorScheme.primary
+    val accent = islandAccent()
     val cardsByPackage by RemoteBriefCards.cards.collectAsState()
     val remoteCards = remember(cardsByPackage) { cardsByPackage.values.flatten() }
 

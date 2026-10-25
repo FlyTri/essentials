@@ -1,5 +1,7 @@
 package com.sameerasw.essentials.island.plugins.progress
 
+import com.sameerasw.essentials.island.ui.components.islandAccent
+
 import com.sameerasw.essentials.island.ui.motionTween
 
 import androidx.compose.animation.core.LinearEasing
@@ -101,7 +103,7 @@ class ProgressPlugin : BaseIslandPlugin() {
                 placement = CompactPlacement.Dynamic,
                 compact = listOf(
                     CompactCell("progress.ring") {
-                        ProgressRing(progress, indeterminate, image, MaterialTheme.colorScheme.primary)
+                        ProgressRing(progress, indeterminate, image, islandAccent())
                     },
                 ),
                 expanded = ExpandedContent { scope ->
@@ -111,7 +113,7 @@ class ProgressPlugin : BaseIslandPlugin() {
                         text = d.text,
                         progress = progress,
                         indeterminate = indeterminate,
-                        accent = MaterialTheme.colorScheme.primary,
+                        accent = islandAccent(),
                         actions = d.actions,
                         onAction = { action ->
                             IslandHaptics.button(context)
@@ -128,7 +130,7 @@ class ProgressPlugin : BaseIslandPlugin() {
                     whenOccupiedOnly = true,
                     onOpen = { ctx?.request?.invoke(PluginRequest.Expand(ITEM_KEY)) },
                     content = { bubbleSize ->
-                        ProgressRing(progress, indeterminate, image, MaterialTheme.colorScheme.primary, bubbleSize)
+                        ProgressRing(progress, indeterminate, image, islandAccent(), bubbleSize)
                     },
                 ),
             ),

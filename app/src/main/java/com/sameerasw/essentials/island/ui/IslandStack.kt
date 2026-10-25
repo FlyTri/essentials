@@ -1,5 +1,7 @@
 package com.sameerasw.essentials.island.ui
 
+import com.sameerasw.essentials.island.ui.components.islandAccent
+
 import com.sameerasw.essentials.island.model.SideBubble
 import androidx.compose.ui.graphics.lerp
 import com.sameerasw.essentials.island.ui.components.LocalIslandIconColor
@@ -295,7 +297,7 @@ fun IslandStackOverlap(
                             .offset { IntOffset(x.value.roundToPx(), 0) }
                             .liquid(entryLiquid),
                     ) {
-                        val ringColor = MaterialTheme.colorScheme.primary
+                        val ringColor = islandAccent()
                         val ringAlpha by animateFloatAsState(if (entry.icon.highlight) 1f else 0f, IslandMotion.expressiveDefaultEffects(), label = "overlapRing")
                         Box(
                             Modifier
@@ -341,7 +343,7 @@ fun IslandStackPill(
     bond: LiquidBond? = null,
     onInteraction: () -> Unit = {},
 ) {
-    val ring = MaterialTheme.colorScheme.primary
+    val ring = islandAccent()
     val liquid = rememberLiquidBody(bond = bond)
     val itemWidth = iconSize + 8.dp
     val spacing = 2.dp

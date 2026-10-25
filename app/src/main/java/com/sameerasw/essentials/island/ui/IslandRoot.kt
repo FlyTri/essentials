@@ -1329,7 +1329,7 @@ private fun IslandRootContent(
             }
         }
         if (showCameraRing) {
-            val ringColor = MaterialTheme.colorScheme.primary
+            val ringColor = com.sameerasw.essentials.island.ui.components.islandAccent()
             Canvas(Modifier.fillMaxSize()) {
                 val stroke = 2.dp.toPx()
                 val radius = spec.compactHeight.toPx() / 2f
