@@ -549,6 +549,18 @@ fun IslandVisualsSettingsUI(
                 },
             )
 
+            var themedAppIcons by remember { mutableStateOf(iconSettings.getBoolean(SettingsRepository.KEY_ISLAND_THEMED_APP_ICONS, false)) }
+            IconToggleItem(
+                iconRes = R.drawable.rounded_apps_24,
+                title = stringResource(R.string.island_themed_app_icons_title),
+                isChecked = themedAppIcons,
+                onCheckedChange = { checked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    themedAppIcons = checked
+                    iconSettings.putBoolean(SettingsRepository.KEY_ISLAND_THEMED_APP_ICONS, checked)
+                },
+            )
+
             var chips by remember { mutableStateOf(iconSettings.getBoolean(SettingsRepository.KEY_ISLAND_CHIPS, false)) }
             IconToggleItem(
                 iconRes = R.drawable.rounded_palette_24,

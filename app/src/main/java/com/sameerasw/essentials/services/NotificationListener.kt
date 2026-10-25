@@ -9,6 +9,7 @@
 
 package com.sameerasw.essentials.services
 
+import com.sameerasw.essentials.utils.AppIconUtil
 import android.graphics.drawable.Icon
 import android.content.pm.LauncherApps
 import com.sameerasw.essentials.domain.controller.HilightController
@@ -1897,7 +1898,7 @@ class NotificationListener : NotificationListenerService() {
 
         if (bitmap == null) {
             try {
-                val appIconDrawable = packageManager.getApplicationIcon(sbn.packageName)
+                val appIconDrawable = AppIconUtil.islandAppIcon(this, sbn.packageName)
                 bitmap = AppUtil.drawableToBitmap(appIconDrawable)
             } catch (_: Exception) {}
         }
@@ -2298,7 +2299,7 @@ class NotificationListener : NotificationListenerService() {
 
         var appIcon: Bitmap? = null
         try {
-            val appIconDrawable = packageManager.getApplicationIcon(sbn.packageName)
+            val appIconDrawable = AppIconUtil.islandAppIcon(this, sbn.packageName)
             appIcon = AppUtil.drawableToBitmap(appIconDrawable)
         } catch (_: Exception) {}
 
